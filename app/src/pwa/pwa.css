@@ -1,0 +1,42 @@
+#pwa-toast {
+  border-radius: 4px;
+  border: 1px solid #8885;
+  bottom: 0;
+  box-shadow: 3px 4px 5px 0 #8885;
+  display: grid;
+  margin: 16px;
+  padding: 12px;
+  position: fixed;
+  right: 0;
+  text-align: left;
+  visibility: hidden;
+  z-index: 1;
+}
+
+#pwa-toast .message {
+  margin-bottom: 8px;
+}
+
+#pwa-toast .buttons {
+  display: flex;
+}
+
+#pwa-toast button {
+  border-radius: 2px;
+  border: 1px solid #8885;
+  margin-right: 5px;
+  outline: none;
+  padding: 3px 10px;
+}
+
+#pwa-toast.show {
+  visibility: visible;
+}
+
+button#pwa-refresh {
+  display: none;
+}
+
+#pwa-toast.show.refresh button#pwa-refresh {
+  display: block;
+}

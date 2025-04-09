@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grid-Map</title>
+  <script type="module" src="/src/app.ts"></script>
+
+  <style>
+    html,
+    body {
+      -webkit-user-select: none;
+      border: 0;
+      height: 100%;
+      margin: 0;
+      user-select: none;
+      width: 100%;
+    }
+
+    body {
+      background-color: #000;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      font-family: monospace;
+      font-weight: 300;
+    }
+
+    h1 {
+      margin: 8px 10px;
+      font-family: monospace;
+      font-weight: 300;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <h1>Map</h1>
+
+  <app-main />
+
+  <!-- PWA -->
+  <div id="pwa-toast" role="alert" aria-labelledby="toast-message">
+    <div class="message">
+      <span id="toast-message"></span>
+    </div>
+    <div class="buttons">
+      <button id="pwa-refresh" type="button">
+        Reload
+      </button>
+      <button id="pwa-close" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+
+</body>
+
+</html>
