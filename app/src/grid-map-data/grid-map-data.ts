@@ -324,12 +324,22 @@ export default class GridMapData extends GridBase {
   SetWalkableStart() {
     
     if(!this.MapData) return
+
+    let maxAttempt:number = 100
     
     // TODO: come up with a way to pick something close to the middle if possible
-    while(this.GetTopMostMapData(this.MapData.Start)?.CanWalk == false) {
-      this.MapData.Start.x = Math.floor(Math.random() * this.MapData.MapDataSize.x)
-      this.MapData.Start.y = Math.floor(Math.random() * this.MapData.MapDataSize.y)
+    while(this.GetTopMostMapData(this.MapData.Start)?.CanWalk == false && maxAttempt > 0) {
+      this.MapData.Start.x = this.RandomRange(2, this.MapData.MapDataSize.x - 2)
+      this.MapData.Start.y = this.RandomRange(2, this.MapData.MapDataSize.y - 2)
+      maxAttempt --
     }
+  }
+
+  
+  RandomRange(min: number, max:number) {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min + 1)) + min
   }
 
 
