@@ -463,7 +463,7 @@ export default class GridMapDisplay extends GridBase {
 
     // in normal state move
     if (this.State == 'normal') {
-      this.CursorMove(coord, true)
+      this.CursorMove(coord, false)
       return
     }
 

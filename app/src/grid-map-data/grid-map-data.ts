@@ -314,8 +314,22 @@ export default class GridMapData extends GridBase {
       }
     )
 
+    this.SetWalkableStart()
+
     this.SendLoaded()
 
+  }
+
+  /** Set Start to a walkable location */
+  SetWalkableStart() {
+    
+    if(!this.MapData) return
+    
+    // TODO: come up with a way to pick something close to the middle if possible
+    while(this.GetTopMostMapData(this.MapData.Start)?.CanWalk == false) {
+      this.MapData.Start.x = Math.floor(Math.random() * this.MapData.MapDataSize.x)
+      this.MapData.Start.y = Math.floor(Math.random() * this.MapData.MapDataSize.y)
+    }
   }
 
 
