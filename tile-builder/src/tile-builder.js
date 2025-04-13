@@ -139,9 +139,6 @@ class TileBuilder {
         files.forEach(
           (fileName) => {
 
-            // 0000 is empty - do not process
-            if (fileName == '0000.svg') return
-
             console.log(`processing ${srcFolder.FolderName} - ${fileName}`)
 
             const filePath = join(srcFolder.Path, fileName)
@@ -155,8 +152,11 @@ class TileBuilder {
 
             // <g class="frame-children"> is where PenPot puts the guts
             const frameChildren = this.FindParentObject(xmlDoc, 'class', 'frame-children')
-            const processedChildren = this.ProcessFrameChildren(frameChildren)
-            const output = js2xml(processedChildren, { compact: true, spaces: 0 })
+            let output = ''
+            if(frameChildren != null) {
+              const processedChildren = this.ProcessFrameChildren(frameChildren)
+              output = js2xml(processedChildren, { compact: true, spaces: 0 })
+            }
             const gWrapper = `<g class="frame-children">${output}</g>`
             const outputFilePath = join(outputFolderPath, fileName)
             writeFileSync(outputFilePath, gWrapper)
