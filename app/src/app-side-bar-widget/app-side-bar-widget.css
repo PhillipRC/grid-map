@@ -1,0 +1,10 @@
+:host {
+  z-index: 10000;
+  min-width: 310px;
+  display: inline-block;
+}
+
+.console-display {
+  margin-right: 0;
+  padding: 10px;
+}

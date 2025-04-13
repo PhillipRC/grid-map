@@ -1,0 +1,25 @@
+<svg width="102" xmlns="http://www.w3.org/2000/svg" height="16" fill="none">
+
+<g class="frame-children">
+  <path d="M2.000,0.000L100.000,0.000C100.000,0.000,101.992,12.223,99.695,13.650C93.703,17.373,6.320,16.132,1.826,13.650C-0.522,12.354,2.000,0.000,2.000,0.000Z" style="fill: rgb(0, 0, 0); fill-opacity: 1;" class="fills"/>
+  
+  <defs>
+    <radialGradient id="b" cx=".499" cy=".123" r=".877" gradientTransform="matrix(-0.718918, 0.000992, -0.001381, -0.999999, 0.857548, 0.245651)">
+      <stop offset="0" stop-color="#1daf27"/><stop offset="1" stop-color="#133d14"/>
+    </radialGradient>
+    <pattern patternUnits="userSpaceOnUse" x="3.716" y="2.5" width="94.819" height="11" patternTransform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" id="c">
+      <rect width="94.819" height="11" style="fill: url(&quot;#b&quot;);"/>
+    </pattern>
+
+    <radialGradient id="d" cx=".499" cy=".123" r=".877" gradientTransform="matrix(-0.718918, 0.000992, -0.001381, -0.999999, 0.857548, 0.245651)">
+      <stop offset="0" stop-color="#197c20"/><stop offset="1" stop-color="#133d14"/>
+    </radialGradient>
+    <pattern patternUnits="userSpaceOnUse" x="3.716" y="2.5" width="94.819" height="11" patternTransform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" id="c">
+      <rect width="94.819" height="11" style="fill: url(&quot;#e&quot;);"/>
+    </pattern>
+  </defs>
+  
+  <path d="M4.500,2.500L97.500,2.500C97.500,2.500,99.677,8.846,97.716,10.990C94.275,14.753,7.823,13.893,4.514,10.990C2.727,9.423,4.500,2.500,4.500,2.500Z" class="fills"/>
+</g>
+
+</svg>

@@ -1,0 +1,63 @@
+<div id="tile-layer-##layer_idx##">
+
+  <div class="row">
+    <label for="tile-set-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##">Tile ##layer_idx##</label>
+    <select id="tile-set-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##" name="tileset"></select>
+  </div>
+
+  <div class="row">
+    <label for="color-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##">&nbsp;&nbsp;Color</label>
+    <input
+      class="console-font"
+      id="color-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##"
+      name="Color"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      title="000000 to FFFFFF"
+      type="color"
+      value="##color_value##"
+    />
+  </div>
+
+  <div class="row">
+    <label for="can-walk-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##" title="Allowing Walking on the Tile">&nbsp;&nbsp;Can Walk</label>
+    <select id="can-walk-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##" name="CanWalk">
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label for="cut-off-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##" title="Minimum value where the tile is rendered">&nbsp;&nbsp;Cutoff</label>
+    <input
+      class="console-font"
+      id="cut-off-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##"
+      max="1"
+      min="-1"
+      name="Cutoff"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      step=".01"
+      title="-1 to 1"
+      type="number"
+      value="##cutoff_value##"
+    />
+  </div>
+
+  <div class="row">
+    <label for="cut-off-cap-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##" title="Minimum value where the tile is rendered">&nbsp;&nbsp;Cutoff Cap</label>
+    <input
+      class="console-font"
+      id="cut-off-cap-tile-layer-##layer_idx##-noise-layer-##noise_layer_idx##"
+      max="1"
+      min="-1"
+      name="CutoffCap"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      step=".01"
+      title="-1 to 1"
+      type="number"
+      value="##cutoffcap_value##"
+    />
+  </div>
+
+</div>

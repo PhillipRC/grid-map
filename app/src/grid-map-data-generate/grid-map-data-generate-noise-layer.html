@@ -1,0 +1,86 @@
+<div id="noise-layer-##layer_idx##">
+
+  <hr/>
+
+  <div class="row">
+    <label
+      for="seed-##layer_idx##"
+      title="The initial number feeding the algorithm - 0 chooses a random number"
+      >
+      Seed
+    </label>
+    <input
+      autocomplete="off"
+      class="console-font"
+      id="seed-##layer_idx##"
+      max="65536"
+      min="0"
+      name="seed"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      title="0 to 65536"
+      type="number"
+      value="##noise_seed##"
+      />
+  </div>
+
+  <div class="row">
+    <label for="zoom-##layer_idx##" title="Generate a layer of Perlin noise with values from -1 to 1">
+      Zoom 
+    </label>
+    <input
+      autocomplete="off"
+      class="console-font"
+      id="zoom-##layer_idx##"
+      min=".1"
+      name="zoom"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      step=".1"
+      type="number"
+      value="##noise_zoom##"
+      />
+  </div>
+
+  <div class="row">
+    <label for="octaves-##layer_idx##" title="Number of Perlin noise layers with values from -1 to 1">
+      Octaves
+    </label>
+    <input
+      autocomplete="off"
+      class="console-font"
+      id="octaves-##layer_idx##"
+      max="10"
+      min="1"
+      name="octaves"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      step="1"
+      type="number"
+      value="##noise_octaves##"
+      />
+  </div>
+
+  <div class="row">
+    <label for="persistence-##layer_idx##" title="Intensity of subsequent noise layers with values from 0 to 1">
+      &nbsp;&nbsp;Persistence
+    </label>
+    <input
+      autocomplete="off"
+      class="console-font"
+      id="persistence-##layer_idx##"
+      max="10"
+      min="0"
+      name="persistence"
+      onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
+      step=".01"
+      type="number"
+      value="##noise_persistence##"
+      />
+  </div>
+
+  
+
+  <div class="tileset-layers">
+  </div>
+
+</div>

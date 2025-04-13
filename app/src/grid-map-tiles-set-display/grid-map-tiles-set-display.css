@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  user-select: none;
+}
+
+.tileset {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  margin: 5px;
+  padding: 5px;
+  position: relative;
+  transition: all .2s;
+}
+
+.tileset-display {
+  flex-grow: 1;
+  text-align: right;
+  zoom: .25;
+}
+
+.tileset-name {
+  text-shadow: 0 0 4px black;
+}
+
+.tileset:hover,
+.tileset:focus-visible {
+  background-color: rgba(255,255,0,.1);
+}
+
+.fills, .fills-o {
+  fill: #339933;
+}
+.fills-o {
+  fill-opacity: .5;
+}
+
+.fills-1 {
+  fill: #116611;
+}
+
+.fills-2 {
+  fill: #003300;
+}

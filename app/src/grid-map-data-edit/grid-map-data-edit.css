@@ -1,0 +1,27 @@
+.pointer-select-option,
+.pointer-remove-option,
+.pointer-add-option {
+  align-items: anchor-center;
+  display: flex;
+  height: initial;
+  justify-content: center;
+  max-height: 48px;
+  max-width: 48px;
+  padding: 5px;
+}
+
+button {
+  height: 48px;
+  width: 48px;
+}
+
+grid-map-pointer {
+  scale: .5;
+}
+
+.console-display .container .sub-buttons button {
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 5px;
+  margin-top: 5px;
+}

@@ -1,0 +1,210 @@
+.console-font {
+  color: limegreen;
+  font-family: monospace;
+  font-size: 13.3333px;
+  font-weight: 300;
+  line-height: 20px;
+}
+
+
+/* Wrapper */
+.console-display.console-wrapper {
+  background-color: #020;
+  background-image: url("images/console-bg.svg");
+  border-radius: 10px;
+  box-shadow: 0px 0px 40px 8px #004000 inset;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 20px;
+  padding: 10px;
+}
+
+.console-display .row {
+  display: flex;
+}
+
+.console-display .row >  * {
+  flex-grow: 1;
+}
+
+.console-display .console-header {
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  margin: -10px;
+  padding: 10px;
+  position: relative;
+}
+
+.console-display .console-header:hover,
+.console-display .console-header:focus-visible {
+  background: linear-gradient(180deg, rgba(255,255,0,0.15) 0%, rgba(255,255,0,0) 70%);
+}
+
+
+.console-display hr {
+  border-style: solid;
+  border-top: 0;
+  border-width: 1px;
+  color: limegreen;
+  width: 100%;
+}
+
+.console-display label {
+  align-self: center;
+}
+
+
+/* Textarea */
+.console-display textarea {
+  background-color: transparent;
+  border: 0;
+  caret-color: var(--yellow);
+  color: limegreen;
+  flex-grow: 1;
+  font-family: monospace;
+  font-weight: 300;
+  line-height: 20px;
+  margin: 0;
+  padding: 0;
+  resize: none;
+}
+
+.console-display textarea::selection {
+  background-color: limegreen;
+  color: black;
+}
+
+
+/* Input */
+.console-display input {
+  background: transparent;
+  border-bottom-color: var(--yellow);
+  border-bottom-style: dashed;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  caret-color: var(--yellow);
+  margin-right: 2px;
+  max-width: 100px;
+  min-width: 100px;
+  transition: all .2s;
+}
+
+.console-display input::selection {
+  background-color: limegreen;
+  color: black;
+}
+
+.console-display input::selection {
+  background-color: limegreen;
+  color: black;
+}
+
+.console-display input[type=number]::-webkit-inner-spin-button, 
+.console-display input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+}
+
+.console-display input[type=number]::-webkit-inner-spin-button, 
+.console-display input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+}
+
+
+/* Select */
+.console-display select {
+  background-color: transparent;
+  border-bottom-color: var(--yellow);
+  border-bottom-width: 0;
+  border-left: none;
+  border-radius: 0;
+  border-right: none;
+  border-top: none;
+  color: limegreen;
+  height: 24px;
+  max-width: 104px;
+  min-width: 104px;
+}
+
+.console-display option {
+  background-color: #003000;
+}
+
+.console-display select:hover,
+.console-display input:hover {
+  background-color: rgba(255,255,0,.2);
+}
+
+
+/* Button */
+.console-display .button {
+  background-color: rgba(255,255,0,.1);
+  border-radius: 10px;
+  border: none;
+  height: 32px;
+  text-shadow: 0 0 3px black;
+  transition: all .2s;
+}
+
+.console-display .button.full {
+  width: 100%;
+}
+
+.console-display .button:hover {
+  background-color: rgba(255,255,0,.2);
+}
+
+.console-display .button.disabled,
+.console-display .button:active {
+  background-color: rgba(0,0,0,.4);
+  color: white;
+}
+
+.console-display .sub-buttons .button {
+  height: 22px;
+  margin: 10px;
+}
+
+
+/* Tabs */
+.console-display grid-map-form-tile-layers .button:not([selected="true"]) {
+  background-color: rgba(0,0,0,.4);
+}
+grid-map-form-tile-layers .tab[slot="tab"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 32px;
+}
+
+grid-map-form-tile-layers div[slot="panel"] {
+  background-color: rgba(255, 255, 0, 0.11);
+  border-radius: 5px;
+  margin: 0;
+  padding: 10px;
+}
+
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,255,0,.1);
+  border-radius: 6px;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(0,255,0,.55);
+}

@@ -1,0 +1,20 @@
+<div class="container">
+
+  <div class="sidebar-toggle-bar">
+    <app-ui-svg 
+      class="sidebar-toggle-option"
+      data-svg-name="EdgeOption"
+      data-title="Toggle Edit"
+      >
+    </app-ui-svg>
+  </div>
+
+  <div class="scroll-container">
+  
+    <animated-collapse class="slot-container" direction="horizontal">
+      <slot></slot>
+    </animated-collapse>
+  
+  </div>
+
+</div>

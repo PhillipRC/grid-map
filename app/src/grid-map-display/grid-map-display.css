@@ -1,0 +1,72 @@
+:host {
+  background-color: #333;
+  background-image: url("images/out-of-bounds.png");
+  border-color: #333;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  display: grid;
+  flex-grow: 1;
+  margin: 10px 10px 10px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 900;
+}
+
+.container {
+  display: grid;
+  overflow: hidden;
+}
+
+svg {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+svg[id="layer-0"] {
+  background-image: url("images/water.png");
+  z-index: 1;
+}
+
+.edit-tools-panel {
+  background-color: rgba(0, 0, 0, .2);
+  border-bottom-right-radius: 10px;
+  font-family: monospace;
+  padding: 8px 12px;
+  position: absolute;
+  text-shadow: 0 0 4px black;
+  z-index: 4000;
+}
+
+.debug {
+  font-family: monospace;
+  text-shadow: 0 0 4px black;
+}
+
+.reticle {
+  position: absolute;
+}
+.reticle img {
+  -webkit-user-drag: none;
+  left: -32px;
+  position: relative;
+  top: -68px;
+  width: 128px;
+  z-index: 3000;
+}
+
+.welcome {
+  background-color: rgba(0,0,0,.2);
+  border-radius: 4px;
+  margin: 0;
+  padding: 20px;
+  position: absolute;
+  z-index: 2000;
+}
+
+.layer-pointer {
+  position: absolute;
+  margin-left: -1px;
+  margin-top: -1px;
+  z-index: 2000;
+}

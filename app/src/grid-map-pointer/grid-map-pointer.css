@@ -1,0 +1,83 @@
+.container {
+  background-color: rgb(0, 0, 0, .1);
+  border-radius: 10px;
+  display: grid;
+}
+
+.container.type-0 {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+svg {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* none */
+.type-0  {
+  .fills {
+    fill-opacity: 0;
+  }
+  
+  .pointer-label-text {
+    display: none;
+  }
+}
+
+.pointer-label-text {
+  position: absolute;
+  left: 72px;
+  background-color: RGBA(0,0,0,.5);
+  padding: 4px;
+  border-radius: 4px;
+  min-width: 120px;
+}
+
+/* add */
+.container.type-1 {
+  background-color: rgb(0, 255, 0, .2);
+  border-style: dashed;
+  border-color: limegreen;
+  box-shadow: none;
+}
+
+.type-1 .icon {
+  fill: rgba(255, 255, 255, 1);
+  filter: drop-shadow( 0 0 2px rgba(0, 0, 0, .7));
+}
+
+/* remove */
+.container.type-2 {
+  background-color: rgb(255, 0, 0, .2);
+  box-shadow: none;
+  border-style: dashed;
+  border-color: rgb(255,0,0);
+}
+.type-2 .icon {
+  fill: rgba(255, 255, 255, 1);
+  filter: drop-shadow( 0 0 2px rgba(0, 0, 0, .7));
+}
+
+/* select */
+.container.type-3 {
+  background-color: rgb(0, 0, 0, .2);
+  box-shadow: none;
+  border-style: dashed;
+  border-color: rgb(255,255,255);
+}
+.type-3 .icon {
+  fill: rgba(255, 255, 255, 1);
+  filter: drop-shadow( 0 0 2px rgba(0, 0, 0, .7));
+}
+
+.type-1 .circle,
+.type-2 .circle,
+.type-3 .circle {
+  fill: rgba(255, 255, 255, 1);
+  filter: drop-shadow( 0 0 2px rgba(0, 0, 0, .7));
+}
+
+svg[hidden="true"] {
+  display: none;
+}

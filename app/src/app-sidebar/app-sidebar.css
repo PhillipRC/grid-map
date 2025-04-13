@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  height: 100%;
+}
+
+slot {
+  flex-grow: 1;
+}
+
+.sidebar-toggle-bar {
+  flex-shrink: 1;
+}
+
+.sidebar-container {
+  min-width: 350px;
+  width: 350px;
+}
+
+.sidebar grid-map-tiles {
+  display: inline-block;
+}
+
+.sidebar-toggle-bar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  pointer-events: none;
+  position: relative;
+}
+
+.sidebar-toggle-option {
+  display: block;
+  pointer-events: all;
+  position: absolute;
+  transition: all .2s;
+  z-index: 1000;
+  transform: rotate(90deg);
+  left: -60px;
+}
+
+.sidebar-toggle-option {
+  .fills-a ~ defs stop {
+    transition: .2s;
+  }  
+}
+
+:host([expanded]) .sidebar-toggle-option {
+  .fills-a~defs stop:first-child {
+    stop-color: #1daf27;
+  }
+
+  .fills-a~defs stop:last-child {
+    stop-color: #133d14;
+  }
+}
+
+/* 1daf27 and 133d14 */
+/* 197c20 and 133d14 */
+.sidebar-toggle-option:hover,
+:host([expanded]) .sidebar-toggle-option:hover {
+  .fills-a~defs stop:first-child {
+    stop-color: #7eaf1c;
+  }
+
+  .fills-a~defs stop:last-child {
+    stop-color: #133d14;
+  }
+}
+
+/* TODO: scrollbar-gutter:stable only when animated-collapse[expanded] */
+.scroll-container {
+  overflow-y: scroll;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0,255,0,.1);
+  border-radius: 6px;
+}
+
+.scroll-container:hover::-webkit-scrollbar-thumb {
+  background: rgba(0,255,0,.55);
+}

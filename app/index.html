@@ -8,6 +8,9 @@
   <script type="module" src="/src/app.ts"></script>
 
   <style>
+    :root {
+      --yellow: #AA0
+    }
     html,
     body {
       -webkit-user-select: none;
@@ -26,21 +29,13 @@
       font-family: monospace;
       font-weight: 300;
     }
-
-    h1 {
-      margin: 8px 10px;
-      font-family: monospace;
-      font-weight: 300;
-    }
   </style>
 
 </head>
 
 <body>
 
-  <h1>Map</h1>
-
-  <app-main />
+  <app-main></app-main>
 
   <!-- PWA -->
   <div id="pwa-toast" role="alert" aria-labelledby="toast-message">

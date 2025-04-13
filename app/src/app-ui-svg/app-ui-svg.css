@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+lion-button {
+  background-color: transparent;
+  padding: 0;
+}

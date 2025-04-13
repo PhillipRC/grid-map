@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.main,
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.main {
+  flex-grow: 1;
+  margin-left: 10px;
+}
+
+.sidebar {
+  flex-shrink: 1;
+  height: 100%;
+}
+
+/* add spacing between items in sidebar */
+.sidebar * {
+  margin-top: 10px;
+  margin-right: 4px;
+}
+
+.sidebar *:last-child {
+  margin-bottom: 10px;
+}
+

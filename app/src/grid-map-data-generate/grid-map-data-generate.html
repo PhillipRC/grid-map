@@ -1,0 +1,133 @@
+<div>
+
+  <form
+    autocomplete="off"
+    class="generate-form"
+    >
+
+    <div class="row">
+      <label
+        for="width"
+        title="Horizontal size"
+        >
+        Width
+      </label>
+      <input
+        autocomplete="off"
+        class="console-font"
+        id="width"
+        max="4000"
+        min="5"
+        name="width"
+        onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+        title="5 to 4000"
+        type="number"
+        value="5"
+      />
+    </div>
+
+    <div class="row">
+      <label
+        for="height"
+        title="Vertical size"
+        >
+        Height
+      </label>
+      <input
+        autocomplete="off"
+        class="console-font"
+        id="height"
+        max="4000"
+        min="5"
+        name="height"
+        onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
+        title="5 to 4000"
+        type="number"
+        value="5"
+      />
+    </div>
+
+    <div class="row">
+      <label
+        for="startx"
+        title="Horizontal starting location"
+        >
+        Start X
+      </label>
+      <input
+        autocomplete="off"
+        class="console-font"
+        id="startx"
+        name="startx"
+        type="number"
+        value="1"
+        />
+    </div>
+
+    <div class="row">
+      <label
+        for="starty"
+        title="Vertical starting location"
+        >
+        Start Y
+      </label>
+      <input
+        autocomplete="off"
+        class="console-font"
+        id="starty"
+        name="starty"
+        type="number"
+        value="1"
+        />
+    </div>
+
+    <div class="noise-layers"></div>
+
+    <div class="row sub-buttons">
+      <button
+        class="button console-font remove-tileset"
+        title="Remove the last Tileset"
+        type="button"
+        >
+        Remove Tiles
+      </button>
+      <button
+        class="button console-font add-tileset"
+        title="Add a Tileset"
+        type="button"
+        >
+        Add Tiles
+      </button>
+    </div>
+
+    <div class="noise-preview-wrapper">
+  
+      <canvas
+        class="noise-preview"
+        height="256"
+        width="256"
+        >
+      </canvas>
+      
+      <canvas
+        class="noise-preview-start"
+        height="256"
+        title="Select start location"
+        width="256"
+        >
+      </canvas>
+    
+    </div>
+
+    
+
+    <button
+      class="button console-font full"
+      type="submit"
+      >
+      GENERATE
+    </button>
+
+  </form>
+
+</div>

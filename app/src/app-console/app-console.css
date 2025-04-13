@@ -1,0 +1,87 @@
+:host {
+  color: limegreen;
+  display: flex;
+  flex-direction: column;
+  transition: all .2s;
+  z-index: 1000;
+}
+
+:host([expanded]) {
+  background-color: black;
+}
+
+.console-display.console-wrapper {
+  margin-bottom: 0;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.console-collapse {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 0;
+  transition: all .2s;
+}
+
+:host([expanded]) .console-collapse {
+  height: 210px;
+}
+
+.console-display {
+  display: none;
+  padding-right: 4px;
+}
+
+:host([expanded]) .console-display {
+  display: flex;
+}
+
+.console-display textarea:focus-visible {
+  outline: none;
+}
+
+.console-bar {
+  pointer-events: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+:host([expanded]) .console-bar {
+  position: relative;
+  width: initial;
+}
+
+.console-button {
+  display: block;
+  pointer-events: all;
+  position: absolute;
+  z-index: 1000;
+  margin-top: 1px;
+
+  .fills-a~defs stop {
+    transition: .2s;
+  }
+}
+
+:host([expanded]) .console-button {
+  .fills-a~defs stop:first-child {
+    stop-color: #1daf27;
+  }
+
+  .fills-a~defs stop:last-child {
+    stop-color: #133d14;
+  }
+}
+
+.console-button:hover,
+:host([expanded]) .console-button:hover {
+  .fills-a~defs stop:first-child {
+    stop-color: #7eaf1c;
+  }
+
+  .fills-a~defs stop:last-child {
+    stop-color: #133d14;
+  }
+}

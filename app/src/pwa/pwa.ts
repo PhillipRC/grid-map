@@ -41,11 +41,11 @@ export function initPWA(app: Element) {
     refreshSW = registerSW({
       immediate: true,
       onOfflineReady() {
-        pwaToastMessage.innerHTML = 'App ready to work offline'
+        pwaToastMessage.innerHTML = 'Ready to install for offline use.'
         showPwaToast(true)
       },
       onNeedRefresh() {
-        pwaToastMessage.innerHTML = 'New content available, click on reload button to update'
+        pwaToastMessage.innerHTML = 'Update available, select \'Reload\' to update.'
         showPwaToast(false)
       },
       onRegisteredSW(swUrl, r) {

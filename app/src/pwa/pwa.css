@@ -1,16 +1,18 @@
 #pwa-toast {
+  background-color: #333;
   border-radius: 4px;
   border: 1px solid #8885;
-  bottom: 0;
-  box-shadow: 3px 4px 5px 0 #8885;
+  box-shadow: 3px 4px 5px 0 rgba(0,0,0,.5);
+  color: #ddd;
   display: grid;
   margin: 16px;
   padding: 12px;
   position: fixed;
   right: 0;
   text-align: left;
+  top: 0;
   visibility: hidden;
-  z-index: 1;
+  z-index: 10000;
 }
 
 #pwa-toast .message {
@@ -22,8 +24,10 @@
 }
 
 #pwa-toast button {
+  background-color: #666;
   border-radius: 2px;
   border: 1px solid #8885;
+  color: #ddd;
   margin-right: 5px;
   outline: none;
   padding: 3px 10px;
