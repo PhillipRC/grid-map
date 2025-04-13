@@ -49,6 +49,7 @@ svg[id="layer-0"] {
 .reticle img {
   -webkit-user-drag: none;
   left: -32px;
+  pointer-events: none;
   position: relative;
   top: -68px;
   width: 128px;
