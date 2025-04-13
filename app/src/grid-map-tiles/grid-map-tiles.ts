@@ -157,6 +157,10 @@ class GridMapTiles extends AppSidebarWidget {
     this.Tiles[tileSet] = []
 
     for (const [_idx, tile] of this.TileIndex.entries()) {
+      
+      // do not load empty
+      if(tile == '0000') return
+      
       const response = await fetch(
         `tiles/${tileSet}/${tile}.svg`
       )
