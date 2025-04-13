@@ -120,7 +120,7 @@ export default class GridConsole extends GridBase {
         break
       case 'generate':
       case 'g':
-        this.Generate(command)
+        this.Generate()
         break
       case 'joke':
       case 'j':
