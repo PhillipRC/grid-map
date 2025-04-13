@@ -59,6 +59,11 @@ export default class GridMapData extends GridBase {
       false
     )
 
+    document.addEventListener(
+      'grid-map-data-generate-random',
+      () => { this.GenerateRandomMap() }
+    )
+
     this.Display = this.shadowRoot?.querySelector('.display')!
 
     this.Init()
@@ -75,7 +80,7 @@ export default class GridMapData extends GridBase {
 
 
   Init() {
-    this.Load()
+    this.GenerateRandomMap()
   }
 
 
@@ -116,14 +121,20 @@ export default class GridMapData extends GridBase {
   }
 
   SendLoaded() {
-    document.dispatchEvent(
-      new CustomEvent(
-        'grid-map-data-loaded',
-        {
-          bubbles: true,
-          detail: this,
-        }
-      )
+    // using a setTimeout to give components time to listen before sending
+    setTimeout(
+      () => {
+        document.dispatchEvent(
+          new CustomEvent(
+            'grid-map-data-loaded',
+            {
+              bubbles: true,
+              detail: this,
+            }
+          )
+        )
+      }
+      , 0
     )
   }
 
@@ -159,6 +170,61 @@ export default class GridMapData extends GridBase {
         console.error(error)
       }
     }
+  }
+
+  /** Generate a random map */
+  GenerateRandomMap() {
+
+    const mapDataSize = {
+      x: 512,
+      y: 512,
+    }
+
+    const start = {
+      x: 160,
+      y: 201,
+    }
+
+    const noiseLayers = [
+      {
+        Zoom: 2,
+        Seed: 0,
+        Octaves: 8,
+        Persistence: 0.5,
+        TileLayers: [
+          {
+            Tileset: "Solid-1-Edge",
+            CanWalk: true,
+            Cutoff: -0.05,
+            CutoffCap: 0.1,
+            Color: "#f5d151"
+          },
+          {
+            Tileset: "Solid-1",
+            CanWalk: true,
+            Cutoff: -0.03,
+            CutoffCap: 0.1,
+            Color: "#0f7110"
+          },
+          {
+            Tileset: "Rough-1-Edge",
+            CanWalk: true,
+            Cutoff: 0.06,
+            CutoffCap: 0.16,
+            Color: "#39302d"
+          },
+          {
+            Tileset: "Solid-1-Edge-2",
+            CanWalk: false,
+            Cutoff: 0.1,
+            CutoffCap: 0.12,
+            Color: '#362521'
+          }
+        ]
+      }
+    ]
+
+    this.Generate(mapDataSize, start, noiseLayers)
   }
 
 

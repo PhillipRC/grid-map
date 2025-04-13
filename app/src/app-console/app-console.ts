@@ -153,6 +153,12 @@ export default class GridConsole extends GridBase {
     if(command?.length == 2) {
 
       switch (command[1].toLowerCase()) {
+        case 'generate':
+        case 'g':
+          this.Textarea.value += '\r'
+          + this.PromptSpace + 'Generates a random map with 4 layers.'
+          return
+          break
         case 'joke':
         case 'j':
           this.Textarea.value += '\r'
@@ -160,29 +166,21 @@ export default class GridConsole extends GridBase {
           return
           break
       }
-      
 
     }
 
     this.Textarea.value += '\r'
     + this.PromptSpace + ' Command     Description\r'
     + this.PromptSpace + '----------  ---------------------\r'
+    + this.PromptSpace + ' Generate    Create map\r'
     + this.PromptSpace + ' Joke        Dad joke\r'
     + this.PromptSpace + ' Help        Command details\r'    
   }
 
-  Generate(command: any[]) {
+  Generate() {
     document.dispatchEvent(
-      new CustomEvent(
-        'grid-map-data-generate',
-        {
-          bubbles: true,
-          detail: {
-            sizeX:command[1],
-            sizeY:command[2],
-            rate:command[3]
-          },
-        }
+      new Event(
+        'grid-map-data-generate-random', { bubbles: true }
       )
     )
   }

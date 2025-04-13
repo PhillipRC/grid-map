@@ -56,6 +56,15 @@ export default class AppMain extends GridBase {
       )
     }
 
+    // grid-map-data-generate-random
+    if (event.key == 'g') {
+      this.dispatchEvent(
+        new Event(
+          'grid-map-data-generate-random', { bubbles: true }
+        )
+      )
+    }
+
     // arrow keys
     if (event.keyCode >= 37 && event.keyCode <= 40) {
 
