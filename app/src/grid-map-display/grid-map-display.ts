@@ -113,7 +113,7 @@ export default class GridMapDisplay extends GridBase {
    */
   PointerLocationData: TileData | null = null
 
-  
+
   /** 
    * Pointer Map Location
    * 
@@ -154,11 +154,15 @@ export default class GridMapDisplay extends GridBase {
 
   LayersStyle: HTMLStyleElement | null | undefined = null
 
+  /** avatar img */
   Reticle: HTMLElement | null | undefined = null
 
   EditToolsPanel: HTMLElement | null | undefined
 
   Debug: HTMLElement | null | undefined = null
+
+  /** Track if it is the first render after a map is loaded */
+  FirstRenderAfterLoad: boolean = true
 
   UpdateTime: number = 0
 
@@ -383,17 +387,33 @@ export default class GridMapDisplay extends GridBase {
 
   SetStateNormal() {
     this.EditToolsPanel?.setAttribute('hidden', 'true')
-    if (this.GridMapData) this.Reticle?.removeAttribute('hidden')
     this.Container?.classList.remove('edit')
     this.SetPointer(PointerType.None)
+    this.ReticleShow()
+  }
+
+  
+  ReticleShow() {
+    if (
+      this.GridMapData
+      && !this.FirstRenderAfterLoad
+      && this.State == 'normal'
+    ) {
+      this.Reticle?.removeAttribute('hidden')
+    }
+  }
+
+  
+  ReticleHide() {
+    this.Reticle?.setAttribute('hidden', 'true')    
   }
 
 
   SetStateEdit() {
     this.EditToolsPanel?.removeAttribute('hidden')
-    this.Reticle?.setAttribute('hidden', 'true')
     this.Container?.classList.add('edit')
     this.SetPointer(PointerType.Select)
+    this.ReticleHide()
   }
 
 
@@ -582,7 +602,7 @@ export default class GridMapDisplay extends GridBase {
       y: 0
     }
 
-    this.Reticle?.setAttribute('hidden', 'true')
+    this.ReticleHide()
 
     this.SetPointer(PointerType.None)
 
@@ -663,6 +683,8 @@ export default class GridMapDisplay extends GridBase {
    * @param {GridMapData} gridMapData 
    */
   HandleGridMapLoaded(gridMapData: GridMapData) {
+
+    this.FirstRenderAfterLoad = true
     this.GridMapData = gridMapData
 
     this.Init()
@@ -671,7 +693,7 @@ export default class GridMapDisplay extends GridBase {
     if (data) this.SelectedLocationData = data
 
     // show reticle in normal mode
-    if (this.State == 'normal') this.Reticle?.removeAttribute('hidden')
+    if (this.State == 'normal') this.ReticleShow()
   }
 
   /**
@@ -938,6 +960,12 @@ export default class GridMapDisplay extends GridBase {
         }
       }
     }
+
+    if (this.FirstRenderAfterLoad) {
+      this.FirstRenderAfterLoad = false
+      this.ReticleShow()
+    }
+
   }
 
   RemoveAllTiles() {
