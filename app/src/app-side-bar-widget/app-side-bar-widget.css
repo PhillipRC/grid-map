@@ -1,10 +1,16 @@
 :host {
   display: inline-block;
-  max-width: 310px;
-  min-width: 310px;
+  max-width: 300px;
+  min-width: 300px;
 }
 
 .console-display {
   margin-right: 0;
   padding: 10px;
+}
+
+.console-content[collapsed] {
+  .container {
+    display: none;
+  }
 }

@@ -21,6 +21,7 @@ export default class AnimatedCollapse extends HTMLElement {
 
   set expanded(val) {
     if (val) {
+      this.collapsed = false
       this.setAttribute('expanded', '')
     } else {
       this.removeAttribute('expanded')
@@ -29,6 +30,18 @@ export default class AnimatedCollapse extends HTMLElement {
 
   get expanded() {
     return this.hasAttribute('expanded')
+  }
+
+  set collapsed(val) {
+    if (val) {
+      this.setAttribute('collapsed', '')
+    } else {
+      this.removeAttribute('collapsed')
+    }
+  }
+
+  get collapsed() {
+    return this.hasAttribute('collapsed')
   }
 
   constructor() {
@@ -53,6 +66,7 @@ export default class AnimatedCollapse extends HTMLElement {
       if (this.#direction == 'horizontal')
         wrapperStyle.width = '0px'
       wrapperStyle.visibility = 'hidden'
+      this.collapsed = true
     }
 
     wrapperEl.addEventListener(
@@ -162,7 +176,7 @@ export default class AnimatedCollapse extends HTMLElement {
       }
 
       case 'collapsed': {
-        // noop
+        this.collapsed = true
         break
       }
     }
