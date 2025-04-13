@@ -47,6 +47,8 @@ customElements.define('grid-map-data-generate', GridMapDataGenerate)
 import GridMapFormTileLayers from './grid-map-form-tile-layers/grid-map-form-tile-layers'
 customElements.define('grid-map-form-tile-layers', GridMapFormTileLayers)
 
+// disable touchmove
+window.addEventListener('touchmove', (event) => { event.preventDefault() })
 
 /**
  * Setup PWA
