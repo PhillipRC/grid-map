@@ -29,7 +29,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
    */
   MinTileLayers = 1
 
-  
+
   /**
    * Controls the max number of layers
    */
@@ -66,6 +66,15 @@ export default class GridMapFormTileLayers extends HTMLElement {
   /** @param {Array.<Tileset>} tileSets */
   SetTilesets(tileSets: Array<Tileset>) {
     this.AvailableTilesets = tileSets
+  }
+
+
+  SelectLayer(layerIdx: number) {
+    
+    if (!this.Tabs) return
+    if (layerIdx < 0 || layerIdx > this.Tabs.panels.length) return
+
+    this.Tabs.selectedIndex = layerIdx
   }
 
 
@@ -124,7 +133,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
   AddTabs() {
     if (this.Tabs == null) {
       var newTab = new LionTabs()
-      if(!newTab) return
+      if (!newTab) return
       this.Tabs = newTab
       this.appendChild(this.Tabs)
       this.Tabs.addEventListener('change', (event) => { this.HandleInputChange(event) })
@@ -210,7 +219,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     this.AllInputs.forEach(
       (element) => {
         // tileLayer doesn't have the field remove it from the markup
-        if(!(element in tileLayer)) {
+        if (!(element in tileLayer)) {
           layerMarkup = this.RemoveInputFromMarkup(layerMarkup, element)
           return
         }
@@ -241,7 +250,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     this.AllInputs.forEach(
       (element) => {
         let inputElement: HTMLInputElement | null = panel.querySelector(`input[name="${element}"]`)
-        
+
         // @ts-ignore
         if (inputElement) inputElement.value = tileLayer[element].toString()
         inputElement = panel.querySelector(`select[name="${element}"]`)

@@ -709,6 +709,15 @@ export default class GridMapDisplay extends GridBase {
 
     switch (this.Pointer?.PointerType) {
 
+      case (PointerType.Select):
+        document.dispatchEvent(
+          new CustomEvent(
+            'grid-map-display-select-layer',
+            { bubbles: true, detail: tileData }
+          )
+        )
+        break
+
       case (PointerType.Remove):
         this.GridMapData?.SetMapData(
           this.PointerLocation.x,

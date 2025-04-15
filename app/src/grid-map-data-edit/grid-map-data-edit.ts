@@ -3,6 +3,7 @@ import GridMapData from '../grid-map-data/grid-map-data'
 import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
 import PointerType from '../grid-map-pointer/PointerType.js'
+import { TileData } from '../types'
 
 // markup and styles
 import DataEditHtml from './grid-map-data-edit.html?raw'
@@ -104,6 +105,15 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         // @ts-ignore
         this.GridMapTilesRef = customEvent.detail
         this.HandleDataLoaded()
+      }
+    )
+
+    document.addEventListener(
+      'grid-map-display-select-layer',
+      (customEvent) => {
+        // @ts-ignore
+        const tileData = customEvent.detail as TileData
+        this.Layers?.SelectLayer(tileData.Layer)
       }
     )
 
