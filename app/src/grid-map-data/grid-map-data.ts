@@ -181,8 +181,8 @@ export default class GridMapData extends GridBase {
     }
 
     const start = {
-      x: 160,
-      y: 201,
+      x: 0,
+      y: 0,
     }
 
     const noiseLayers = [
@@ -322,21 +322,33 @@ export default class GridMapData extends GridBase {
 
   /** Set Start to a walkable location */
   SetWalkableStart() {
-    
-    if(!this.MapData) return
 
-    let maxAttempt:number = 100
-    
+    if (!this.MapData) return
+
+    // if start is not outside of map and walkable - use it
+    if(!this.IsOutsideOfMap(this.MapData.Start) && this.GetTopMostMapData(this.MapData.Start)?.CanWalk == true) return
+
+    let maxAttempt: number = 300
     // TODO: come up with a way to pick something close to the middle if possible
-    while(this.GetTopMostMapData(this.MapData.Start)?.CanWalk == false && maxAttempt > 0) {
+    while (maxAttempt > 0) {
+
+      // pick a rnd location
       this.MapData.Start.x = this.RandomRange(2, this.MapData.MapDataSize.x - 2)
       this.MapData.Start.y = this.RandomRange(2, this.MapData.MapDataSize.y - 2)
-      maxAttempt --
+      
+      // get the data for the location - if its walkable and next to anything use it
+      const topMostData = this.GetTopMostMapData(this.MapData.Start)
+      if (topMostData?.CanWalk == true) {
+        if (this.GetTileData(this.MapData.Start.x, this.MapData.Start.y, topMostData.Layer).SurroundingMapData != '1111') {
+          maxAttempt = 0
+        }
+      }
+      maxAttempt--
     }
   }
 
-  
-  RandomRange(min: number, max:number) {
+
+  RandomRange(min: number, max: number) {
     min = Math.ceil(min)
     max = Math.floor(max)
     return Math.floor(Math.random() * (max - min + 1)) + min
@@ -352,6 +364,14 @@ export default class GridMapData extends GridBase {
   GetMapData(x: number, y: number, layer: number = 0) {
     // @ts-ignore
     return this.MapData.Layers[layer].Map[x + y * this.MapData.MapDataSize.x]
+  }
+
+
+  IsOutsideOfMap(coord: XY): boolean {
+    if (this.MapData == null) return true
+    if (coord.x < 1 || coord.x > this.MapData.MapDataSize.x - 2) return true
+    if (coord.y < 1 || coord.y > this.MapData.MapDataSize.y - 2) return true
+    return false
   }
 
 

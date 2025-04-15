@@ -18,6 +18,11 @@
   overflow: hidden;
 }
 
+.scale-container {
+  display: grid;
+  overflow: hidden;
+}
+
 svg {
   grid-column: 1;
   grid-row: 1;
@@ -25,7 +30,6 @@ svg {
 
 svg[id="layer-0"] {
   background-image: url("images/water.png");
-  z-index: 1;
 }
 
 .edit-tools-panel {

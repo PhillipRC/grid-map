@@ -46,7 +46,7 @@ export default class GridMapDisplay extends GridBase {
    * 
    * @type {XY} Units: Pixels
    */
-  TileSize: XY = {
+  TilePixelSize: XY = {
     x: 64,
     y: 64
   }
@@ -56,7 +56,7 @@ export default class GridMapDisplay extends GridBase {
    * 
    * @type {XY} Units: Map Coordinates
    */
-  GridSize: XY = {
+  GridPixelSize: XY = {
     x: 0,
     y: 0
   }
@@ -128,10 +128,22 @@ export default class GridMapDisplay extends GridBase {
   Pointer: GridMapPointer | null | undefined = null
 
 
+  #displayScale: number = 1
+
+  set DisplayScale(value) {
+    if (value && value != this.#displayScale) {
+      this.#displayScale = value
+      if (this.ScaleContainer) this.ScaleContainer.style.zoom = value.toString()
+    }
+  }
+
+  get DisplayScale() {
+    return this.#displayScale
+  }
+
+
   /**
    * Tile Data under the Pointer
-   * 
-   * @type {TileData|null}
    */
   SavedTileData: TileData | null = null
 
@@ -148,18 +160,20 @@ export default class GridMapDisplay extends GridBase {
 
   ViewRect: DOMRect | null = null
 
-  Container: HTMLElement | null | undefined = null
+  Container: HTMLElement | null = null
+
+  ScaleContainer: HTMLElement | null = null
 
   Layers: Array<GridMapDisplayLayer> = []
 
   LayersStyle: HTMLStyleElement | null | undefined = null
 
   /** avatar img */
-  Reticle: HTMLElement | null | undefined = null
+  Reticle: HTMLElement | null = null
 
-  EditToolsPanel: HTMLElement | null | undefined
+  EditToolsPanel: HTMLElement | null = null
 
-  Debug: HTMLElement | null | undefined = null
+  Debug: HTMLElement | null = null
 
   /** Track if it is the first render after a map is loaded */
   FirstRenderAfterLoad: boolean = true
@@ -191,11 +205,12 @@ export default class GridMapDisplay extends GridBase {
     this.ConnectedCallback = true
 
     // set references to display elements
-    this.Container = this.shadowRoot?.querySelector('.container')
-    this.Reticle = this.shadowRoot?.querySelector('.reticle')
+    this.Container = this.shadowRoot?.querySelector('.container')!
+    this.ScaleContainer = this.shadowRoot?.querySelector('.scale-container')!
+    this.Reticle = this.shadowRoot?.querySelector('.reticle')!
     this.LayersStyle = this.shadowRoot?.querySelector('#layer-styles')
-    this.EditToolsPanel = this.shadowRoot?.querySelector('.edit-tools-panel')
-    this.Debug = this.shadowRoot?.querySelector('.debug')
+    this.EditToolsPanel = this.shadowRoot?.querySelector('.edit-tools-panel')!
+    this.Debug = this.shadowRoot?.querySelector('.debug')!
     this.Pointer = this.shadowRoot?.querySelector('.layer-pointer')
 
     /**
@@ -323,7 +338,7 @@ export default class GridMapDisplay extends GridBase {
     this.CenterLocation.x = this.GridMapData.MapData.Start.x
     this.CenterLocation.y = this.GridMapData.MapData.Start.y
 
-    this.SetGridSize()
+    this.SetGridPixelSize()
 
     // create a Display Layer for each Map Layer
     this.GridMapData.MapData.Layers.forEach(
@@ -331,8 +346,8 @@ export default class GridMapDisplay extends GridBase {
         const svgContainer = this.CreateSvgTag(
           'svg',
           [
-            ['width', this.GridSize.x],
-            ['height', this.GridSize.y],
+            ['width', this.GridPixelSize.x],
+            ['height', this.GridPixelSize.y],
           ]
         )
         svgContainer.id = `layer-${layerIdx}`
@@ -343,7 +358,7 @@ export default class GridMapDisplay extends GridBase {
             RenderedTiles: []
           }
         )
-        this.Container?.appendChild(svgContainer)
+        this.ScaleContainer?.appendChild(svgContainer)
       }
     )
 
@@ -392,7 +407,7 @@ export default class GridMapDisplay extends GridBase {
     this.ReticleShow()
   }
 
-  
+
   ReticleShow() {
     if (
       this.GridMapData
@@ -403,9 +418,9 @@ export default class GridMapDisplay extends GridBase {
     }
   }
 
-  
+
   ReticleHide() {
-    this.Reticle?.setAttribute('hidden', 'true')    
+    this.Reticle?.setAttribute('hidden', 'true')
   }
 
 
@@ -439,27 +454,17 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  /**
-   * @param {MouseEvent} event 
-   * @returns {XY} Units: Map Coordinates
-   */
   GetMapCoordFromMouseEvent(event: MouseEvent): XY {
     return {
-      x: Math.ceil((event.offsetX - this.GridCenterOffset.x) / this.TileSize.x),
-      y: Math.ceil((event.offsetY - this.GridCenterOffset.y) / this.TileSize.y)
+      x: Math.ceil(((event.offsetX * (1 / this.DisplayScale)) - this.GridCenterOffset.x) / this.TilePixelSize.x),
+      y: Math.ceil(((event.offsetY * (1 / this.DisplayScale)) - this.GridCenterOffset.y) / this.TilePixelSize.y)
     }
   }
 
 
-  /**
-   * @param {MouseEvent} event 
-   */
   HandleMouseDown(event: MouseEvent) {
 
-    const coord = {
-      x: Math.ceil((event.offsetX - this.GridCenterOffset.x) / this.TileSize.x),
-      y: Math.ceil((event.offsetY - this.GridCenterOffset.y) / this.TileSize.y)
-    }
+    const coord = this.GetMapCoordFromMouseEvent(event)
 
     // in normal state move
     if (this.State == 'normal') {
@@ -475,9 +480,6 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  /**
-   * @param {MouseEvent} event 
-   */
   HandlePointerMouseUp(event: MouseEvent) {
     const coord = this.GetMapCoordFromMouseEvent(event)
     const mapData = this.GridMapData?.GetTopMostMapData(coord)
@@ -489,8 +491,6 @@ export default class GridMapDisplay extends GridBase {
 
   /**
    * Translate the current mouse pointer location into Map Coordinates
-   * 
-   * @param {MouseEvent} event 
    */
   HandlePointerMouseMove(event: MouseEvent) {
 
@@ -548,8 +548,8 @@ export default class GridMapDisplay extends GridBase {
 
   PositionPointer() {
     if (!this.Pointer) return
-    this.Pointer.style.top = `${(this.PointerLocation.y - 1) * this.TileSize.y + this.GridCenterOffset.y}px`
-    this.Pointer.style.left = `${(this.PointerLocation.x - 1) * this.TileSize.x + this.GridCenterOffset.x}px`
+    this.Pointer.style.top = `${(this.PointerLocation.y - 1) * this.TilePixelSize.y + this.GridCenterOffset.y}px`
+    this.Pointer.style.left = `${(this.PointerLocation.x - 1) * this.TilePixelSize.x + this.GridCenterOffset.x}px`
   }
 
 
@@ -597,7 +597,7 @@ export default class GridMapDisplay extends GridBase {
     this.ClearLayerStyles()
 
     this.GridMapData = null
-    this.GridSize = {
+    this.GridPixelSize = {
       x: 0,
       y: 0
     }
@@ -636,8 +636,8 @@ export default class GridMapDisplay extends GridBase {
   CursorMove(coord: XY, anywhere = false) {
 
     if (this.State == 'normal') {
-      // bomb out if the requests move is outside the map
-      if (this.GridMapData == null || this.IsOutsideOfMap(coord)) return
+      // bomb out if the requested move is outside the map
+      if (this.GridMapData == null || this.GridMapData.IsOutsideOfMap(coord)) return
 
       const SelectedLocationData = this.GridMapData.GetTopMostMapData(coord)
       if (SelectedLocationData == null) return
@@ -696,17 +696,6 @@ export default class GridMapDisplay extends GridBase {
     if (this.State == 'normal') this.ReticleShow()
   }
 
-  /**
-   * @param {XY} coord 
-   * @returns {boolean}
-   */
-  IsOutsideOfMap(coord: XY): boolean {
-    if (this.GridMapData == null || this.GridMapData.MapData == null) return true
-    if (coord.x < 1 || coord.x > this.GridMapData.MapData.MapDataSize.x - 2) return true
-    if (coord.y < 1 || coord.y > this.GridMapData.MapData.MapDataSize.y - 2) return true
-    return false
-  }
-
 
   /**
    * @param {TileData|null|undefined} tileData 
@@ -749,27 +738,47 @@ export default class GridMapDisplay extends GridBase {
    * Handle when the display container changes size
    */
   HandleResize() {
+    
     this.ViewRect = this.getBoundingClientRect()
-    this.ViewCenter = {
-      x: (this.ViewRect.width / 2),
-      y: (this.ViewRect.height / 2),
-    }
+    this.SetDisplayScale()
 
+    this.ViewCenter = {
+      x: (this.ViewRect.width / 2) * (1 / this.DisplayScale),
+      y: (this.ViewRect.height / 2) * (1 / this.DisplayScale),
+    }
     this.CenterOnMapCursor()
     this.PositionPointer()
   }
 
+  
+  SetDisplayScale() {
 
+    if(!this.ViewRect) return
+
+    // calculate - scale = max(fh/ih, fw/iw)
+    let scale = Math.max(
+      this.ViewRect?.height / ((this.MaxRenderAreaSize.y + (this.MaxRenderAreaSize.y/2)) * this.TilePixelSize.y),
+      this.ViewRect?.width / ((this.MaxRenderAreaSize.x + (this.MaxRenderAreaSize.x/2)) * this.TilePixelSize.x)
+    )
+
+    // restrict scale to a single decimal
+    scale = Math.floor(scale * 10) / 10
+
+    this.DisplayScale = scale
+    if (this.ScaleContainer) this.ScaleContainer.style.zoom = scale.toString()
+  }
+
+  
   /**
    * Calculate the Grid/Map Size in pixels
    */
-  SetGridSize() {
+  SetGridPixelSize() {
 
     if (this.GridMapData == null || this.GridMapData.MapData == null) return
 
     // Size of Map * Size of Tiles - the size of 2 tiles - we are not rendering the edge tiles
-    this.GridSize.x = this.GridMapData.MapData.MapDataSize.x * this.TileSize.x - (this.TileSize.x * 2)
-    this.GridSize.y = this.GridMapData.MapData.MapDataSize.y * this.TileSize.y - (this.TileSize.y * 2)
+    this.GridPixelSize.x = this.GridMapData.MapData.MapDataSize.x * this.TilePixelSize.x - (this.TilePixelSize.x * 2)
+    this.GridPixelSize.y = this.GridMapData.MapData.MapDataSize.y * this.TilePixelSize.y - (this.TilePixelSize.y * 2)
   }
 
   /**
@@ -780,11 +789,16 @@ export default class GridMapDisplay extends GridBase {
     // bomb out if objects are not set
     if (this.ViewCenter.x == null || this.ViewCenter.y == null || this.Reticle == null) return
 
-    this.Reticle.style.top = `${this.ViewCenter.y - (this.TileSize.y / 2)}px`
-    this.Reticle.style.left = `${this.ViewCenter.x - (this.TileSize.x / 2)}px`
+    const tileCenter = {
+      x: this.CenterLocation.x * this.TilePixelSize.x,
+      y: this.CenterLocation.y * this.TilePixelSize.y
+    }
 
-    this.Reticle.style.height = `${this.TileSize.y}px`
-    this.Reticle.style.width = `${this.TileSize.x}px`
+    this.Reticle.style.top = (this.GridCenterOffset.y + tileCenter.y - this.TilePixelSize.y) + 'px'
+    this.Reticle.style.left = (this.GridCenterOffset.x + tileCenter.x - this.TilePixelSize.x) + 'px'
+    
+    this.Reticle.style.height = `${this.TilePixelSize.y}px`
+    this.Reticle.style.width = `${this.TilePixelSize.x}px`
   }
 
   /**
@@ -795,34 +809,28 @@ export default class GridMapDisplay extends GridBase {
     // bomb out if things are not setup
     if (this.GridMapData == null || this.GridMapTiles == null) return
 
-    this.CenterRecticle()
-
     const tileCenter = {
-      x: this.CenterLocation.x * this.TileSize.x,
-      y: this.CenterLocation.y * this.TileSize.y
+      x: this.CenterLocation.x * this.TilePixelSize.x,
+      y: this.CenterLocation.y * this.TilePixelSize.y
     }
 
     this.GridCenterOffset = {
-      x: this.ViewCenter.x - tileCenter.x + (this.TileSize.x / 2),
-      y: this.GridCenterOffset.y = this.ViewCenter.y - tileCenter.y + (this.TileSize.y / 2)
+      x: this.ViewCenter.x - tileCenter.x + (this.TilePixelSize.x / 2),
+      y: this.ViewCenter.y - tileCenter.y + (this.TilePixelSize.y / 2)
     }
 
-    if (this.GridCenterOffset.x != null && this.GridCenterOffset.y != null) {
-      // position each layer
-      this.Layers.forEach(
-        (layer) => {
-          layer.SvgContainer.style.marginLeft = this.GridCenterOffset.x.toString()
-          layer.SvgContainer.style.marginTop = this.GridCenterOffset.y.toString()
-        }
-      )
+    if (this.ScaleContainer) {
+      this.ScaleContainer.style.marginLeft = this.GridCenterOffset.x.toString() + 'px'
+      this.ScaleContainer.style.marginTop = this.GridCenterOffset.y.toString() + 'px'
     }
+
+    this.CenterRecticle()
 
     this.UpdateDisplay()
   }
 
   /**
    * Returns the area of the Map to Render
-   * @returns {XYMinMax}
    */
   GetRenderArea(): XYMinMax {
     return {
@@ -906,8 +914,8 @@ export default class GridMapDisplay extends GridBase {
 
           // tiles are offset from the main grid by half
           const tileOffset = {
-            x: this.TileSize.x / 2,
-            y: this.TileSize.y / 2
+            x: this.TilePixelSize.x / 2,
+            y: this.TilePixelSize.y / 2
           }
 
           // only render tiles: within the viewableArea,
@@ -936,8 +944,8 @@ export default class GridMapDisplay extends GridBase {
             this.AddAttributesToElement(
               tile,
               [
-                ['x', this.TileSize.x * x - tileOffset.x],
-                ['y', this.TileSize.y * y - tileOffset.y],
+                ['x', this.TilePixelSize.x * x - tileOffset.x],
+                ['y', this.TilePixelSize.y * y - tileOffset.y],
                 ['t', tileId]
               ]
             )
