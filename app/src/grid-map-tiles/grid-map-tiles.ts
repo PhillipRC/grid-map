@@ -7,7 +7,7 @@ import {
 } from '../types'
 
 // style
-import css from './grid-map-tiles.css?inline'
+import css from './grid-map-tiles.css?raw'
 
 
 /**

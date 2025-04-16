@@ -1,7 +1,7 @@
-import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget.js'
-import GridMapTiles from '../grid-map-tiles/grid-map-tiles.js'
+import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
+import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
-import PerlinNoise from '../Noise.js'
+import PerlinNoise from '../Noise'
 
 import {
   XY,
@@ -15,7 +15,7 @@ import {
 // markup and styles
 import html from './grid-map-data-generate.html?raw'
 import htmlNoiseLayer from './grid-map-data-generate-noise-layer.html?raw'
-import css from './grid-map-data-generate.css?inline'
+import css from './grid-map-data-generate.css?raw'
 
 
 /**

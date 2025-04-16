@@ -1,11 +1,11 @@
-import GridBase from '../shared/grid-base.js'
+import GridBase from '../shared/grid-base'
 
 import {
   XY,
 } from '../types'
 
 // markup and style
-import css from './grid-map-tiles-set-display.css?inline'
+import css from './grid-map-tiles-set-display.css?raw'
 import html from './grid-map-tiles-set-display.html?raw'
 
 

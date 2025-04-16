@@ -1,13 +1,13 @@
-import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget.js'
+import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
 import GridMapData from '../grid-map-data/grid-map-data'
 import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
-import PointerType from '../grid-map-pointer/PointerType.js'
+import PointerType from '../grid-map-pointer/PointerType'
 import { TileData } from '../types'
 
 // markup and styles
 import DataEditHtml from './grid-map-data-edit.html?raw'
-import css from './grid-map-data-edit.css?inline'
+import css from './grid-map-data-edit.css?raw'
 
 
 /**

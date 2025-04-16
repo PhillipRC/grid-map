@@ -1,8 +1,8 @@
-import GridBase from '../shared/grid-base.js'
-import PointerType from './PointerType.js'
+import GridBase from '../shared/grid-base'
+import PointerType from './PointerType'
 
 // markup and style
-import css from './grid-map-pointer.css?inline'
+import css from './grid-map-pointer.css?raw'
 import html from './grid-map-pointer.html?raw'
 import PointerNone from './svgs/PointerNone.svg?raw'
 import PointerAdd from './svgs/PointerAdd.svg?raw'

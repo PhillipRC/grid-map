@@ -3,7 +3,7 @@ import AppSidebar from '../app-sidebar/app-sidebar'
 
 // markup and style
 import html from './app-main.html?raw'
-import css from './app-main.css?inline'
+import css from './app-main.css?raw'
 
 
 export default class AppMain extends GridBase {

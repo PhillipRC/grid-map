@@ -1,10 +1,10 @@
-import GridBase from '../shared/grid-base.js'
+import GridBase from '../shared/grid-base'
 import AnimatedCollapse from '../animated-collapse/animated-collapse.ts'
 
 // markup and style
 import html from './app-side-bar-widget.html?raw'
-import cssSideBarWidget from './app-side-bar-widget.css?inline'
-import cssConsole from '../shared/console.css?inline'
+import cssSideBarWidget from './app-side-bar-widget.css?raw'
+import cssConsole from '../shared/console.css?raw'
 
 
 /**

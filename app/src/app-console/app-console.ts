@@ -1,10 +1,10 @@
 
-import GridBase from '../shared/grid-base.js'
+import GridBase from '../shared/grid-base'
 
 // markup and style
 import html from './app-console.html?raw'
-import css from './app-console.css?inline'
-import consoleCss from '../shared/console.css?inline'
+import css from './app-console.css?raw'
+import consoleCss from '../shared/console.css?raw'
 
 
 export default class GridConsole extends GridBase {

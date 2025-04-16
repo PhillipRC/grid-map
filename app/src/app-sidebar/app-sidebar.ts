@@ -1,9 +1,9 @@
-import GridBase from '../shared/grid-base.js'
+import GridBase from '../shared/grid-base'
 import AnimatedCollapse from '../animated-collapse/animated-collapse'
 
 // markup and style
 import html from './app-sidebar.html?raw'
-import css from './app-sidebar.css?inline'
+import css from './app-sidebar.css?raw'
 
 
 export default class AppSidebar extends GridBase {

@@ -1,5 +1,5 @@
-import GridBase from '../shared/grid-base.js'
-import Noise from '../Noise.js'
+import GridBase from '../shared/grid-base'
+import Noise from '../Noise'
 import {
   XY,
   NoiseLayer,
@@ -10,7 +10,7 @@ import {
 } from '../types'
 
 // markup and style
-import css from './grid-map-data.css?inline'
+import css from './grid-map-data.css?raw'
 import html from './grid-map-data.html?raw'
 
 

@@ -1,8 +1,8 @@
-import GridBase from '../shared/grid-base.js'
-import GridMapData from '../grid-map-data/grid-map-data.js'
-import GridMapTiles from '../grid-map-tiles/grid-map-tiles.js'
-import GridMapPointer from '../grid-map-pointer/grid-map-pointer.js'
-import PointerType from '../grid-map-pointer/PointerType.js'
+import GridBase from '../shared/grid-base'
+import GridMapData from '../grid-map-data/grid-map-data'
+import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
+import GridMapPointer from '../grid-map-pointer/grid-map-pointer'
+import PointerType from '../grid-map-pointer/PointerType'
 
 import {
   XY,
@@ -13,7 +13,7 @@ import {
 } from '../types'
 
 // markup and style
-import css from './grid-map-display.css?inline'
+import css from './grid-map-display.css?raw'
 import html from './grid-map-display.html?raw'
 
 
@@ -747,7 +747,7 @@ export default class GridMapDisplay extends GridBase {
    * Handle when the display container changes size
    */
   HandleResize() {
-    
+
     this.ViewRect = this.getBoundingClientRect()
     this.SetDisplayScale()
 
@@ -759,22 +759,33 @@ export default class GridMapDisplay extends GridBase {
     this.PositionPointer()
   }
 
-  
+
   SetDisplayScale() {
 
-    if(!this.ViewRect) return
+    if (!this.ViewRect) return
 
     // calculate - scale = max(fh/ih, fw/iw)
     let scale = Math.max(
-      this.ViewRect?.height / ((this.MaxRenderAreaSize.y + (this.MaxRenderAreaSize.y/2)) * this.TilePixelSize.y),
-      this.ViewRect?.width / ((this.MaxRenderAreaSize.x + (this.MaxRenderAreaSize.x/2)) * this.TilePixelSize.x)
+      this.ViewRect?.height / ((this.MaxRenderAreaSize.y + (this.MaxRenderAreaSize.y / 2)) * this.TilePixelSize.y),
+      this.ViewRect?.width / ((this.MaxRenderAreaSize.x + (this.MaxRenderAreaSize.x / 2)) * this.TilePixelSize.x)
     )
-
-    // restrict scale to a single decimal
-    scale = Math.floor(scale * 10) / 10
+    // prevent odd numbers to keep graphics aligned
+    scale = GridMapDisplay.EvenDecimal(scale)
 
     this.DisplayScale = scale
     if (this.ScaleContainer) this.ScaleContainer.style.zoom = scale.toString()
+  }
+
+  
+  /**
+   * i.e. 10.03 > 10, 10.19999 > 10.2, etc.
+   */
+  static EvenDecimal(value: number): number {
+    return (
+      Math.round(
+        Math.floor(value * 10) / 2
+      ) * 2
+    ) / 10
   }
 
   
@@ -805,7 +816,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.Reticle.style.top = (this.GridCenterOffset.y + tileCenter.y - this.TilePixelSize.y) + 'px'
     this.Reticle.style.left = (this.GridCenterOffset.x + tileCenter.x - this.TilePixelSize.x) + 'px'
-    
+
     this.Reticle.style.height = `${this.TilePixelSize.y}px`
     this.Reticle.style.width = `${this.TilePixelSize.x}px`
   }
