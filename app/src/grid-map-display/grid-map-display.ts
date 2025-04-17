@@ -43,8 +43,6 @@ export default class GridMapDisplay extends GridBase {
 
   /**
    * The pixel size of a tile in the Grid/Map
-   * 
-   * @type {XY} Units: Pixels
    */
   TilePixelSize: XY = {
     x: 64,
@@ -204,7 +202,11 @@ export default class GridMapDisplay extends GridBase {
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    // set references to display elements
+    // allow display to capture focus
+    this.setAttribute('tabindex', '1')
+
+    // #region set display element references
+    
     this.Container = this.shadowRoot?.querySelector('.container')!
     this.ScaleContainer = this.shadowRoot?.querySelector('.scale-container')!
     this.Reticle = this.shadowRoot?.querySelector('.reticle')!
@@ -213,9 +215,9 @@ export default class GridMapDisplay extends GridBase {
     this.Debug = this.shadowRoot?.querySelector('.debug')!
     this.Pointer = this.shadowRoot?.querySelector('.layer-pointer')
 
-    /**
-     * Mouse Event Listeners
-     */
+    // #endregion
+
+    // #region Mouse Event Listeners
 
     this.addEventListener(
       'mousemove',
@@ -242,9 +244,23 @@ export default class GridMapDisplay extends GridBase {
       (event) => { this.HandleMouseDown(event) }
     )
 
+    this.addEventListener(
+      'wheel',
+      (event) => { this.HandleWheel(event) }
+    )
+
+    // #endregion
+
     /**
-     * Custom Event Listeners
+     * Keyboard Event Listeners
      */
+    this.addEventListener(
+      'keyup',
+      (event) => { this.HandleKeyboardUp(event) }
+    )
+
+    
+    // #region Custom Event Listeners
 
     document.addEventListener(
       'grid-map-set-edit-state-normal',
@@ -295,7 +311,7 @@ export default class GridMapDisplay extends GridBase {
       () => {
         this.RemoveAllTiles()
         this.SetLayerStyles()
-        this.UpdateDisplay()
+        this.Render()
       }
     )
 
@@ -320,6 +336,8 @@ export default class GridMapDisplay extends GridBase {
       }
     )
 
+    // #endregion
+
     // handle resize
     new ResizeObserver(() => { this.HandleResize() }).observe(this)
 
@@ -331,10 +349,13 @@ export default class GridMapDisplay extends GridBase {
   async Init() {
 
     // don't bother doing anything until a map and tiles are loaded
-    if (this.GridMapData == null || this.GridMapData.MapData == null || this.GridMapTiles == null) return
+    if (
+      this.GridMapData == null
+      || this.GridMapData.MapData == null
+      || this.GridMapTiles == null
+    ) return
 
     // set the starting location
-    // TODO pick a starting location if one is not defined
     this.CenterLocation.x = this.GridMapData.MapData.Start.x
     this.CenterLocation.y = this.GridMapData.MapData.Start.y
 
@@ -461,6 +482,21 @@ export default class GridMapDisplay extends GridBase {
     }
   }
 
+  
+  // #region Mouse Handlers
+
+  HandleWheel(event:WheelEvent) {
+
+    this.CursorMoveBy(
+      {
+        x: 0,
+        y: (event.deltaY > 1 ? 1 : -1)
+      },
+      this.State == 'edit' ? true : false
+    )
+
+  }
+
 
   HandleMouseDown(event: MouseEvent) {
 
@@ -544,6 +580,74 @@ export default class GridMapDisplay extends GridBase {
   HandlePointerMouseOut() {
     this.Pointer?.setAttribute('hidden', 'true')
   }
+
+  // #endregion
+
+  // #region Keyboard Handlers
+
+  HandleKeyboardUp(event: KeyboardEvent) {
+
+    // grid-map-data-generate-random
+    if (event.key == 'g') {
+      this.dispatchEvent(
+        new Event(
+          'grid-map-data-generate-random', { bubbles: true }
+        )
+      )
+    }
+
+    // arrow keys - move horizontal and vertical
+    if (
+      event.key == 'ArrowRight'
+      || event.key == 'ArrowLeft'
+      || event.key == 'ArrowUp'
+      || event.key == 'ArrowDown'
+    ) {
+      this.CursorMoveBy(
+        {
+          x: (event.key == 'ArrowRight' ? 1 : event.key == 'ArrowLeft' ? -1 : 0),
+          y: (event.key == 'ArrowUp' ? -1 : event.key == 'ArrowDown' ? 1 : 0),
+        },
+        this.State == 'edit' ? true : false
+      )
+    }
+
+    // wasd - move horizontal and vertical
+    if (
+      event.key == 'd'
+      || event.key == 'a'
+      || event.key == 'w'
+      || event.key == 's'
+    ) {
+      this.CursorMoveBy(
+        {
+          x: (event.key == 'd' ? 1 : event.key == 'a' ? -1 : 0),
+          y: (event.key == 'w' ? -1 : event.key == 's' ? 1 : 0),
+        },
+        this.State == 'edit' ? true : false
+      )
+    }
+
+    // qezc - move at an angle
+    if (
+      event.key == 'q'
+      || event.key == 'e'
+      || event.key == 'z'
+      || event.key == 'c'
+    ) {
+      this.CursorMoveBy(
+        {
+          x: ((event.key == 'q' || event.key == 'z') ? -1 : (event.key == 'e' || event.key == 'c') ? 1 : 0),
+          y: ((event.key == 'q' || event.key == 'e') ? -1 : (event.key == 'z' || event.key == 'c') ? 1 : 0),
+        },
+        this.State == 'edit' ? true : false
+      )
+    }
+
+
+  }
+
+  // #endregion
 
 
   PositionPointer() {
@@ -635,24 +739,20 @@ export default class GridMapDisplay extends GridBase {
    */
   CursorMove(coord: XY, anywhere = false) {
 
-    if (this.State == 'normal') {
-      // bomb out if the requested move is outside the map
-      if (this.GridMapData == null || this.GridMapData.IsOutsideOfMap(coord)) return
+    // bomb out if the requested move is outside the map
+    if (this.GridMapData == null || this.GridMapData.IsOutsideOfMap(coord)) return
 
-      const SelectedLocationData = this.GridMapData.GetTopMostMapData(coord)
-      if (SelectedLocationData == null) return
+    const SelectedLocationData = this.GridMapData.GetTopMostMapData(coord)
+    if (SelectedLocationData == null) return
 
-      if (anywhere == false) {
-        // bomb out if it is not walkable
-        if (SelectedLocationData.CanWalk == false) return
-      }
-
-      this.SelectedLocationData = SelectedLocationData
-      this.CenterLocation = coord
-      this.CenterOnMapCursor()
-
-      return
+    if (anywhere == false) {
+      // bomb out if it is not walkable
+      if (SelectedLocationData.CanWalk == false) return
     }
+
+    this.SelectedLocationData = SelectedLocationData
+    this.CenterLocation = coord
+    this.CenterOnMapCursor()
 
   }
 
@@ -697,9 +797,6 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  /**
-   * @param {TileData|null|undefined} tileData 
-   */
   UpdateMapDataAtPointerLocation(tileData: TileData | null | undefined) {
 
     // if tileData is provided save it - this is the data used to update the map location while the use clicks and drags
@@ -716,6 +813,8 @@ export default class GridMapDisplay extends GridBase {
             { bubbles: true, detail: tileData }
           )
         )
+        // no need to update the map with select
+        return
         break
 
       case (PointerType.Remove):
@@ -738,7 +837,7 @@ export default class GridMapDisplay extends GridBase {
     }
 
     this.RemoveAllTiles()
-    this.UpdateDisplay()
+    this.Render()
 
   }
 
@@ -846,7 +945,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.CenterRecticle()
 
-    this.UpdateDisplay()
+    this.Render()
   }
 
   /**
@@ -878,7 +977,7 @@ export default class GridMapDisplay extends GridBase {
   /**
    * Render the Display
    */
-  UpdateDisplay() {
+  Render() {
     const startTime = window.performance.now()
     this.RenderTilesInViewableArea()
     this.RemoveTilesOutOfViewableArea()
@@ -930,7 +1029,6 @@ export default class GridMapDisplay extends GridBase {
         for (let layer = this.Layers.length - 1; layer >= 0; layer--) {
 
           const tileId = `${layer}-${x}-${y}`
-          const tileNotRendred = this.Layers[layer].RenderedTiles.map(t => t.id).indexOf(tileId) == -1
 
           // tiles are offset from the main grid by half
           const tileOffset = {
@@ -942,8 +1040,7 @@ export default class GridMapDisplay extends GridBase {
           // that have not been rendered and
           // are not in the last row or column
           if (
-            tileNotRendred
-            && y >= viewableArea.min.y
+            y >= viewableArea.min.y
             && y <= viewableArea.max.y
             && x >= viewableArea.min.x
             && x <= viewableArea.max.x
@@ -951,34 +1048,41 @@ export default class GridMapDisplay extends GridBase {
             && (x <= this.GridMapData.MapData.MapDataSize.x - 1)
           ) {
 
+            // tileNotRendred
+            const tileNotRendred = this.Layers[layer].RenderedTiles.map(t => t.id).indexOf(tileId) == -1
+
             // the tile used is based on where it is and what layer its on
             const tileData = this.GridMapData.GetTileData(x, y, layer)
 
-            // don't render empty space
-            if (tileData.SurroundingMapData == '0000') continue
+            if(tileNotRendred) {
 
-            // get the tile
-            const tile = this.GridMapTiles.GetTile(tileData.Tileset, tileData.SurroundingMapData)
+              // don't render empty space
+              if (tileData.SurroundingMapData == '0000') continue
 
-            // position tile
-            this.AddAttributesToElement(
-              tile,
-              [
-                ['x', this.TilePixelSize.x * x - tileOffset.x],
-                ['y', this.TilePixelSize.y * y - tileOffset.y],
-                ['t', tileId]
-              ]
-            )
+              // get the tile
+              const tile = this.GridMapTiles.GetTile(tileData.Tileset, tileData.SurroundingMapData)
 
-            const renderedTile = {
-              id: tileId,
-              x: x,
-              y: y,
-              ref: tile
+              // position tile
+              this.AddAttributesToElement(
+                tile,
+                [
+                  ['x', this.TilePixelSize.x * x - tileOffset.x],
+                  ['y', this.TilePixelSize.y * y - tileOffset.y],
+                  ['t', tileId]
+                ]
+              )
+
+              const renderedTile = {
+                id: tileId,
+                x: x,
+                y: y,
+                ref: tile
+              }
+
+              this.Layers[layer].RenderedTiles.push(renderedTile)
+              this.Layers[layer].SvgContainer.appendChild(tile)
+
             }
-
-            this.Layers[layer].RenderedTiles.push(renderedTile)
-            this.Layers[layer].SvgContainer.appendChild(tile)
 
             // do not render other layers if the topmost is solid
             if (tileData.SurroundingMapData == '1111') layer = -1
@@ -1002,6 +1106,7 @@ export default class GridMapDisplay extends GridBase {
 
   /**
    * Loops through the Rendered Tiles removing Tiles out of the Viewable area
+   * 
    * @param {boolean} all Remove all Tiles
    */
   RemoveTilesOutOfViewableArea(all: boolean = false) {
