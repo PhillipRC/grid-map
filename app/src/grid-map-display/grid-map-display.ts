@@ -217,7 +217,7 @@ export default class GridMapDisplay extends GridBase {
 
     // #endregion
 
-    // #region Mouse Event Listeners
+    // #region Mouse Listeners
 
     this.addEventListener(
       'mousemove',
@@ -254,10 +254,20 @@ export default class GridMapDisplay extends GridBase {
     /**
      * Keyboard Event Listeners
      */
+
+    // #region KB Listeners
+    
     this.addEventListener(
       'keyup',
       (event) => { this.HandleKeyboardUp(event) }
     )
+
+    this.addEventListener(
+      'keydown',
+      (event) => { this.HandleKeyboardDown(event) }
+    )
+
+    // #endregion
 
     
     // #region Custom Event Listeners
@@ -583,19 +593,10 @@ export default class GridMapDisplay extends GridBase {
 
   // #endregion
 
-  // #region Keyboard Handlers
+  // #region KB Handlers
 
-  HandleKeyboardUp(event: KeyboardEvent) {
-
-    // grid-map-data-generate-random
-    if (event.key == 'g') {
-      this.dispatchEvent(
-        new Event(
-          'grid-map-data-generate-random', { bubbles: true }
-        )
-      )
-    }
-
+  HandleKeyboardDown(event: KeyboardEvent) {
+    
     // arrow keys - move horizontal and vertical
     if (
       event.key == 'ArrowRight'
@@ -644,6 +645,18 @@ export default class GridMapDisplay extends GridBase {
       )
     }
 
+  }
+
+  HandleKeyboardUp(event: KeyboardEvent) {
+
+    // grid-map-data-generate-random
+    if (event.key == 'g') {
+      document.dispatchEvent(
+        new Event(
+          'grid-map-data-generate-random', { bubbles: true }
+        )
+      )
+    }
 
   }
 
