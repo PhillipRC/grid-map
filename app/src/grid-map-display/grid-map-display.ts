@@ -206,7 +206,7 @@ export default class GridMapDisplay extends GridBase {
     this.setAttribute('tabindex', '1')
 
     // #region set display element references
-    
+
     this.Container = this.shadowRoot?.querySelector('.container')!
     this.ScaleContainer = this.shadowRoot?.querySelector('.scale-container')!
     this.Reticle = this.shadowRoot?.querySelector('.reticle')!
@@ -221,22 +221,22 @@ export default class GridMapDisplay extends GridBase {
 
     this.addEventListener(
       'mousemove',
-      (event) => { this.HandlePointerMouseMove(event) }
+      (event) => { this.HandleMouseMove(event) }
     )
 
     this.addEventListener(
       'click',
-      (event) => { this.HandlePointerMouseUp(event) }
+      (event) => { this.HandleMouseUp(event) }
     )
 
     this.addEventListener(
       'mouseover',
-      () => { this.HandlePointerMouseIn() }
+      () => { this.HandleMouseIn() }
     )
 
     this.addEventListener(
       'mouseout',
-      () => { this.HandlePointerMouseOut() }
+      () => { this.HandleMouseOut() }
     )
 
     this.addEventListener(
@@ -246,7 +246,13 @@ export default class GridMapDisplay extends GridBase {
 
     this.addEventListener(
       'wheel',
-      (event) => { this.HandleWheel(event) }
+      (event) => { this.HandleMouseWheel(event) }
+    )
+
+    // react to when the mouse is down
+    setInterval(
+      () => { if(this.#mouseIsDown) this.HandleMouseIsDown() },
+      100
     )
 
     // #endregion
@@ -256,7 +262,7 @@ export default class GridMapDisplay extends GridBase {
      */
 
     // #region KB Listeners
-    
+
     this.addEventListener(
       'keyup',
       (event) => { this.HandleKeyboardUp(event) }
@@ -269,7 +275,7 @@ export default class GridMapDisplay extends GridBase {
 
     // #endregion
 
-    
+
     // #region Custom Event Listeners
 
     document.addEventListener(
@@ -492,10 +498,10 @@ export default class GridMapDisplay extends GridBase {
     }
   }
 
-  
+
   // #region Mouse Handlers
 
-  HandleWheel(event:WheelEvent) {
+  HandleMouseWheel(event: WheelEvent) {
 
     this.CursorMoveBy(
       {
@@ -507,16 +513,15 @@ export default class GridMapDisplay extends GridBase {
 
   }
 
+  #mouseIsDown: boolean = false
+  #mouseMoveBy: XY = { x: 0, y: 0 }
 
   HandleMouseDown(event: MouseEvent) {
 
-    const coord = this.GetMapCoordFromMouseEvent(event)
+    this.#mouseIsDown = true
+    this.UpdateMouseMoveBy()
 
-    // in normal state move
-    if (this.State == 'normal') {
-      this.CursorMove(coord, false)
-      return
-    }
+    const coord = this.GetMapCoordFromMouseEvent(event)
 
     if (this.State == 'edit') {
       const SelectedLocationData = this.GridMapData?.GetTopMostMapData(coord)
@@ -526,7 +531,10 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  HandlePointerMouseUp(event: MouseEvent) {
+  HandleMouseUp(event: MouseEvent) {
+
+    this.#mouseIsDown = false
+
     const coord = this.GetMapCoordFromMouseEvent(event)
     const mapData = this.GridMapData?.GetTopMostMapData(coord)
     this.SelectedLocation = coord
@@ -535,10 +543,30 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
+  /** Handle performing operations  */
+  HandleMouseIsDown() {
+
+    if (this.State != 'normal') return
+
+    this.CursorMoveBy(
+      this.#mouseMoveBy,
+      false
+    )
+  }
+
+
+  UpdateMouseMoveBy() {
+    this.#mouseMoveBy = {
+      x: (this.PointerLocation.x > this.CenterLocation.x ? 1 : this.PointerLocation.x < this.CenterLocation.x ? -1 : 0),
+      y: (this.PointerLocation.y > this.CenterLocation.y ? 1 : this.PointerLocation.y < this.CenterLocation.y ? -1 : 0)
+    }
+  }
+
+
   /**
    * Translate the current mouse pointer location into Map Coordinates
    */
-  HandlePointerMouseMove(event: MouseEvent) {
+  HandleMouseMove(event: MouseEvent) {
 
     if (!this.GridMapData) return
 
@@ -551,6 +579,7 @@ export default class GridMapDisplay extends GridBase {
       this.PointerLocationData = this.GridMapData?.GetTopMostMapData(coord)
       this.RenderDebug()
       this.PositionPointer()
+      this.UpdateMouseMoveBy()
 
       // when in edit state and the primary button is down - update map data
       if (this.State == 'edit' && event.buttons == 1) {
@@ -582,12 +611,12 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  HandlePointerMouseIn() {
+  HandleMouseIn() {
     this.Pointer?.removeAttribute('hidden')
   }
 
 
-  HandlePointerMouseOut() {
+  HandleMouseOut() {
     this.Pointer?.setAttribute('hidden', 'true')
   }
 
@@ -596,7 +625,7 @@ export default class GridMapDisplay extends GridBase {
   // #region KB Handlers
 
   HandleKeyboardDown(event: KeyboardEvent) {
-    
+
     // arrow keys - move horizontal and vertical
     if (
       event.key == 'ArrowRight'
@@ -888,7 +917,7 @@ export default class GridMapDisplay extends GridBase {
     if (this.ScaleContainer) this.ScaleContainer.style.zoom = scale.toString()
   }
 
-  
+
   /**
    * i.e. 10.03 > 10, 10.19999 > 10.2, etc.
    */
@@ -900,7 +929,7 @@ export default class GridMapDisplay extends GridBase {
     ) / 10
   }
 
-  
+
   /**
    * Calculate the Grid/Map Size in pixels
    */
@@ -1067,7 +1096,7 @@ export default class GridMapDisplay extends GridBase {
             // the tile used is based on where it is and what layer its on
             const tileData = this.GridMapData.GetTileData(x, y, layer)
 
-            if(tileNotRendred) {
+            if (tileNotRendred) {
 
               // don't render empty space
               if (tileData.SurroundingMapData == '0000') continue
