@@ -141,6 +141,11 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     // todo - convert from the type used by render to the type used by the form
     this.Layers.SetTileLayers(this.GridMapData?.MapData?.Layers)
 
+    this.Layers?.Tabs?.addEventListener(
+      'selected-changed',
+      () => { this.HandleLayerChanged() }
+    )
+
     // @ts-ignore
     this.Layers.addEventListener(
       'change',
@@ -180,10 +185,21 @@ export default class GridMapDataEdit extends AppSidebarWidget {
   }
 
 
+  HandleLayerChanged() {
+    document.dispatchEvent(
+      new CustomEvent(
+        'grid-map-edit-selected-layer',
+        {
+          bubbles: true,
+          detail: this.Layers?.Tabs?.selectedIndex,
+        }
+      )
+    )
+  }
+
+
   /**
    * Handle Pointer Select
-   * 
-   * @param {PointerType} pointerType
    */
   HandlePointerSelection(pointerType: PointerType) {
     

@@ -180,6 +180,8 @@ export default class GridMapDisplay extends GridBase {
 
   #State: string = 'normal'
 
+  #Focus: boolean = false
+
   set State(value) {
     if (!(value == 'normal' || value == 'edit')) return
     this.#State = value
@@ -217,6 +219,22 @@ export default class GridMapDisplay extends GridBase {
 
     // #endregion
 
+    this.addEventListener(
+      'focus',
+      () => {
+        this.#Focus = true
+        this.Container?.classList.add('focus')
+      }
+    )
+
+    this.addEventListener(
+      'blur',
+      () => {
+        this.#Focus = false
+        this.Container?.classList.remove('focus')
+      }
+    )
+
     // #region Mouse Listeners
 
     this.addEventListener(
@@ -249,17 +267,40 @@ export default class GridMapDisplay extends GridBase {
       (event) => { this.HandleMouseWheel(event) }
     )
 
-    // react to when the mouse is down
+    // process when the mouse or touch is down
     setInterval(
-      () => { if(this.#mouseIsDown) this.HandleMouseIsDown() },
+      () => {
+        if (this.#mouseIsDown) this.HandleMouseIsDown()
+        if (this.#touchIsDown) this.HandleTouchIsDown()
+      },
       100
     )
 
     // #endregion
 
-    /**
-     * Keyboard Event Listeners
-     */
+    // #region Touch Listeners
+    this.addEventListener(
+      'touchstart',
+      (event) => { this.HandleTouchStart(event) }
+    )
+
+    this.addEventListener(
+      'touchmove',
+      (event) => { this.HandleTouchStart(event) }
+    )
+
+    this.addEventListener(
+      'touchend',
+      () => { this.HandleTouchEnd() }
+    )
+
+    this.addEventListener(
+      'touchcancel',
+      () => { this.HandleTouchEnd() }
+    )
+
+    // #endregion
+
 
     // #region KB Listeners
 
@@ -334,22 +375,28 @@ export default class GridMapDisplay extends GridBase {
     document.addEventListener(
       'grid-map-display-select-tile',
       () => {
-        this.SetPointer(PointerType.Select)
+        if (this.State == 'edit') this.SetPointer(PointerType.Select)
       }
     )
 
     document.addEventListener(
       'grid-map-display-remove-tile',
       () => {
-        this.SetPointer(PointerType.Remove)
+        if (this.State == 'edit') this.SetPointer(PointerType.Remove)
       }
     )
 
     document.addEventListener(
       'grid-map-display-add-tile',
       () => {
-        this.SetPointer(PointerType.Add)
+        if (this.State == 'edit') this.SetPointer(PointerType.Add)
       }
+    )
+
+    // @ts-ignore
+    document.addEventListener(
+      'grid-map-edit-selected-layer',
+      (event: CustomEvent) => { this.HandleLayerSelected(event.detail) }
     )
 
     // #endregion
@@ -482,6 +529,18 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
+  HandleLayerSelected(layerIdx: number) {
+    let tileLayer = this.GridMapData?.MapData?.Layers[layerIdx]
+    if (tileLayer?.Tileset != null && tileLayer?.CanWalk != null) {
+      this.SavedTileData = {
+        Layer: layerIdx,
+        Tileset: tileLayer?.Tileset!,
+        CanWalk: tileLayer?.CanWalk!,
+      }
+    }
+  }
+
+
   /**
    * @param {GridMapTiles} event 
    */
@@ -491,6 +550,51 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
+  // #region Touch Handlers
+
+  #touchIsDown: boolean = false
+  #touchMoveBy: XY = { x: 0, y: 0 }
+
+  GetMapCoordFromTouchEvent(touch: Touch): XY {
+    return {
+      x: Math.ceil(((touch.clientX * (1 / this.DisplayScale)) - this.GridCenterOffset.x) / this.TilePixelSize.x),
+      y: Math.ceil(((touch.clientY * (1 / this.DisplayScale)) - this.GridCenterOffset.y) / this.TilePixelSize.y)
+    }
+  }
+
+
+  HandleTouchStart(event: TouchEvent) {
+    this.#touchIsDown = true
+    const touchLocation = this.GetMapCoordFromTouchEvent(event.touches[0])
+    this.#touchMoveBy = {
+      x: (touchLocation.x > this.CenterLocation.x ? 1 : touchLocation.x < this.CenterLocation.x ? -1 : 0),
+      y: (touchLocation.y > this.CenterLocation.y ? 1 : touchLocation.y < this.CenterLocation.y ? -1 : 0)
+    }
+  }
+
+
+  HandleTouchIsDown() {
+    if (this.State != 'normal') return
+
+    this.CursorMoveBy(
+      this.#touchMoveBy,
+      false
+    )
+  }
+
+  HandleTouchEnd() {
+    this.#touchIsDown = false
+  }
+
+  // #endregion
+
+
+  // #region Mouse Handlers
+
+  #mouseIsDown: boolean = false
+  #mouseMoveBy: XY = { x: 0, y: 0 }
+
+
   GetMapCoordFromMouseEvent(event: MouseEvent): XY {
     return {
       x: Math.ceil(((event.offsetX * (1 / this.DisplayScale)) - this.GridCenterOffset.x) / this.TilePixelSize.x),
@@ -498,8 +602,6 @@ export default class GridMapDisplay extends GridBase {
     }
   }
 
-
-  // #region Mouse Handlers
 
   HandleMouseWheel(event: WheelEvent) {
 
@@ -513,9 +615,6 @@ export default class GridMapDisplay extends GridBase {
 
   }
 
-  #mouseIsDown: boolean = false
-  #mouseMoveBy: XY = { x: 0, y: 0 }
-
   HandleMouseDown(event: MouseEvent) {
 
     this.#mouseIsDown = true
@@ -523,7 +622,7 @@ export default class GridMapDisplay extends GridBase {
 
     const coord = this.GetMapCoordFromMouseEvent(event)
 
-    if (this.State == 'edit') {
+    if (this.#Focus && this.State == 'edit') {
       const SelectedLocationData = this.GridMapData?.GetTopMostMapData(coord)
       this.UpdateMapDataAtPointerLocation(SelectedLocationData)
     }
@@ -586,11 +685,6 @@ export default class GridMapDisplay extends GridBase {
         this.UpdateMapDataAtPointerLocation(null)
       }
 
-      // when in edit state and button is released - forget the tile data
-      if (this.State == 'edit' && event.buttons == 0) {
-        this.SavedTileData = null
-      }
-
       // when in edit state - update pointer text
       if (this.State == 'edit' && this.PointerLocationData) {
 
@@ -617,6 +711,7 @@ export default class GridMapDisplay extends GridBase {
 
 
   HandleMouseOut() {
+    this.#mouseIsDown = false
     this.Pointer?.setAttribute('hidden', 'true')
   }
 
@@ -625,6 +720,16 @@ export default class GridMapDisplay extends GridBase {
   // #region KB Handlers
 
   HandleKeyboardDown(event: KeyboardEvent) {
+
+    if (this.State == 'edit') {
+      if (event.ctrlKey || event.shiftKey) {
+        if (event.ctrlKey) this.SetPointer(PointerType.Remove)
+        if (event.shiftKey) this.SetPointer(PointerType.Add)
+      } else {
+        this.SetPointer(PointerType.Select)
+      }
+    }
+
 
     // arrow keys - move horizontal and vertical
     if (
@@ -677,6 +782,8 @@ export default class GridMapDisplay extends GridBase {
   }
 
   HandleKeyboardUp(event: KeyboardEvent) {
+
+    if (this.State == 'edit') this.SetPointer(PointerType.Select)
 
     // grid-map-data-generate-random
     if (event.key == 'g') {
@@ -841,14 +948,10 @@ export default class GridMapDisplay extends GridBase {
 
   UpdateMapDataAtPointerLocation(tileData: TileData | null | undefined) {
 
-    // if tileData is provided save it - this is the data used to update the map location while the use clicks and drags
-    if (tileData) this.SavedTileData = tileData
-
-    // TODO be nice to be able to select the -1 layer and set all layers to 0
-
     switch (this.Pointer?.PointerType) {
 
       case (PointerType.Select):
+        if (tileData) this.SavedTileData = tileData
         document.dispatchEvent(
           new CustomEvent(
             'grid-map-display-select-layer',

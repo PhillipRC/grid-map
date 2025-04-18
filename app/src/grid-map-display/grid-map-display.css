@@ -13,6 +13,19 @@
   z-index: 900;
 }
 
+
+grid-map-pointer {
+  display: none;
+}
+
+.container.focus grid-map-pointer {
+  display: initial;
+}
+
+.container grid-map-pointer[hidden="true"] {
+  display: none;
+}
+
 .container {
   display: grid;
   overflow: hidden;

@@ -18,6 +18,10 @@
   margin-left: 10px;
 }
 
+.main grid-map-display:focus {
+  outline: auto 1px;
+}
+
 .sidebar {
   flex-shrink: 1;
   height: 100%;
