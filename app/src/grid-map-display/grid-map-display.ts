@@ -94,13 +94,27 @@ export default class GridMapDisplay extends GridBase {
 
   /**
    * Selected Tile Data
-   * 
-   * @type {TileData}
    */
-  SelectedLocationData: TileData = {
+  #selectedLocationData: TileData = {
     Layer: -1,
     Tileset: null,
     CanWalk: false,
+  }
+
+  set SelectedLocationData(value: TileData) {
+    if (value) {
+      this.Container?.classList.remove(`selected-layer-${this.#selectedLocationData.Layer}`)
+      this.Container?.querySelector(`#layer-${this.#selectedLocationData.Layer}`)?.classList.remove('selected')
+
+      this.#selectedLocationData = value
+
+      this.Container?.classList.add(`selected-layer-${value.Layer}`)
+      this.Container?.querySelector(`#layer-${value.Layer}`)?.classList.add('selected')
+    }
+  }
+
+  get SelectedLocationData(): TileData {
+    return this.#selectedLocationData
   }
 
 
@@ -204,10 +218,10 @@ export default class GridMapDisplay extends GridBase {
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    // allow display to capture focus
+    // allow display to capture focus/keyboard
     this.setAttribute('tabindex', '1')
 
-    // #region set display element references
+    // #region display references
 
     this.Container = this.shadowRoot?.querySelector('.container')!
     this.ScaleContainer = this.shadowRoot?.querySelector('.scale-container')!
@@ -244,7 +258,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.addEventListener(
       'click',
-      (event) => { this.HandleMouseUp(event) }
+      () => { this.HandleMouseUp() }
     )
 
     this.addEventListener(
@@ -286,7 +300,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.addEventListener(
       'touchmove',
-      (event) => { this.HandleTouchStart(event) }
+      (event) => { this.HandleTouchMove(event) }
     )
 
     this.addEventListener(
@@ -532,6 +546,11 @@ export default class GridMapDisplay extends GridBase {
   HandleLayerSelected(layerIdx: number) {
     let tileLayer = this.GridMapData?.MapData?.Layers[layerIdx]
     if (tileLayer?.Tileset != null && tileLayer?.CanWalk != null) {
+      this.SelectedLocationData = {
+        Layer: layerIdx,
+        Tileset: tileLayer?.Tileset!,
+        CanWalk: tileLayer?.CanWalk!,
+      }
       this.SavedTileData = {
         Layer: layerIdx,
         Tileset: tileLayer?.Tileset!,
@@ -557,19 +576,53 @@ export default class GridMapDisplay extends GridBase {
 
   GetMapCoordFromTouchEvent(touch: Touch): XY {
     return {
-      x: Math.ceil(((touch.clientX * (1 / this.DisplayScale)) - this.GridCenterOffset.x) / this.TilePixelSize.x),
-      y: Math.ceil(((touch.clientY * (1 / this.DisplayScale)) - this.GridCenterOffset.y) / this.TilePixelSize.y)
+      x: Math.ceil(((touch.clientX * (1 / this.DisplayScale)) - this.GridCenterOffset.x - (this.TilePixelSize.x / 2)) / (this.TilePixelSize.x)
+      ),
+      y: Math.ceil(((touch.clientY * (1 / this.DisplayScale)) - this.GridCenterOffset.y - (this.TilePixelSize.y / 2)) / (this.TilePixelSize.y))
     }
   }
 
 
   HandleTouchStart(event: TouchEvent) {
     this.#touchIsDown = true
-    const touchLocation = this.GetMapCoordFromTouchEvent(event.touches[0])
+    const coord = this.GetMapCoordFromTouchEvent(event.touches[0])
     this.#touchMoveBy = {
-      x: (touchLocation.x > this.CenterLocation.x ? 1 : touchLocation.x < this.CenterLocation.x ? -1 : 0),
-      y: (touchLocation.y > this.CenterLocation.y ? 1 : touchLocation.y < this.CenterLocation.y ? -1 : 0)
+      x: (coord.x > this.CenterLocation.x ? 1 : coord.x < this.CenterLocation.x ? -1 : 0),
+      y: (coord.y > this.CenterLocation.y ? 1 : coord.y < this.CenterLocation.y ? -1 : 0)
     }
+  
+    if (this.#Focus && this.State == 'edit') {
+      const SelectedLocationData = this.GridMapData?.GetTopMostMapData(coord)
+      this.UpdateMapDataAtPointerLocation(SelectedLocationData)
+    }
+  }
+
+  HandleTouchMove(event: TouchEvent) {
+    
+    if(!this.#touchIsDown || !this.GridMapData) return
+
+    const coord = this.GetMapCoordFromTouchEvent(event.touches[0])
+
+    this.#touchMoveBy = {
+      x: (coord.x > this.CenterLocation.x ? 1 : coord.x < this.CenterLocation.x ? -1 : 0),
+      y: (coord.y > this.CenterLocation.y ? 1 : coord.y < this.CenterLocation.y ? -1 : 0)
+    }
+
+    if (this.PointerLocation.x != coord.x || this.PointerLocation.y != coord.y) {
+
+      this.PointerLocation = coord
+      this.PointerLocationData = this.GridMapData?.GetTopMostMapData(coord)
+      this.RenderDebug()
+      this.PositionPointer()
+      this.UpdateMouseMoveBy()
+
+      // when in edit state - update map data
+      if (this.State == 'edit') {
+        this.UpdateMapDataAtPointerLocation(null)
+      }
+
+    }
+
   }
 
 
@@ -630,14 +683,8 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  HandleMouseUp(event: MouseEvent) {
-
+  HandleMouseUp() {
     this.#mouseIsDown = false
-
-    const coord = this.GetMapCoordFromMouseEvent(event)
-    const mapData = this.GridMapData?.GetTopMostMapData(coord)
-    this.SelectedLocation = coord
-    if (mapData) this.SelectedLocationData = mapData
     this.RenderDebug()
   }
 
@@ -899,7 +946,6 @@ export default class GridMapDisplay extends GridBase {
       if (SelectedLocationData.CanWalk == false) return
     }
 
-    this.SelectedLocationData = SelectedLocationData
     this.CenterLocation = coord
     this.CenterOnMapCursor()
 

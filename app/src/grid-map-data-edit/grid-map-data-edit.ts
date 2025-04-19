@@ -113,7 +113,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       (customEvent) => {
         // @ts-ignore
         const tileData = customEvent.detail as TileData
-        this.Layers?.SelectLayer(tileData.Layer)
+        if(tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
       }
     )
 

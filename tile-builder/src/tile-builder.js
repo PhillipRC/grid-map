@@ -40,6 +40,11 @@ class TileBuilder {
    * allowing a stylesheet to set the style
    */
   StyleClassPairs = [
+    // fill-opacity: 0.5 replaced with class="fills-o"
+    {
+      Style: 'fill-opacity: 0.5',
+      Class: 'fills-o',
+    },
     // #66666 replaced with class="fills"
     {
       Style: '102, 102, 102',
@@ -54,11 +59,6 @@ class TileBuilder {
     {
       Style: '51, 51, 51',
       Class: 'fills-2',
-    },
-    // fill-opacity: 0.5 replaced with class="fills-o"
-    {
-      Style: 'fill-opacity: 0.5',
-      Class: 'fills-o',
     },
   ]
 

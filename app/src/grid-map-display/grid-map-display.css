@@ -45,6 +45,14 @@ svg[id="layer-0"] {
   background-image: url("images/water.png");
 }
 
+/* give selected layer a dashed outline */
+.edit .scale-container > svg.selected > svg g {
+  stroke-dasharray: 1,3;
+  stroke-linejoin: round;  
+  stroke-width: 1px;
+  stroke: #fff;
+}
+
 .edit-tools-panel {
   background-color: rgba(0, 0, 0, .2);
   border-bottom-right-radius: 10px;
