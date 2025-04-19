@@ -3,6 +3,7 @@ import GridMapData from '../grid-map-data/grid-map-data'
 import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapPointer from '../grid-map-pointer/grid-map-pointer'
 import PointerType from '../grid-map-pointer/PointerType'
+import Color from '../Color'
 
 import {
   XY,
@@ -449,6 +450,7 @@ export default class GridMapDisplay extends GridBase {
           ]
         )
         svgContainer.id = `layer-${layerIdx}`
+        svgContainer.classList.add('layer')
         svgContainer.style.zIndex = ((layerIdx + 1) * 100).toString()
         this.Layers.push(
           {
@@ -476,15 +478,18 @@ export default class GridMapDisplay extends GridBase {
 
     this.GridMapData.MapData.Layers.forEach(
       (layer, layerIdx) => {
+        const color = new Color()
         // add styles to apply the select color
         const styles = []
-        // base color
-        styles.push(`#layer-${layerIdx} .fills {fill: ${layer.Color};}`)
-        // color variant 1
-        styles.push(`#layer-${layerIdx} .fills-1 {fill: ${this.ColorRgbLevel(layer.Color, -10)};}`)
-        // color variant 2
-        styles.push(`#layer-${layerIdx} .fills-2 {fill: ${this.ColorRgbLevel(layer.Color, -20)};}`)
-        // 50% opacity
+        // set stroke color
+        styles.push(`#layer-${layerIdx}{--stroke-color: ${color.Color(layer.Color).Contrast()};}`)
+        // set base color
+        styles.push(`#layer-${layerIdx} .fills {fill: ${layer.Color};} `)
+        // set color variant 1
+        styles.push(`#layer-${layerIdx} .fills-1 {fill: ${color.Color(layer.Color).Level(layer.Color, -10)};}`)
+        // set color variant 2
+        styles.push(`#layer-${layerIdx} .fills-2 {fill: ${color.Color(layer.Color).Level(layer.Color, -20)};}`)
+        // set 50% opacity
         styles.push(`#layer-${layerIdx} .fills-o {fill: ${layer.Color};fill-opacity: .5;}`)
         styles.forEach(
           (style) => {
@@ -850,32 +855,6 @@ export default class GridMapDisplay extends GridBase {
     if (!this.Pointer) return
     this.Pointer.style.top = `${(this.PointerLocation.y - 1) * this.TilePixelSize.y + this.GridCenterOffset.y}px`
     this.Pointer.style.left = `${(this.PointerLocation.x - 1) * this.TilePixelSize.x + this.GridCenterOffset.x}px`
-  }
-
-
-  /**
-   * Adjust the level of the color
-   * 
-   * @param {string} rgb #112233
-   * @param {number} percent -100 to 100
-   * @returns {string}
-   */
-  ColorRgbLevel(rgb: string, percent: number): string {
-
-    // adjust each channel by percent
-    let R = Math.floor(parseInt(rgb.substring(1, 3), 16) * (100 + percent) / 100)
-    let G = Math.floor(parseInt(rgb.substring(3, 5), 16) * (100 + percent) / 100)
-    let B = Math.floor(parseInt(rgb.substring(5, 7), 16) * (100 + percent) / 100)
-
-    // cap each channel
-    R = Math.round((R < 255) ? R : 255)
-    G = Math.round((G < 255) ? G : 255)
-    B = Math.round((B < 255) ? B : 255)
-
-    return '#'
-      + ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16))
-      + ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16))
-      + ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16))
   }
 
 

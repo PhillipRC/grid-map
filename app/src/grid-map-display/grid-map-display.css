@@ -50,7 +50,7 @@ svg[id="layer-0"] {
   stroke-dasharray: 1,3;
   stroke-linejoin: round;  
   stroke-width: 1px;
-  stroke: #fff;
+  stroke: var(--stroke-color, #fff);
 }
 
 .edit-tools-panel {
