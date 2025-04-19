@@ -19,8 +19,8 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    * Component handling Map data: loading, generating, getting
    */
   GridMapData: GridMapData | null = null
-  
-  
+
+
   GridMapTilesRef: GridMapTiles | null = null
 
 
@@ -113,7 +113,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       (customEvent) => {
         // @ts-ignore
         const tileData = customEvent.detail as TileData
-        if(tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
+        if (tileData != null && tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
       }
     )
 
@@ -121,7 +121,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
 
   HandleDataLoaded() {
-    if(!this.GridMapData || !this.GridMapTilesRef) return
+    if (!this.GridMapData || !this.GridMapTilesRef) return
     this.Init()
   }
 
@@ -135,7 +135,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
     // create new layer inputs
     this.Layers = new GridMapFormTileLayers()
-    if(this.GridMapTilesRef?.TileSets) this.Layers.SetTilesets(this.GridMapTilesRef.TileSets)
+    if (this.GridMapTilesRef?.TileSets) this.Layers.SetTilesets(this.GridMapTilesRef.TileSets)
     this.LayersForm?.appendChild(this.Layers)
 
     // todo - convert from the type used by render to the type used by the form
@@ -153,8 +153,8 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
         event.stopPropagation()
 
-        if(!event.target) return
-        
+        if (!event.target) return
+
         // @ts-ignore
         const name = event.target.getAttribute('name')
         // @ts-ignore
@@ -164,17 +164,17 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
         if (!name || !layerIdx || !value) return
 
-        switch(name) {
+        switch (name) {
 
-          case('Color'):
+          case ('Color'):
             this.GridMapData?.SetLayerColor(layerIdx, value)
             break
 
-          case('Tileset'):
+          case ('Tileset'):
             this.GridMapData?.SetLayerTileSet(layerIdx, value)
             break
 
-          case('CanWalk'):
+          case ('CanWalk'):
             const bool = value == 'true' ? true : false
             this.GridMapData?.SetLayerCanWalk(layerIdx, bool)
             break
@@ -202,9 +202,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    * Handle Pointer Select
    */
   HandlePointerSelection(pointerType: PointerType) {
-    
+
     this.ClearSelected()
-    
+
     if (pointerType == PointerType.Add) {
       this.PointerAddOption?.setAttribute('selected', 'true')
       document.dispatchEvent(

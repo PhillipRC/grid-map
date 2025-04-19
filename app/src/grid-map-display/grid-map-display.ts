@@ -462,6 +462,11 @@ export default class GridMapDisplay extends GridBase {
       }
     )
 
+    // dummy layer is used to fix a TouchMove listener issue
+    const dummyLayer = this.CreateSvgTag('svg',[['width', this.GridPixelSize.x],['height', this.GridPixelSize.y]])
+    dummyLayer.style.zIndex = ((this.GridMapData.MapData.Layers.length + 1) * 100).toString()
+    this.ScaleContainer?.appendChild(dummyLayer)
+
     this.SetLayerStyles()
     this.HandleResize()
 
@@ -589,23 +594,39 @@ export default class GridMapDisplay extends GridBase {
 
 
   HandleTouchStart(event: TouchEvent) {
+
+    if(!this.GridMapData) return
+
     this.#touchIsDown = true
+    this.focus()
+
     const coord = this.GetMapCoordFromTouchEvent(event.touches[0])
     this.#touchMoveBy = {
       x: (coord.x > this.CenterLocation.x ? 1 : coord.x < this.CenterLocation.x ? -1 : 0),
       y: (coord.y > this.CenterLocation.y ? 1 : coord.y < this.CenterLocation.y ? -1 : 0)
     }
+
+    // if the coords changed
+    if (this.PointerLocation.x != coord.x || this.PointerLocation.y != coord.y) {
+      this.PointerLocation = coord
+      this.PointerLocationData = this.GridMapData.GetTopMostMapData(coord)
+    }
+
+    this.PositionPointer()
+    this.Pointer?.removeAttribute('hidden')
   
     if (this.#Focus && this.State == 'edit') {
-      const SelectedLocationData = this.GridMapData?.GetTopMostMapData(coord)
+      const SelectedLocationData = this.GridMapData.GetTopMostMapData(coord)
       this.UpdateMapDataAtPointerLocation(SelectedLocationData)
     }
   }
 
   HandleTouchMove(event: TouchEvent) {
-    
-    if(!this.#touchIsDown || !this.GridMapData) return
 
+    if(!this.GridMapData) return
+    
+    this.#touchIsDown = true
+    
     const coord = this.GetMapCoordFromTouchEvent(event.touches[0])
 
     this.#touchMoveBy = {
@@ -616,10 +637,9 @@ export default class GridMapDisplay extends GridBase {
     if (this.PointerLocation.x != coord.x || this.PointerLocation.y != coord.y) {
 
       this.PointerLocation = coord
-      this.PointerLocationData = this.GridMapData?.GetTopMostMapData(coord)
+      this.PointerLocationData = this.GridMapData.GetTopMostMapData(coord)
       this.RenderDebug()
       this.PositionPointer()
-      this.UpdateMouseMoveBy()
 
       // when in edit state - update map data
       if (this.State == 'edit') {
@@ -641,6 +661,7 @@ export default class GridMapDisplay extends GridBase {
   }
 
   HandleTouchEnd() {
+    this.Pointer?.setAttribute('hidden', 'true')
     this.#touchIsDown = false
   }
 
@@ -1171,6 +1192,7 @@ export default class GridMapDisplay extends GridBase {
       display += `<br/>Center   Loc   (${this.CenterLocation.x},${this.CenterLocation.y})`
       display += `<br/>Selected Loc   (${this.SelectedLocation.x},${this.SelectedLocation.y})`
       display += `<br/>Selected Data  Layer:${this.SelectedLocationData.Layer} Tile:${this.SelectedLocationData.Tileset}`
+      display += `<br/>Saved TileData ${this.SavedTileData?.Layer} Tile:${this.SavedTileData?.Tileset}`
       display += `<br/>Pointer Loc    (${this.PointerLocation.x},${this.PointerLocation.y})</pre>`
 
     }

@@ -46,9 +46,9 @@ svg[id="layer-0"] {
 }
 
 /* give selected layer a dashed outline */
-.edit .scale-container > svg.selected > svg g {
-  stroke-dasharray: 1,3;
-  stroke-linejoin: round;  
+.edit .scale-container>svg.selected>svg g {
+  stroke-dasharray: 1, 3;
+  stroke-linejoin: round;
   stroke-width: 1px;
   stroke: var(--stroke-color, #fff);
 }
@@ -68,9 +68,17 @@ svg[id="layer-0"] {
   text-shadow: 0 0 4px black;
 }
 
+/* hide debug on small display */
+@media only screen and (max-width: 800px) {
+  .debug {
+    display: none;
+  }
+}
+
 .reticle {
   position: absolute;
 }
+
 .reticle img {
   -webkit-user-drag: none;
   left: -32px;
@@ -82,7 +90,7 @@ svg[id="layer-0"] {
 }
 
 .welcome {
-  background-color: rgba(0,0,0,.2);
+  background-color: rgba(0, 0, 0, .2);
   border-radius: 4px;
   margin: 0;
   padding: 20px;
