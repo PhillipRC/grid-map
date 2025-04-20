@@ -1069,7 +1069,6 @@ export default class GridMapDisplay extends GridBase {
     scale = GridMapDisplay.SnapDecimal(scale)
 
     this.DisplayScale = scale
-    if (this.ScaleContainer) this.ScaleContainer.style.zoom = scale.toString()
   }
 
 
@@ -1077,18 +1076,24 @@ export default class GridMapDisplay extends GridBase {
    * Snap to specific decimal values
    */
   static SnapDecimal(value: number): number {
-    const allowedDecimal = [0.875, 0.75, 0.625, 0.5, 0.375, 0.25, 0.125]
+
+    const allowedDecimal = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]
     const wholeValue = parseInt(value.toString())
     const decimalValue = value - wholeValue
-    allowedDecimal.forEach(
-      (allowedDecimalValue) => {
-        if (decimalValue == allowedDecimalValue) return value
-        if (decimalValue < allowedDecimalValue) {
-          return wholeValue + allowedDecimalValue
-        }
+    let safeDecimalValue:number = 0
+
+    for (const allowedDecimalValue of allowedDecimal) {
+      
+      if (
+        decimalValue == allowedDecimalValue
+        || decimalValue < allowedDecimalValue
+      ) {
+        safeDecimalValue = allowedDecimalValue
+        break
       }
-    )
-    return 1
+    }
+
+    return wholeValue + safeDecimalValue    
   }
 
 
