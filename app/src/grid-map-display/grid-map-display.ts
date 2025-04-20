@@ -913,11 +913,16 @@ export default class GridMapDisplay extends GridBase {
    * @param {number} pointer
    */
   SetPointer(pointer: number) {
-    if (this.GridMapData) {
-      this.Pointer?.setAttribute('data-pointer', PointerType.GetName(pointer))
-    } else {
-      this.Pointer?.setAttribute('data-pointer', PointerType.GetName(0))
-    }
+    let setPointer = PointerType.GetName(pointer)
+    if (setPointer == null) setPointer = PointerType.GetName(0)
+    this.Pointer?.setAttribute('data-pointer', setPointer)
+
+    document.dispatchEvent(
+      new CustomEvent(
+        'grid-map-display-select-pointer',
+        { bubbles: true, detail: pointer }
+      )
+    )
   }
 
   ClearLayerStyles() {

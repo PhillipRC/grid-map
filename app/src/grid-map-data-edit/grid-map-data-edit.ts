@@ -85,9 +85,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     this.PointerSelectOption = this.shadowRoot?.querySelector('.pointer-select-option')!
 
     // add listeners
-    this.PointerAddOption?.addEventListener('click', () => { this.HandlePointerSelection(PointerType.Add) })
-    this.PointerRemoveOption?.addEventListener('click', () => { this.HandlePointerSelection(PointerType.Remove) })
-    this.PointerSelectOption?.addEventListener('click', () => { this.HandlePointerSelection(PointerType.Select) })
+    this.PointerAddOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Add) })
+    this.PointerRemoveOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Remove) })
+    this.PointerSelectOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Select) })
 
     // @ts-ignore
     document.addEventListener(
@@ -114,6 +114,15 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         // @ts-ignore
         const tileData = customEvent.detail as TileData
         if (tileData != null && tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
+      }
+    )
+
+    document.addEventListener(
+      'grid-map-display-select-pointer',
+      (customEvent) => {
+        // @ts-ignore
+        const pointer = customEvent.detail as PointerType
+        if (pointer) this.HandlePointerSelection(pointer)
       }
     )
 
@@ -200,6 +209,27 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
   }
 
+  HandlePointerOptionSelection(pointerType: PointerType) {
+    if (pointerType == PointerType.Add) {
+      document.dispatchEvent(
+        new Event('grid-map-display-add-tile')
+      )
+    }
+
+    if (pointerType == PointerType.Remove) {
+      document.dispatchEvent(
+        new Event('grid-map-display-remove-tile')
+      )
+    }
+
+    if (pointerType == PointerType.Select) {
+      document.dispatchEvent(
+        new Event('grid-map-display-select-tile')
+      )
+    }
+    this.HandlePointerSelection(pointerType)
+  }
+
 
   /**
    * Handle Pointer Select
@@ -210,23 +240,14 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
     if (pointerType == PointerType.Add) {
       this.PointerAddOption?.setAttribute('selected', 'true')
-      document.dispatchEvent(
-        new Event('grid-map-display-add-tile')
-      )
     }
 
     if (pointerType == PointerType.Remove) {
       this.PointerRemoveOption?.setAttribute('selected', 'true')
-      document.dispatchEvent(
-        new Event('grid-map-display-remove-tile')
-      )
     }
 
     if (pointerType == PointerType.Select) {
       this.PointerSelectOption?.setAttribute('selected', 'true')
-      document.dispatchEvent(
-        new Event('grid-map-display-select-tile')
-      )
     }
 
   }
