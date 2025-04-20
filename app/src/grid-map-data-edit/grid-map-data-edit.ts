@@ -129,6 +129,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     // set default selection
     this.HandlePointerSelection(PointerType.Select)
 
+    // open display on first load
+    this.ToggleDisplay()
+
   }
 
 
@@ -157,6 +160,18 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       'selected-changed',
       () => { this.HandleLayerChanged() }
     )
+
+    // send event with default layer selection
+    document.dispatchEvent(
+      new CustomEvent(
+        'grid-map-edit-selected-layer',
+        {
+          bubbles: true,
+          detail: this.Layers?.Tabs?.selectedIndex,
+        }
+      )
+    )
+    
 
     // @ts-ignore
     this.Layers.addEventListener(
