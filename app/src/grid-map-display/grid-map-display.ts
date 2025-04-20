@@ -463,7 +463,7 @@ export default class GridMapDisplay extends GridBase {
     )
 
     // dummy layer is used to fix a TouchMove listener issue
-    const dummyLayer = this.CreateSvgTag('svg',[['width', this.GridPixelSize.x],['height', this.GridPixelSize.y]])
+    const dummyLayer = this.CreateSvgTag('svg', [['width', this.GridPixelSize.x], ['height', this.GridPixelSize.y]])
     dummyLayer.style.zIndex = ((this.GridMapData.MapData.Layers.length + 1) * 100).toString()
     this.ScaleContainer?.appendChild(dummyLayer)
 
@@ -595,7 +595,7 @@ export default class GridMapDisplay extends GridBase {
 
   HandleTouchStart(event: TouchEvent) {
 
-    if(!this.GridMapData) return
+    if (!this.GridMapData) return
 
     this.#touchIsDown = true
     this.focus()
@@ -614,7 +614,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.PositionPointer()
     this.Pointer?.removeAttribute('hidden')
-  
+
     if (this.#Focus && this.State == 'edit') {
       const SelectedLocationData = this.GridMapData.GetTopMostMapData(coord)
       this.UpdateMapDataAtPointerLocation(SelectedLocationData)
@@ -623,10 +623,10 @@ export default class GridMapDisplay extends GridBase {
 
   HandleTouchMove(event: TouchEvent) {
 
-    if(!this.GridMapData) return
-    
+    if (!this.GridMapData) return
+
     this.#touchIsDown = true
-    
+
     const coord = this.GetMapCoordFromTouchEvent(event.touches[0])
 
     this.#touchMoveBy = {
@@ -1059,8 +1059,9 @@ export default class GridMapDisplay extends GridBase {
       this.ViewRect?.height / ((this.MaxRenderAreaSize.y + (this.MaxRenderAreaSize.y / 2)) * this.TilePixelSize.y),
       this.ViewRect?.width / ((this.MaxRenderAreaSize.x + (this.MaxRenderAreaSize.x / 2)) * this.TilePixelSize.x)
     )
-    // prevent odd numbers to keep graphics aligned
-    scale = GridMapDisplay.EvenDecimal(scale)
+
+    // snap decimal value to prevent artifacts caused by scaling
+    scale = GridMapDisplay.SnapDecimal(scale)
 
     this.DisplayScale = scale
     if (this.ScaleContainer) this.ScaleContainer.style.zoom = scale.toString()
@@ -1068,14 +1069,21 @@ export default class GridMapDisplay extends GridBase {
 
 
   /**
-   * i.e. 10.03 > 10, 10.19999 > 10.2, etc.
+   * Snap to specific decimal values
    */
-  static EvenDecimal(value: number): number {
-    return (
-      Math.round(
-        Math.floor(value * 10) / 2
-      ) * 2
-    ) / 10
+  static SnapDecimal(value: number): number {
+    const allowedDecimal = [0.875, 0.75, 0.625, 0.5, 0.375, 0.25, 0.125]
+    const wholeValue = parseInt(value.toString())
+    const decimalValue = value - wholeValue
+    allowedDecimal.forEach(
+      (allowedDecimalValue) => {
+        if (decimalValue == allowedDecimalValue) return value
+        if (decimalValue < allowedDecimalValue) {
+          return wholeValue + allowedDecimalValue
+        }
+      }
+    )
+    return 1
   }
 
 

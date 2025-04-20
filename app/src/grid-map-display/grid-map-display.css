@@ -41,6 +41,11 @@ svg {
   grid-row: 1;
 }
 
+/* if there is ever a need */
+/* .layer {
+  shape-rendering: optimizeSpeed;
+} */
+
 svg[id="layer-0"] {
   background-image: url("images/water.png");
 }
