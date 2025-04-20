@@ -794,11 +794,26 @@ export default class GridMapDisplay extends GridBase {
 
   HandleKeyboardDown(event: KeyboardEvent) {
 
+    if(!this.GridMapData) return
+
     if (this.State == 'edit') {
       if (event.ctrlKey || event.shiftKey) {
         if (event.ctrlKey) this.SetPointer(PointerType.Remove)
         if (event.shiftKey) this.SetPointer(PointerType.Add)
       } else {
+        // jump to pointer location
+        if(event.code == 'Space') {
+          const coord = {
+            x: (this.PointerLocation.x - this.CenterLocation.x),
+            y: (this.PointerLocation.y - this.CenterLocation.y)
+          }
+          this.CursorMoveBy(coord, true)
+          this.PointerLocation = {
+            x: this.CenterLocation.x + coord.x,
+            y: this.CenterLocation.y + coord.y
+          }
+          this.PointerLocationData = this.GridMapData.GetTopMostMapData(this.PointerLocation)
+        }
         this.SetPointer(PointerType.Select)
       }
     }
