@@ -45,7 +45,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    * 
    * @type {HTMLButtonElement|null|undefined}
    */
-  PointerAddOption: HTMLButtonElement | null | undefined = null
+  PointerAddOption: HTMLButtonElement | null = null
 
 
   /**
@@ -53,7 +53,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    * 
    * @type {HTMLButtonElement|null|undefined}
    */
-  PointerRemoveOption: HTMLButtonElement | null | undefined = null
+  PointerRemoveOption: HTMLButtonElement | null = null
 
 
   /**
@@ -61,7 +61,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    * 
    * @type {HTMLButtonElement|null|undefined}
    */
-  PointerSelectOption: HTMLButtonElement | null | undefined = null
+  PointerSelectOption: HTMLButtonElement | null = null
 
 
   constructor() {
@@ -80,9 +80,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     if (node) this.WidgetContent?.append(node)
 
     this.LayersForm = this.shadowRoot?.querySelector('.layers-form')
-    this.PointerAddOption = this.shadowRoot?.querySelector('.pointer-add-option')
-    this.PointerRemoveOption = this.shadowRoot?.querySelector('.pointer-remove-option')
-    this.PointerSelectOption = this.shadowRoot?.querySelector('.pointer-select-option')
+    this.PointerAddOption = this.shadowRoot?.querySelector('.pointer-add-option')!
+    this.PointerRemoveOption = this.shadowRoot?.querySelector('.pointer-remove-option')!
+    this.PointerSelectOption = this.shadowRoot?.querySelector('.pointer-select-option')!
 
     // add listeners
     this.PointerAddOption?.addEventListener('click', () => { this.HandlePointerSelection(PointerType.Add) })
@@ -116,6 +116,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         if (tileData != null && tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
       }
     )
+
+    // set default selection
+    this.HandlePointerSelection(PointerType.Select)
 
   }
 

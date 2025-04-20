@@ -37,8 +37,9 @@ svg {
 /* add */
 .container.type-1 {
   background-color: rgb(0, 255, 0, .2);
-  border-style: dashed;
   border-color: limegreen;
+  border-style: dashed;
+  border-width: 1px;
   box-shadow: none;
 }
 
@@ -50,9 +51,10 @@ svg {
 /* remove */
 .container.type-2 {
   background-color: rgb(255, 0, 0, .2);
-  box-shadow: none;
-  border-style: dashed;
   border-color: rgb(255,0,0);
+  border-style: dashed;
+  border-width: 1px;
+  box-shadow: none;
 }
 .type-2 .icon {
   fill: rgba(255, 255, 255, 1);
@@ -62,9 +64,10 @@ svg {
 /* select */
 .container.type-3 {
   background-color: rgb(0, 0, 0, .2);
-  box-shadow: none;
-  border-style: dashed;
   border-color: rgb(255,255,255);
+  border-style: dashed;
+  border-width: 1px;
+  box-shadow: none;
 }
 .type-3 .icon {
   fill: rgba(255, 255, 255, 1);

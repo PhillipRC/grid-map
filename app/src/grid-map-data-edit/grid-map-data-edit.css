@@ -1,27 +1,32 @@
-.pointer-select-option,
-.pointer-remove-option,
-.pointer-add-option {
+button.button.pointer-select-option,
+button.button.pointer-remove-option,
+button.button.pointer-add-option {
   align-items: anchor-center;
   display: flex;
   height: initial;
   justify-content: center;
-  max-height: 48px;
-  max-width: 48px;
-  padding: 5px;
+  padding: 10px;
+  zoom: .5;
+  background-color: rgba(0, 0, 0, .4);
 }
 
-button {
-  height: 48px;
-  width: 48px;
-}
-
-grid-map-pointer {
-  scale: .5;
+button.button.pointer-select-option[selected],
+button.button.pointer-remove-option[selected],
+button.button.pointer-add-option[selected] {
+  background-color: rgba(255, 255, 0, 0.1)
 }
 
 .console-display .container .sub-buttons button {
   margin-bottom: 0;
   margin-left: 0;
-  margin-right: 5px;
+  margin-right: 10px;
   margin-top: 5px;
+}
+
+.console-display .container .sub-buttons button:last-child {
+  margin-right: 0;
+}
+
+.pointer-row {
+  margin-bottom: 10px;
 }

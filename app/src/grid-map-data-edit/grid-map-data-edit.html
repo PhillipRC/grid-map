@@ -1,15 +1,13 @@
 <div class="container">
 
-  <form class="layers-form">
-  </form>
+  <div class="row sub-buttons pointer-row">
 
-  <div class="row sub-buttons">
-    
     <button
       class="button console-font pointer-select-option"
       selected="true"
       style="height: initial;"
       title="Select a Layer"
+      type="button"
       >
     
       <grid-map-pointer data-pointer="Select" data-selected="true"></grid-map-pointer>
@@ -20,6 +18,7 @@
       class="button console-font pointer-add-option"
       style="height: initial;"
       title="Add Tile to a Layer"
+      type="button"
       >
       
       <grid-map-pointer data-pointer="Add"></grid-map-pointer>
@@ -30,11 +29,15 @@
       class="button console-font pointer-remove-option"
       style="height: initial;"
       title="Remove Tile from a Layer"
+      type="button"
       >
       
       <grid-map-pointer data-pointer="Remove"></grid-map-pointer>
     
     </button>
   </div>
+
+  <form class="layers-form">
+  </form>
 
 </div>
