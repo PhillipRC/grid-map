@@ -39,6 +39,9 @@ export default class GridMapDataEdit extends AppSidebarWidget {
    */
   Layers: GridMapFormTileLayers | null = null
 
+  AddLayerOption: HTMLButtonElement | null = null
+  RemoveLayerOption: HTMLButtonElement | null = null
+
 
   /**
    * Option to Add tiles
@@ -84,10 +87,23 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     this.PointerRemoveOption = this.shadowRoot?.querySelector('.pointer-remove-option')!
     this.PointerSelectOption = this.shadowRoot?.querySelector('.pointer-select-option')!
 
+    this.AddLayerOption = this.shadowRoot?.querySelector('.add-tileset')!
+    this.RemoveLayerOption = this.shadowRoot?.querySelector('.remove-tileset')!
+
     // add listeners
     this.PointerAddOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Add) })
     this.PointerRemoveOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Remove) })
     this.PointerSelectOption?.addEventListener('click', () => { this.HandlePointerOptionSelection(PointerType.Select) })
+
+    this.AddLayerOption?.addEventListener(
+      'click',
+      () => { this.HandleAddLayer() }
+    )
+
+    this.RemoveLayerOption?.addEventListener(
+      'click',
+      () => { this.HandleRemoveLayer() }
+    )
 
     // @ts-ignore
     document.addEventListener(
@@ -106,6 +122,11 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         this.GridMapTilesRef = customEvent.detail
         this.HandleDataLoaded()
       }
+    )
+
+    document.addEventListener(
+      'grid-map-data-layer-updated',
+      () => { this.RemoveLayer() }
     )
 
     document.addEventListener(
@@ -135,16 +156,47 @@ export default class GridMapDataEdit extends AppSidebarWidget {
   }
 
 
+  HandleRemoveLayer() {
+
+    if (!this.GridMapData) return
+
+    const layerIdx = this.Layers?.Tabs?.selectedIndex
+    if (layerIdx) this.GridMapData.RemoveLayer(layerIdx)
+  }
+
+
+  RemoveLayer() {
+    this.SetLayers()
+  }
+
+
+  HandleAddLayer() {
+    throw new Error('Method not implemented.')
+  }
+
+
   HandleDataLoaded() {
     if (!this.GridMapData || !this.GridMapTilesRef) return
     this.Init()
   }
 
 
+  /** Handle first load */
   Init() {
+    this.SetLayers()
+  }
 
-    // clear layer inputs
+
+  /** Clear layer inputs */
+  ClearLayers() {
     if (this.Layers) this.LayersForm?.removeChild(this.Layers)
+  }
+
+
+  /** Create inputs for each Layer */
+  SetLayers() {
+
+    this.ClearLayers()
 
     if (!this.GridMapData || !this.GridMapData.MapData || !this.GridMapData.MapData.Layers) return
 
@@ -171,7 +223,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         }
       )
     )
-    
+
 
     // @ts-ignore
     this.Layers.addEventListener(

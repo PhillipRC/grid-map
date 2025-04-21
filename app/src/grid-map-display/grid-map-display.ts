@@ -388,6 +388,17 @@ export default class GridMapDisplay extends GridBase {
     )
 
     document.addEventListener(
+      'grid-map-data-layer-updated',
+      () => {
+        // when a layer is added/removed rebuild the layer display
+        this.SetLayers()
+        this.RemoveAllTiles()
+        this.SetLayerStyles()
+        this.Render()
+      }
+    )
+
+    document.addEventListener(
       'grid-map-display-select-tile',
       () => {
         if (this.State == 'edit') this.SetPointer(PointerType.Select)
@@ -438,8 +449,24 @@ export default class GridMapDisplay extends GridBase {
     this.CenterLocation.y = this.GridMapData.MapData.Start.y
 
     this.SetGridPixelSize()
+    this.SetLayers()
+    this.SetLayerStyles()
+    this.HandleResize()
 
-    // create a Display Layer for each Map Layer
+  }
+
+  /** Create a Display Layer for each Map Layer */
+  SetLayers() {
+
+    // don't bother doing anything until a map and tiles are loaded
+    if (
+      this.GridMapData == null
+      || this.GridMapData.MapData == null
+      || this.GridMapTiles == null
+    ) return
+
+    this.ClearLayers()
+
     this.GridMapData.MapData.Layers.forEach(
       (_layer, layerIdx) => {
         const svgContainer = this.CreateSvgTag(
@@ -466,10 +493,6 @@ export default class GridMapDisplay extends GridBase {
     const dummyLayer = this.CreateSvgTag('svg', [['width', this.GridPixelSize.x], ['height', this.GridPixelSize.y]])
     dummyLayer.style.zIndex = ((this.GridMapData.MapData.Layers.length + 1) * 100).toString()
     this.ScaleContainer?.appendChild(dummyLayer)
-
-    this.SetLayerStyles()
-    this.HandleResize()
-
   }
 
   /**
@@ -900,14 +923,8 @@ export default class GridMapDisplay extends GridBase {
   Clear() {
 
     // clear each layer
-    this.Layers.forEach(
-      (layer) => {
-        layer.SvgContainer?.remove()
-        layer.RenderedTiles = []
-      }
-    )
-    this.Layers = []
-
+    this.ClearLayers()
+    
     // clear LayersStyle
     this.ClearLayerStyles()
 
@@ -922,6 +939,17 @@ export default class GridMapDisplay extends GridBase {
     this.SetPointer(PointerType.None)
 
     this.RenderDebug()
+  }
+
+  /** Clear each layer */
+  ClearLayers() {
+    this.Layers.forEach(
+      (layer) => {
+        layer.SvgContainer?.remove()
+        layer.RenderedTiles = []
+      }
+    )
+    this.Layers = []
   }
 
   /**

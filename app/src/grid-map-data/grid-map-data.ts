@@ -28,6 +28,7 @@ export default class GridMapData extends GridBase {
   // TODO make a object with all the valid event names
   // figure out how to handle customevent vs normal, make all cusom?
   #EventGridMapUpdated = 'grid-map-data-updated'
+  #EventGridMapLayerUpdated = 'grid-map-data-layer-updated'
   #EventGridMapDataLoading = 'grid-map-data-loading'
 
   Display: HTMLElement | null = null
@@ -119,6 +120,24 @@ export default class GridMapData extends GridBase {
     this.MapData.Layers[layerIdx].CanWalk = canWalk
     this.SendEvent(this.#EventGridMapUpdated)
   }
+
+
+  RemoveLayer(layerIdx: number) {
+
+    if (!this.MapData) return
+
+    if (layerIdx < 0 || layerIdx > this.MapData.Layers.length) return
+
+    // remove the layer
+    this.MapData.Layers.splice(layerIdx, 1)
+    this.SendEvent(this.#EventGridMapLayerUpdated)
+  }
+
+
+  AddLayer() {
+    throw new Error('Method not implemented.')
+  }
+
 
   SendLoaded() {
     // using a setTimeout to give components time to listen before sending
@@ -326,7 +345,10 @@ export default class GridMapData extends GridBase {
     if (!this.MapData) return
 
     // if start is not outside of map and walkable - use it
-    if(!this.IsOutsideOfMap(this.MapData.Start) && this.GetTopMostMapData(this.MapData.Start)?.CanWalk == true) return
+    if (
+      !this.IsOutsideOfMap(this.MapData.Start)
+      && this.GetTopMostMapData(this.MapData.Start)?.CanWalk == true
+    ) return
 
     let maxAttempt: number = 300
     // TODO: come up with a way to pick something close to the middle if possible
@@ -335,7 +357,7 @@ export default class GridMapData extends GridBase {
       // pick a rnd location
       this.MapData.Start.x = this.RandomRange(2, this.MapData.MapDataSize.x - 2)
       this.MapData.Start.y = this.RandomRange(2, this.MapData.MapDataSize.y - 2)
-      
+
       // get the data for the location - if its walkable and next to anything use it
       const topMostData = this.GetTopMostMapData(this.MapData.Start)
       if (topMostData?.CanWalk == true) {
