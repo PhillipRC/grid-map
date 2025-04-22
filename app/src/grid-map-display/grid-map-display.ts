@@ -380,22 +380,17 @@ export default class GridMapDisplay extends GridBase {
 
     document.addEventListener(
       'grid-map-data-updated',
-      () => {
-        this.RemoveAllTiles()
-        this.SetLayerStyles()
-        this.Render()
-      }
+      () => { this.ResetTiles() }
     )
 
     document.addEventListener(
-      'grid-map-data-layer-updated',
-      () => {
-        // when a layer is added/removed rebuild the layer display
-        this.SetLayers()
-        this.RemoveAllTiles()
-        this.SetLayerStyles()
-        this.Render()
-      }
+      'grid-map-data-layer-removed',
+      () => { this.ResetLayers() }
+    )
+
+    document.addEventListener(
+      'grid-map-data-layer-added',
+      () => { this.ResetLayers() }
     )
 
     document.addEventListener(
@@ -454,6 +449,28 @@ export default class GridMapDisplay extends GridBase {
     this.HandleResize()
 
   }
+
+
+  /**
+   * Clear and Rebuild Layers and Tiles,
+   * needed to refresh display when layers are added, removed
+   */
+  ResetLayers() {
+    this.SetLayers()
+    this.ResetTiles()
+  }
+
+
+  /**
+   * Clear and Rebuild Tiles,
+   * needed to refresh display when tile props change, i.e. color, tileset
+   */
+  ResetTiles() {
+    this.RemoveAllTiles()
+    this.SetLayerStyles()
+    this.Render()
+  }
+
 
   /** Create a Display Layer for each Map Layer */
   SetLayers() {
@@ -817,7 +834,7 @@ export default class GridMapDisplay extends GridBase {
 
   HandleKeyboardDown(event: KeyboardEvent) {
 
-    if(!this.GridMapData) return
+    if (!this.GridMapData) return
 
     if (this.State == 'edit') {
       if (event.ctrlKey || event.shiftKey) {
@@ -825,7 +842,7 @@ export default class GridMapDisplay extends GridBase {
         if (event.shiftKey) this.SetPointer(PointerType.Add)
       } else {
         // jump to pointer location
-        if(event.code == 'Space') {
+        if (event.code == 'Space') {
           const coord = {
             x: (this.PointerLocation.x - this.CenterLocation.x),
             y: (this.PointerLocation.y - this.CenterLocation.y)
@@ -924,7 +941,7 @@ export default class GridMapDisplay extends GridBase {
 
     // clear each layer
     this.ClearLayers()
-    
+
     // clear LayersStyle
     this.ClearLayerStyles()
 
@@ -1123,10 +1140,10 @@ export default class GridMapDisplay extends GridBase {
     const allowedDecimal = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]
     const wholeValue = parseInt(value.toString())
     const decimalValue = value - wholeValue
-    let safeDecimalValue:number = 0
+    let safeDecimalValue: number = 0
 
     for (const allowedDecimalValue of allowedDecimal) {
-      
+
       if (
         decimalValue == allowedDecimalValue
         || decimalValue < allowedDecimalValue
@@ -1136,7 +1153,7 @@ export default class GridMapDisplay extends GridBase {
       }
     }
 
-    return wholeValue + safeDecimalValue    
+    return wholeValue + safeDecimalValue
   }
 
 

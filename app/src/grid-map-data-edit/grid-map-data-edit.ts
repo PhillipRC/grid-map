@@ -124,9 +124,22 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       }
     )
 
+    // @ts-ignore
     document.addEventListener(
-      'grid-map-data-layer-updated',
-      () => { this.RemoveLayer() }
+      'grid-map-data-layer-removed',
+      (event: CustomEvent) => {
+        const layerIdx: number = event.detail
+        this.HandleLayerRemoved(layerIdx)
+      }
+    )
+
+    // @ts-ignore
+    document.addEventListener(
+      'grid-map-data-layer-added',
+      (event: CustomEvent) => {
+        const layerIdx: number = event.detail
+        this.HandleLayerAdded(layerIdx)
+      }
     )
 
     document.addEventListener(
@@ -158,20 +171,39 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
   HandleRemoveLayer() {
 
-    if (!this.GridMapData) return
-
     const layerIdx = this.Layers?.Tabs?.selectedIndex
-    if (layerIdx) this.GridMapData.RemoveLayer(layerIdx)
+
+    if (!this.GridMapData || layerIdx == undefined) return
+
+    this.GridMapData.RemoveLayer(layerIdx)
   }
 
 
-  RemoveLayer() {
-    this.SetLayers()
+  HandleLayerRemoved(layerIdx: number) {
+    if (layerIdx == 0) layerIdx = 1
+    this.SetLayersEditControls(layerIdx - 1)
   }
 
 
   HandleAddLayer() {
-    throw new Error('Method not implemented.')
+
+    const layerIdx = this.Layers?.Tabs?.selectedIndex
+
+    if (!this.GridMapData || layerIdx == undefined) return
+
+    // set defaults for new layer
+    this.GridMapData.AddLayer(
+      layerIdx + 1,
+      {
+        Tileset: 'Solid-1',
+        CanWalk: true,
+        Color: '#855785',
+      }
+    )
+  }
+
+  HandleLayerAdded(layerIdx: number) {
+    this.SetLayersEditControls(layerIdx)
   }
 
 
@@ -183,20 +215,20 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
   /** Handle first load */
   Init() {
-    this.SetLayers()
+    this.SetLayersEditControls()
   }
 
 
   /** Clear layer inputs */
-  ClearLayers() {
+  ClearLayersEditControls() {
     if (this.Layers) this.LayersForm?.removeChild(this.Layers)
   }
 
 
   /** Create inputs for each Layer */
-  SetLayers() {
+  SetLayersEditControls(selectedIdx: number = 0) {
 
-    this.ClearLayers()
+    this.ClearLayersEditControls()
 
     if (!this.GridMapData || !this.GridMapData.MapData || !this.GridMapData.MapData.Layers) return
 
@@ -212,6 +244,13 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       'selected-changed',
       () => { this.HandleLayerChanged() }
     )
+
+    if (selectedIdx) {
+      this.Layers.Tabs?.setAttribute(
+        'selected-index',
+        selectedIdx.toString()
+      )
+    }
 
     // send event with default layer selection
     document.dispatchEvent(

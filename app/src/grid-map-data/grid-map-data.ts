@@ -28,7 +28,8 @@ export default class GridMapData extends GridBase {
   // TODO make a object with all the valid event names
   // figure out how to handle customevent vs normal, make all cusom?
   #EventGridMapUpdated = 'grid-map-data-updated'
-  #EventGridMapLayerUpdated = 'grid-map-data-layer-updated'
+  #EventGridMapLayerRemoved = 'grid-map-data-layer-removed'
+  #EventGridMapLayerAdded = 'grid-map-data-layer-added'
   #EventGridMapDataLoading = 'grid-map-data-loading'
 
   Display: HTMLElement | null = null
@@ -124,18 +125,36 @@ export default class GridMapData extends GridBase {
 
   RemoveLayer(layerIdx: number) {
 
-    if (!this.MapData) return
-
-    if (layerIdx < 0 || layerIdx > this.MapData.Layers.length) return
+    if (
+      !this.MapData
+      || layerIdx < 0
+      || layerIdx > this.MapData.Layers.length
+      || this.MapData.Layers.length == 1
+    ) return
 
     // remove the layer
     this.MapData.Layers.splice(layerIdx, 1)
-    this.SendEvent(this.#EventGridMapLayerUpdated)
+    document.dispatchEvent(
+      new CustomEvent(this.#EventGridMapLayerRemoved, { bubbles: true, detail: layerIdx })
+    )
   }
 
 
-  AddLayer() {
-    throw new Error('Method not implemented.')
+  AddLayer(layerIdx: number, tileLayer: TileLayer, data: number = 0) {
+
+    if (
+      !this.MapData
+      || this.MapData.Layers.length == 8
+    ) return
+
+    const newLayer: TileLayer = {
+      ...tileLayer,
+      Map: new Array(this.MapData.MapDataSize.x * this.MapData.MapDataSize.y).fill(data)
+    }
+    this.MapData?.Layers.splice(layerIdx, 0, newLayer)
+    document.dispatchEvent(
+      new CustomEvent(this.#EventGridMapLayerAdded, { bubbles: true, detail: layerIdx })
+    )
   }
 
 

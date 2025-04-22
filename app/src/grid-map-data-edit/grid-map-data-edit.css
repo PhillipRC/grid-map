@@ -30,3 +30,7 @@ button.button.pointer-add-option[selected] {
 .pointer-row {
   margin-bottom: 10px;
 }
+
+.console-display .sub-buttons .button {
+  margin-bottom: 0;
+}
