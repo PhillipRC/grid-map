@@ -95,7 +95,7 @@ class GridMapTiles extends AppSidebarWidget {
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    this.WidgetTitle = 'Tile Sets'
+    this.WidgetTitle = 'Tilesets'
     this.LoadTiles()
   }
 

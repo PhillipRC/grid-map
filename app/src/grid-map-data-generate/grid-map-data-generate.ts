@@ -126,7 +126,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    this.WidgetTitle = 'Generate Map'
+    this.WidgetTitle = 'Generate'
 
     const node = this.HtmlToNode(html)
     if (node && this.WidgetContent) this.WidgetContent?.append(node)

@@ -6,7 +6,8 @@ import {
   MapRenderData,
   TileLayer,
   TileData,
-  GridMapTileData
+  GridMapTileData,
+  MapData,
 } from '../types'
 
 // markup and style
@@ -46,19 +47,13 @@ export default class GridMapData extends GridBase {
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
+    this.Display = this.shadowRoot?.querySelector('.display')!
+
     document.addEventListener(
       'grid-map-data-generate',
-      (event) => {
-        this.Generate(
-          // @ts-ignore
-          event.detail?.Size,
-          // @ts-ignore
-          event.detail?.Start,
-          // @ts-ignore
-          event.detail?.NoiseLayers,
-        )
-      },
-      false
+      (customEvent: CustomEventInit<MapData>) => {
+        if (customEvent.detail != undefined) this.GenerateHandler(customEvent.detail)
+      }
     )
 
     document.addEventListener(
@@ -66,17 +61,7 @@ export default class GridMapData extends GridBase {
       () => { this.GenerateRandomMap() }
     )
 
-    this.Display = this.shadowRoot?.querySelector('.display')!
-
     this.Init()
-
-    // prevent keypresses from going outside
-    this.shadowRoot?.addEventListener(
-      'keyup',
-      (event) => {
-        event.stopPropagation()
-      }
-    )
 
   }
 
@@ -163,13 +148,7 @@ export default class GridMapData extends GridBase {
     setTimeout(
       () => {
         document.dispatchEvent(
-          new CustomEvent(
-            'grid-map-data-loaded',
-            {
-              bubbles: true,
-              detail: this,
-            }
-          )
+          new CustomEvent('grid-map-data-loaded', { detail: this, bubbles: true })
         )
       }
       , 0
@@ -208,6 +187,19 @@ export default class GridMapData extends GridBase {
         console.error(error)
       }
     }
+  }
+
+  LoadMapData(json: MapRenderData) {
+    this.SendEvent(this.#EventGridMapDataLoading)
+    // let the event cycle
+    setTimeout(
+      () => {
+        this.MapData = json
+        this.SetWalkableStart()
+        this.SendLoaded()
+      },
+      1
+    )
   }
 
   /** Generate a random map */
@@ -263,6 +255,15 @@ export default class GridMapData extends GridBase {
     ]
 
     this.Generate(mapDataSize, start, noiseLayers)
+  }
+
+
+  GenerateHandler(mapData: MapData) {
+    this.Generate(
+      mapData.Size,
+      mapData.Start,
+      mapData.NoiseLayers,
+    )
   }
 
 

@@ -76,7 +76,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
     super.connectedCallback()
 
-    this.WidgetTitle = 'Edit Map'
+    this.WidgetTitle = 'Edit'
 
     // add base markup for edit options
     const node = this.HtmlToNode(DataEditHtml)

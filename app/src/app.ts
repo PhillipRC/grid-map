@@ -47,6 +47,9 @@ customElements.define('grid-map-data-generate', GridMapDataGenerate)
 import GridMapFormTileLayers from './grid-map-form-tile-layers/grid-map-form-tile-layers'
 customElements.define('grid-map-form-tile-layers', GridMapFormTileLayers)
 
+import GridMapDataPersist from './grid-map-data-persist/grid-map-data-persist'
+customElements.define('grid-map-data-persist', GridMapDataPersist)
+
 // disable touchmove
 window.addEventListener('touchmove', (event) => { event.preventDefault() })
 
