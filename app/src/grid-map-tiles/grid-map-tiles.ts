@@ -39,6 +39,9 @@ class GridMapTiles extends AppSidebarWidget {
       Name: 'Brick-2',
     },
     {
+      Name: 'Brick-3',
+    },
+    {
       Name: 'Block-1',
     },
     {
