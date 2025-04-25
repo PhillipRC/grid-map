@@ -17,6 +17,16 @@
   flex-grow: 1;
   text-align: right;
   zoom: .25;
+  display: flex;
+  justify-content: end;
+}
+
+.tileset-display>div {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  height: 256px;
+  width: 256px;
 }
 
 .tileset-name {

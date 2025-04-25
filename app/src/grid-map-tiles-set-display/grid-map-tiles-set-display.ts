@@ -71,8 +71,8 @@ export default class GridMapTilesSetDisplay extends GridBase {
 
     this.addEventListener(
       'keydown',
-      (event) => { 
-        if(event.key == 'Enter')
+      (event) => {
+        if (event.key == 'Enter')
           this.DispatchTileSetSelected()
       }
     )
@@ -101,44 +101,19 @@ export default class GridMapTilesSetDisplay extends GridBase {
 
     if (this.Title) this.Title.textContent = this.#TileSetName
 
-    const svg = this.CreateSvgTag(
-      'svg',
-      [
-        ['width', this.TileSize.x * 4],
-        ['height', this.TileSize.y * 4],
-      ]
-    )
+    const container = document.createElement('div')
 
     // loop over the tiles
     this.#Tileset.forEach(
-      (tile, tileIdx) => {
-
-        // do not render empty
-        if(tileIdx == 12) return
-
-        // calculate the position of each tile
-        let x = this.TileSize.x * (tileIdx % 4)
-        let y = Math.floor(tileIdx / 4) * 64
-
+      (tile) => {
         // create each tile
-        var svgTile = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'svg'
-        )
-        this.AddAttributesToElement(
-          svgTile,
-          [
-            ['x', x],
-            ['y', y],
-          ]
-        )
-        svgTile.innerHTML = tile
-        svg.appendChild(svgTile)
+        let tileClone = tile.cloneNode(true)
+        container.appendChild(tileClone)
       }
     )
 
     // add the tile to the container
-    this.Display.appendChild(svg)
+    this.Display.appendChild(container)
 
   }
 

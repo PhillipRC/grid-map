@@ -31,6 +31,7 @@ export default class GridMapData extends GridBase {
   #EventGridMapUpdated = 'grid-map-data-updated'
   #EventGridMapLayerRemoved = 'grid-map-data-layer-removed'
   #EventGridMapLayerAdded = 'grid-map-data-layer-added'
+  #EventGridMapLayerSet = 'grid-map-data-layer-set'
   #EventGridMapDataLoading = 'grid-map-data-loading'
 
   Display: HTMLElement | null = null
@@ -94,7 +95,10 @@ export default class GridMapData extends GridBase {
     if (layerIdx < 0 || layerIdx > this.MapData.Layers.length) return
 
     this.MapData.Layers[layerIdx].Tileset = tileSet
-    this.SendEvent(this.#EventGridMapUpdated)
+
+    document.dispatchEvent(
+      new CustomEvent(this.#EventGridMapLayerSet, { bubbles: true, detail: layerIdx })
+    )
   }
 
 

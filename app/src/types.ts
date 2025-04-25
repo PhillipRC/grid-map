@@ -47,9 +47,10 @@ export type RGBA = {
 }
 
 
-
 export type Tileset = {
   Name: string
+  Format: 'svg' | 'img'
+  Ext: 'svg' | 'png'
 }
 
 
@@ -90,11 +91,12 @@ export type RenderedTile = {
   x: number
   y: number
   ref: SVGElement
+  value: number
 }
 
 
 export type GridMapDisplayLayer = {
-  SvgContainer: SVGElement
+  SvgContainer: SVGElement | HTMLElement
   RenderedTiles: RenderedTile[]
 }
 

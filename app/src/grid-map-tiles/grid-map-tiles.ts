@@ -19,38 +19,63 @@ class GridMapTiles extends AppSidebarWidget {
   TileSets: Array<Tileset> = [
     {
       Name: 'Solid-1',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Solid-1-Edge',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Solid-1-Edge-2',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Rough-1',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Rough-1-Edge',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Brick-1',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Brick-2',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Brick-3',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Block-1',
+      Format: 'svg',
+      Ext: 'svg',
     },
     {
       Name: 'Block-2',
+      Format: 'svg',
+      Ext: 'svg',
+    },
+    {
+      Name: 'Rock-1',
+      Format: 'img',
+      Ext: 'png',
     },
   ]
 
-  /** Holds the graphic data for each tileset, format: {'Solid-1': ['<g></g>',...'<g></g>']} */
-  Tiles: { [key: string]: string[] } = {}
+  /** Holds the element that represents the graphic for each tile */
+  Tiles: { [key: string]: (SVGSVGElement | HTMLImageElement)[] } = {}
 
   TileSize: XY = {
     x: 64,
@@ -134,7 +159,7 @@ class GridMapTiles extends AppSidebarWidget {
 
   async LoadTiles() {
     for (const [_idx, tileSet] of this.TileSets.entries()) {
-      await this.LoadTileSet(tileSet.Name)
+      await this.LoadTileSet(tileSet)
     }
 
     this.IsLoaded = true
@@ -154,17 +179,32 @@ class GridMapTiles extends AppSidebarWidget {
   }
 
 
-  async LoadTileSet(tileSet: string) {
+  async LoadTileSet(tileSet: Tileset) {
 
     // init tiles
-    this.Tiles[tileSet] = []
+    this.Tiles[tileSet.Name] = []
 
     for (const [_idx, tile] of this.TileIndex.entries()) {
-      const response = await fetch(
-        `tiles/${tileSet}/${tile}.svg`
-      )
-      const svg = await response.text()
-      this.Tiles[tileSet].push(svg)
+
+      if(tileSet.Format == 'svg') {
+        const response = await fetch(
+          `tiles/${tileSet.Name}/${tile}.${tileSet.Ext}`
+        )
+        const svg = await response.text()
+        var svgContainer = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'svg'
+        )
+        svgContainer.innerHTML = svg
+        this.Tiles[tileSet.Name].push(svgContainer)
+      }
+
+      if(tileSet.Format == 'img') {
+        const image = new Image()
+        image.src = `tiles/${tileSet.Name}/${tile}.${tileSet.Ext}`
+        this.Tiles[tileSet.Name].push(image)
+      }
+      
     }
 
   }
@@ -174,20 +214,12 @@ class GridMapTiles extends AppSidebarWidget {
    * 
    * @param {string} tileSet Tile Set to get tile from, i.e. sand-2
    * @param {string} surroundingMapData Map data to select correct tile, i.e. 0011
-   * @returns {SVGAElement}
    * 
    * @example GetTile('sand-2', '0011')
    */
-  GetTile(tileSet: string, surroundingMapData: string): SVGAElement {
+  GetTile(tileSet: string, surroundingMapData: string): SVGSVGElement {
     const tileIdx = this.TileIndex.indexOf(surroundingMapData)
-    const tile = this.Tiles[tileSet][tileIdx]
-    var svg = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg'
-    )
-    svg.innerHTML = tile
-    // @ts-ignore
-    return svg
+    return this.Tiles[tileSet][tileIdx].cloneNode(true) as SVGSVGElement
   }
 
 }

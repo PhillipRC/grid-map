@@ -349,16 +349,18 @@ export default class GridMapDisplay extends GridBase {
       () => { this.HandleGridMapLoading() }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-data-loaded',
-      (/**@type {CustomEvent} */ customEvent: CustomEvent) => { this.HandleGridMapLoaded(customEvent.detail) }
+      (event: CustomEventInit<GridMapData>) => {
+        if (event.detail != undefined) this.HandleGridMapLoaded(event.detail)
+      }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-cursor-move',
-      (/**@type {CustomEvent} */ customEvent: CustomEvent) => { this.CursorMoveBy(customEvent.detail) }
+      (event: CustomEventInit<XY>) => {
+        if (event.detail != undefined) this.CursorMoveBy(event.detail)
+      }
     )
 
     document.addEventListener(
@@ -366,16 +368,18 @@ export default class GridMapDisplay extends GridBase {
       () => { this.Clear() }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-tiles-loaded',
-      (event: CustomEvent) => { this.HandleTilesLoaded(event.detail) }
+      (event: CustomEventInit<GridMapTiles>) => {
+        if (event.detail != undefined) this.HandleTilesLoaded(event.detail)
+      }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'tile-set-selected',
-      (event: CustomEvent) => { this.HandleTileSetSelected(event.detail) }
+      (event: CustomEventInit<string>) => {
+        if (event.detail != undefined) this.HandleTileSetSelected(event.detail)
+      }
     )
 
     document.addEventListener(
@@ -385,12 +389,30 @@ export default class GridMapDisplay extends GridBase {
 
     document.addEventListener(
       'grid-map-data-layer-removed',
-      () => { this.ResetLayers() }
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) this.ResetLayers(event.detail)
+      }
     )
 
     document.addEventListener(
       'grid-map-data-layer-added',
-      () => { this.ResetLayers() }
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) this.ResetLayers(event.detail)
+      }
+    )
+
+    document.addEventListener(
+      'grid-map-data-layer-set',
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) this.ResetLayers(event.detail)
+      }
+    )
+
+    document.addEventListener(
+      'grid-map-data-layer-set',
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) this.ResetLayers(event.detail)
+      }
     )
 
     document.addEventListener(
@@ -414,10 +436,11 @@ export default class GridMapDisplay extends GridBase {
       }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-edit-selected-layer',
-      (event: CustomEvent) => { this.HandleLayerSelected(event.detail) }
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) this.HandleLayerSelected(event.detail)
+      }
     )
 
     // #endregion
@@ -452,10 +475,10 @@ export default class GridMapDisplay extends GridBase {
 
 
   /**
-   * Clear and Rebuild Layers and Tiles,
-   * needed to refresh display when layers are added, removed
+   * Clear and Rebuild Layers and Tiles
    */
-  ResetLayers() {
+  ResetLayers(_layerIdx:number) {
+    // TODO rebuild layers if format of a layer has changed
     this.SetLayers()
     this.ResetTiles()
   }
@@ -486,34 +509,72 @@ export default class GridMapDisplay extends GridBase {
 
     this.GridMapData.MapData.Layers.forEach(
       (_layer, layerIdx) => {
-        const svgContainer = this.CreateSvgTag(
-          'svg',
-          [
-            ['width', this.GridPixelSize.x],
-            ['height', this.GridPixelSize.y],
-          ]
-        )
-        svgContainer.id = `layer-${layerIdx}`
-        svgContainer.classList.add('layer')
-        svgContainer.style.zIndex = ((layerIdx + 1) * 100).toString()
-        this.Layers.push(
-          {
-            SvgContainer: svgContainer,
-            RenderedTiles: []
-          }
-        )
-        this.ScaleContainer?.appendChild(svgContainer)
+
+        const tileSet = this.GridMapTiles?.GetTileSetByName(_layer.Tileset)
+
+        let container = null
+
+        // create svg layer
+        if (tileSet?.Format == 'svg') {
+          container = this.CreateSvgTag(
+            'svg',
+            [
+              ['width', this.GridPixelSize.x],
+              ['height', this.GridPixelSize.y],
+            ]
+          )
+        }
+
+        // create image layer
+        if (tileSet?.Format == 'img') {
+          container = document.createElement('div')
+          container.style.width = this.GridPixelSize.x.toString() + 'px'
+          container.style.height = this.GridPixelSize.y.toString() + 'px'
+        }
+
+        if (container != null) {
+          container.id = `layer-${layerIdx}`
+          container.classList.add('layer')
+          container.style.zIndex = ((layerIdx + 1) * 100).toString()
+          this.Layers.push(
+            {
+              SvgContainer: container,
+              RenderedTiles: []
+            }
+          )
+          this.ScaleContainer?.appendChild(container)
+        }
+
       }
     )
 
-    // dummy layer is used to fix a TouchMove listener issue
+    this.AddDummyLayer()
+
+  }
+
+  /**
+   * Dummy layer is added to fix a TouchMove listener issue,
+   * without this TouchMove was not firing on the last layer
+   */
+  AddDummyLayer() {
+
+    if (!this.GridMapData?.MapData) return
+
+    // remove previous dummy layer to ensure its last in the DOM
+    const currentDummyLayer = this.ScaleContainer?.querySelector('#dummy-layer')
+    if (currentDummyLayer) this.ScaleContainer?.removeChild(currentDummyLayer)
+
+    // create dummy layer
     const dummyLayer = this.CreateSvgTag('svg', [['width', this.GridPixelSize.x], ['height', this.GridPixelSize.y]])
+    dummyLayer.id = 'dummy-layer'
+    dummyLayer.classList.add('layer')
     dummyLayer.style.zIndex = ((this.GridMapData.MapData.Layers.length + 1) * 100).toString()
     this.ScaleContainer?.appendChild(dummyLayer)
   }
 
   /**
-   * Set the Styles for each layer
+   * Set the Styles for each layer,
+   * enables setting a color for a svg layer using styles
    */
   SetLayerStyles() {
 
@@ -1092,7 +1153,7 @@ export default class GridMapDisplay extends GridBase {
         break
     }
 
-    this.RemoveAllTiles()
+    this.RemoveUpdatedTiles()
     this.Render()
 
   }
@@ -1235,13 +1296,6 @@ export default class GridMapDisplay extends GridBase {
     }
   }
 
-  /**
-   * Update the MaxRenderAreaSize based on size of viewport
-   */
-  UpdateMaxRenderAreaSize() {
-    // TODO do this to reduce cpu useage
-  }
-
 
   /**
    * Render the Display
@@ -1306,6 +1360,10 @@ export default class GridMapDisplay extends GridBase {
             y: this.TilePixelSize.y / 2
           }
 
+          const tileSet = this.GridMapTiles?.GetTileSetByName(
+            this.GridMapData.MapData.Layers[layer].Tileset
+          )
+
           // only render tiles: within the viewableArea,
           // that have not been rendered and
           // are not in the last row or column
@@ -1332,21 +1390,31 @@ export default class GridMapDisplay extends GridBase {
               // get the tile
               const tile = this.GridMapTiles.GetTile(tileData.Tileset, tileData.SurroundingMapData)
 
-              // position tile
-              this.AddAttributesToElement(
-                tile,
-                [
-                  ['x', this.TilePixelSize.x * x - tileOffset.x],
-                  ['y', this.TilePixelSize.y * y - tileOffset.y],
-                  ['t', tileId]
-                ]
-              )
+              tile.setAttribute('t', tileId)
+
+              // position svg with attributes
+              if (tileSet?.Format == 'svg') {
+                this.AddAttributesToElement(
+                  tile,
+                  [
+                    ['x', this.TilePixelSize.x * x - tileOffset.x],
+                    ['y', this.TilePixelSize.y * y - tileOffset.y],
+                  ]
+                )
+              }
+
+              // position img with style
+              if (tileSet?.Format == 'img') {
+                tile.style.left = (this.TilePixelSize.x * x - tileOffset.x).toString() + 'px'
+                tile.style.top = (this.TilePixelSize.y * y - tileOffset.y).toString() + 'px'
+              }
 
               const renderedTile = {
                 id: tileId,
                 x: x,
                 y: y,
-                ref: tile
+                ref: tile,
+                value: parseInt(tileData.SurroundingMapData, 2)
               }
 
               this.Layers[layer].RenderedTiles.push(renderedTile)
@@ -1370,10 +1438,41 @@ export default class GridMapDisplay extends GridBase {
 
   }
 
+  
   RemoveAllTiles() {
     this.RemoveTilesOutOfViewableArea(true)
   }
 
+  
+  /** Remove only the updated tiles */
+  RemoveUpdatedTiles() {
+
+    // loop through layers
+    for (let layer = 0; layer < this.Layers.length; layer++) {
+
+      // array of tiles to remove
+      const tilesToRemove: Array<RenderedTile> = []
+
+      this.Layers[layer].RenderedTiles.forEach(
+        (tile) => {
+          // @ts-ignore
+          let data = this.GridMapData.GetTileData(tile.x, tile.y, layer).SurroundingMapData
+          let mapValue = parseInt(data, 2)
+          if (mapValue != tile.value) {
+            tilesToRemove.push(tile)
+          }
+        }
+      )
+
+      // nothing to remove
+      if (tilesToRemove.length == 0) continue
+
+      this.RemoveTilesByLayer(tilesToRemove, layer)
+    }
+
+  }
+
+  
   /**
    * Loops through the Rendered Tiles removing Tiles out of the Viewable area
    * 
@@ -1386,10 +1485,7 @@ export default class GridMapDisplay extends GridBase {
     // loop through layers
     for (let layer = 0; layer < this.Layers.length; layer++) {
 
-      /**
-       * Create an array of tiles to remove
-       * @type {Array.<RenderedTile>}
-       */
+      // array of tiles to remove
       const tilesToRemove: Array<RenderedTile> = []
 
       this.Layers[layer].RenderedTiles.forEach(
