@@ -48,9 +48,14 @@ export type RGBA = {
 
 
 export type Tileset = {
+  /** Hyphenated name */
   Name: string
+  /** Container type used to display the tile */
   Format: 'svg' | 'img'
+  /** File extension */
   Ext: 'svg' | 'png'
+  /** Number of tiles the sheet is wide */
+  TilesWide: number
 }
 
 
@@ -90,7 +95,7 @@ export type RenderedTile = {
   id: string
   x: number
   y: number
-  ref: SVGElement
+  ref: SVGElement | HTMLImageElement
   value: number
 }
 

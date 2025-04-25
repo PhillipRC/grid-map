@@ -11,6 +11,7 @@ import {
   TileData,
   RenderedTile,
   GridMapDisplayLayer,
+  Tileset,
 } from '../types'
 
 // markup and style
@@ -19,9 +20,8 @@ import html from './grid-map-display.html?raw'
 
 
 /**
- * Handles displaying GridMapData.
+ * Handles displaying GridMapData using GridMapTiles.
  * 
- * A SVGElement is created for each GridMapData Layers (`GridMapData.Layers`).
  * Tiles are added and removed as they enter and leave the Render Area.
  */
 export default class GridMapDisplay extends GridBase {
@@ -1360,7 +1360,8 @@ export default class GridMapDisplay extends GridBase {
             y: this.TilePixelSize.y / 2
           }
 
-          const tileSet = this.GridMapTiles?.GetTileSetByName(
+          // @ts-ignore
+          const tileSet:Tileset = this.GridMapTiles?.GetTileSetByName(
             this.GridMapData.MapData.Layers[layer].Tileset
           )
 
@@ -1388,7 +1389,8 @@ export default class GridMapDisplay extends GridBase {
               if (tileData.SurroundingMapData == '0000') continue
 
               // get the tile
-              const tile = this.GridMapTiles.GetTile(tileData.Tileset, tileData.SurroundingMapData)
+              // @ts-ignore
+              const tile = this.GridMapTiles.GetTile(tileSet, tileData.SurroundingMapData)
 
               tile.setAttribute('t', tileId)
 
