@@ -198,10 +198,11 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
     document.addEventListener(
       'grid-map-tiles-loaded',
-      (event) => {
-        // @ts-ignore
-        this.GridMapTilesRef = event.detail
-        this.Init()
+      (event: CustomEventInit<GridMapTiles>) => {
+        if (event.detail != undefined) {
+          this.GridMapTilesRef = event.detail
+          this.Init()
+        }
       }
     )
 

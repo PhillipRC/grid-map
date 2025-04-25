@@ -105,58 +105,59 @@ export default class GridMapDataEdit extends AppSidebarWidget {
       () => { this.HandleRemoveLayer() }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-data-loaded',
-      (customEvent) => {
-        // @ts-ignore
-        this.GridMapData = customEvent.detail
-        this.HandleDataLoaded()
+      (event: CustomEventInit<GridMapData>) => {
+        if (event.detail != undefined) {
+          this.GridMapData = event.detail
+          this.HandleDataLoaded()
+        }
       }
     )
 
     document.addEventListener(
       'grid-map-tiles-loaded',
-      (customEvent) => {
-        // @ts-ignore
-        this.GridMapTilesRef = customEvent.detail
-        this.HandleDataLoaded()
+      (event: CustomEventInit<GridMapTiles>) => {
+        if (event.detail != undefined) {
+          this.GridMapTilesRef = event.detail
+          this.HandleDataLoaded()
+        }
       }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-data-layer-removed',
-      (event: CustomEvent) => {
-        const layerIdx: number = event.detail
-        this.HandleLayerRemoved(layerIdx)
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) {
+          this.HandleLayerRemoved(event.detail)
+        }
       }
     )
 
-    // @ts-ignore
     document.addEventListener(
       'grid-map-data-layer-added',
-      (event: CustomEvent) => {
-        const layerIdx: number = event.detail
-        this.HandleLayerAdded(layerIdx)
+      (event: CustomEventInit<number>) => {
+        if (event.detail != undefined) {
+          this.HandleLayerAdded(event.detail)
+        }
       }
     )
 
     document.addEventListener(
       'grid-map-display-select-layer',
-      (customEvent) => {
-        // @ts-ignore
-        const tileData = customEvent.detail as TileData
-        if (tileData != null && tileData.Layer != null) this.Layers?.SelectLayer(tileData.Layer)
+      (event: CustomEventInit<TileData>) => {
+        if (event.detail != undefined) {
+          if (event.detail != null && event.detail.Layer != null) {
+            this.Layers?.SelectLayer(event.detail.Layer)
+          }
+        }
       }
     )
 
     document.addEventListener(
       'grid-map-display-select-pointer',
-      (customEvent) => {
-        // @ts-ignore
-        const pointer = customEvent.detail as PointerType
-        if (pointer) this.HandlePointerSelection(pointer)
+      (event: CustomEventInit<PointerType>) => {
+        if (event.detail) this.HandlePointerSelection(event.detail)
       }
     )
 
