@@ -1,13 +1,14 @@
 import GridBase from '../shared/grid-base'
 import Noise from '../Noise'
 import {
-  XY,
-  NoiseLayer,
-  MapRenderData,
-  TileLayer,
-  TileData,
   GridMapTileData,
   MapData,
+  MapRenderData,
+  NoiseLayer,
+  SurroundingMapData,
+  TileData,
+  TileLayer,
+  XY,
 } from '../types'
 
 // markup and style
@@ -25,14 +26,21 @@ export default class GridMapData extends GridBase {
   MapData: MapRenderData | null = null
 
   Noise: Noise = new Noise()
+  
+  /** Color, CanWalk udpated */
+  static EventGridMapUpdated = 'grid-map-data-layer-updated'
+  
+  /** Layer Removed */
+  static EventGridMapLayerRemoved = 'grid-map-data-layer-removed'
+  
+  /** Layer Added */
+  static EventGridMapLayerAdded = 'grid-map-data-layer-added'
+  
+  /** Layer Tileset updated */
+  static EventGridMapLayerTilesetUpdateSet = 'grid-map-data-layer-tileset-updated'
 
-  // TODO make a object with all the valid event names
-  // figure out how to handle customevent vs normal, make all cusom?
-  #EventGridMapUpdated = 'grid-map-data-updated'
-  #EventGridMapLayerRemoved = 'grid-map-data-layer-removed'
-  #EventGridMapLayerAdded = 'grid-map-data-layer-added'
-  #EventGridMapLayerSet = 'grid-map-data-layer-set'
-  #EventGridMapDataLoading = 'grid-map-data-loading'
+  /** Map Loading */
+  static EventGridMapDataLoading = 'grid-map-data-loading'
 
   Display: HTMLElement | null = null
 
@@ -84,7 +92,7 @@ export default class GridMapData extends GridBase {
     if (!this.MapData) return
 
     this.MapData.Layers[layerIdx].Color = color
-    this.SendEvent(this.#EventGridMapUpdated)
+    this.SendEvent(GridMapData.EventGridMapUpdated)
   }
 
 
@@ -97,7 +105,7 @@ export default class GridMapData extends GridBase {
     this.MapData.Layers[layerIdx].Tileset = tileSet
 
     document.dispatchEvent(
-      new CustomEvent(this.#EventGridMapLayerSet, { bubbles: true, detail: layerIdx })
+      new CustomEvent(GridMapData.EventGridMapLayerTilesetUpdateSet, { bubbles: true, detail: layerIdx })
     )
   }
 
@@ -108,7 +116,7 @@ export default class GridMapData extends GridBase {
     if (layerIdx < 0 || layerIdx > this.MapData.Layers.length) return
 
     this.MapData.Layers[layerIdx].CanWalk = canWalk
-    this.SendEvent(this.#EventGridMapUpdated)
+    this.SendEvent(GridMapData.EventGridMapUpdated)
   }
 
 
@@ -124,7 +132,7 @@ export default class GridMapData extends GridBase {
     // remove the layer
     this.MapData.Layers.splice(layerIdx, 1)
     document.dispatchEvent(
-      new CustomEvent(this.#EventGridMapLayerRemoved, { bubbles: true, detail: layerIdx })
+      new CustomEvent(GridMapData.EventGridMapLayerRemoved, { bubbles: true, detail: layerIdx })
     )
   }
 
@@ -142,7 +150,7 @@ export default class GridMapData extends GridBase {
     }
     this.MapData?.Layers.splice(layerIdx, 0, newLayer)
     document.dispatchEvent(
-      new CustomEvent(this.#EventGridMapLayerAdded, { bubbles: true, detail: layerIdx })
+      new CustomEvent(GridMapData.EventGridMapLayerAdded, { bubbles: true, detail: layerIdx })
     )
   }
 
@@ -166,7 +174,7 @@ export default class GridMapData extends GridBase {
   async Load(url = './maps/map-01.json') {
     try {
 
-      this.SendEvent(this.#EventGridMapDataLoading)
+      this.SendEvent(GridMapData.EventGridMapDataLoading)
 
       this.MapData = null
 
@@ -194,7 +202,7 @@ export default class GridMapData extends GridBase {
   }
 
   LoadMapData(json: MapRenderData) {
-    this.SendEvent(this.#EventGridMapDataLoading)
+    this.SendEvent(GridMapData.EventGridMapDataLoading)
     // let the event cycle
     setTimeout(
       () => {
@@ -248,11 +256,11 @@ export default class GridMapData extends GridBase {
             Color: "#39302d"
           },
           {
-            Tileset: "Solid-1-Edge-2",
+            Tileset: "Rock-1",
             CanWalk: false,
             Cutoff: 0.1,
             CutoffCap: 0.12,
-            Color: '#362521'
+            Color: '#624c46'
           }
         ]
       }
@@ -278,7 +286,7 @@ export default class GridMapData extends GridBase {
 
     if (noiseLayers == null) return
 
-    this.SendEvent(this.#EventGridMapDataLoading)
+    this.SendEvent(GridMapData.EventGridMapDataLoading)
 
     const tileLayers: Array<TileLayer> = []
 
@@ -478,11 +486,7 @@ export default class GridMapData extends GridBase {
   }
 
 
-  /**
-   * Gets the data needed to request the correct Tile
-   * 
-   * @returns {GridMapTileData}
-   */
+  /** Gets the data needed to request the correct Tile */
   GetTileData(x: number, y: number, layer = 0): GridMapTileData {
     return {
       // @ts-ignore
@@ -491,7 +495,7 @@ export default class GridMapData extends GridBase {
         + this.GetMapData(x, y, layer)
         + this.GetMapData(x + 1, y, layer)
         + this.GetMapData(x, y + 1, layer)
-        + this.GetMapData(x + 1, y + 1, layer)
+        + this.GetMapData(x + 1, y + 1, layer) as SurroundingMapData
     }
   }
 

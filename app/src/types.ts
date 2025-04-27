@@ -46,6 +46,13 @@ export type RGBA = {
   a: number
 }
 
+export type HSLA = {
+  h: number
+  s: number
+  l: number
+  a: number
+}
+
 
 export type Tileset = {
   /** Hyphenated name */
@@ -56,8 +63,12 @@ export type Tileset = {
   Ext: 'svg' | 'png'
   /** Number of tiles the sheet is wide */
   TilesWide: number
+  /** Enable color option */
+  ApplyColor: boolean
 }
 
+// TODO: only need this for loading individual files, this could be reduced to an int in other cases
+export type SurroundingMapData = '0000' | '0001' | '0010' | '0011' | '0100' | '0101' | '0110' | '0111' | '1000' | '1001' | '1010' | '1011' | '1100' | '1101' | '1110' | '1111'
 
 export type MapDefault = {
   Width: number
@@ -110,7 +121,7 @@ export type GridMapTileData = {
   /** Name of the Tileset */
   Tileset: string
   /** Surrounding Map Data */
-  SurroundingMapData: string
+  SurroundingMapData: SurroundingMapData
 }
 
 

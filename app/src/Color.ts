@@ -1,16 +1,74 @@
+import { HSLA, RGBA } from "./types"
+
 export default class Color {
 
   r: number = 0
   g: number = 0
   b: number = 0
-  a: number = 0
+
+  h: number = 0
+  s: number = 0
+  l: number = 0
+
+  a: number = 1
 
 
-  Color(hexString: string) {
-    this.r = Math.floor(parseInt(hexString.substring(1, 3), 16))
-    this.g = Math.floor(parseInt(hexString.substring(3, 5), 16))
-    this.b = Math.floor(parseInt(hexString.substring(5, 7), 16))
-    return this
+  static ColorFromHex(hexString: string) {
+    const colorObj = new Color()
+    const rgba = {
+      r: Math.floor(parseInt(hexString.substring(1, 3), 16)),
+      g: Math.floor(parseInt(hexString.substring(3, 5), 16)),
+      b: Math.floor(parseInt(hexString.substring(5, 7), 16)),
+      a: colorObj.a,
+    }
+    colorObj.SetRGBA(rgba)
+    colorObj.SetHSLA(Color.RgbaToHsla(colorObj as RGBA))
+    return colorObj
+  }
+
+
+  static ColorFromHsla(hsla: HSLA) {
+    const colorObj = new Color()
+    colorObj.SetRGBA(Color.HslatoRgba(hsla))
+    colorObj.SetHSLA(hsla)
+    return colorObj
+  }
+
+  static ColorFromRgba(rgba: RGBA) {
+    const colorObj = new Color()
+    colorObj.r = rgba.r
+    colorObj.g = rgba.g
+    colorObj.b = rgba.b
+    colorObj.a = rgba.a
+    colorObj.SetHSLA(Color.RgbaToHsla(colorObj as RGBA))
+    return colorObj
+  }
+
+  SetRGBA(rgba:RGBA) {
+    this.r = rgba.r
+    this.g = rgba.g
+    this.b = rgba.b
+    this.a = rgba.a
+  }
+
+  SetHSLA(hsla:HSLA) {
+    this.h = hsla.h
+    this.s = hsla.s
+    this.l = hsla.l
+    this.a = hsla.a
+  }
+
+
+  AsHex(): string {
+    return this.ToHexString(this.r, this.g, this.b)
+  }
+
+
+  ToHexString(r: number, g: number, b: number): string {
+    return '#'
+      + ((r.toString(16).length == 1) ? "0" + r.toString(16) : r.toString(16))
+      + ((g.toString(16).length == 1) ? "0" + g.toString(16) : g.toString(16))
+      + ((b.toString(16).length == 1) ? "0" + b.toString(16) : b.toString(16))
   }
 
 
@@ -33,10 +91,7 @@ export default class Color {
     G = Math.round((G < 255) ? G : 255)
     B = Math.round((B < 255) ? B : 255)
 
-    return '#'
-      + ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16))
-      + ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16))
-      + ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16))
+    return this.ToHexString(R, G, B)
   }
 
 
@@ -46,9 +101,93 @@ export default class Color {
         (this.r * 299) + (this.g * 587) + (this.b * 114)
       ) / 1000
     )
-    return (sum > 128) ? '#000000' : '#ffffff';
+    return (sum > 128) ? '#000000' : '#ffffff'
 
   }
 
+
+
+  static RgbaToHsla(rgba: RGBA): HSLA {
+
+    let r = rgba.r / 255
+    let g = rgba.g / 255
+    let b = rgba.b / 255
+    let h, s, l = 0
+
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    h = s = l = (max + min) / 2
+
+    if (max === min) {
+      h = s = 0 // achromatic
+    } else {
+      const d = max - min
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0)
+          break
+        case g:
+          h = (b - r) / d + 2
+          break
+        case b:
+          h = (r - g) / d + 4
+          break
+      }
+      h /= 6;
+    }
+
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      l: Math.round(l * 100),
+      a: rgba.a
+    }
+  }
+
+  static HslatoRgba(hsla: HSLA): RGBA {
+
+    let h = hsla.h / 360
+    let s = hsla.s / 100
+    let l = hsla.l / 100
+    let r, g, b
+
+    if (s === 0) {
+      r = g = b = l // achromatic
+    } else {
+      const hue2rgb = (p: number, q: number, t: number) => {
+        if (t < 0) t += 1
+        if (t > 1) t -= 1
+        if (t < 1 / 6) return p + (q - p) * 6 * t
+        if (t < 1 / 2) return q
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
+        return p
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+      const p = 2 * l - q
+      r = hue2rgb(p, q, h + 1 / 3)
+      g = hue2rgb(p, q, h)
+      b = hue2rgb(p, q, h - 1 / 3)
+    }
+
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255),
+      a: hsla.a
+    }
+  }
+
+
+  TargetHsla(target:HSLA):RGBA {
+    return Color.HslatoRgba(
+      {
+        h: this.h + target.h,
+        s: this.s * (target.s/100),
+        l: this.l * (target.l/100 * 2),
+        a: this.a,
+      }
+    )
+  }
 
 }

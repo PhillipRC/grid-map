@@ -2,12 +2,15 @@ import GridMapTilesSetDisplay from '../grid-map-tiles-set-display/grid-map-tiles
 import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
 
 import {
-  XY,
+  HSLA,
+  SurroundingMapData,
   Tileset,
+  XY,
 } from '../types'
 
 // style
 import css from './grid-map-tiles.css?raw'
+import Color from '../Color'
 
 
 /**
@@ -22,66 +25,77 @@ class GridMapTiles extends AppSidebarWidget {
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Solid-1-Edge',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Solid-1-Edge-2',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Rough-1',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Rough-1-Edge',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Brick-1',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Brick-2',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Brick-3',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Block-1',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Block-2',
       Format: 'svg',
       Ext: 'svg',
       TilesWide: 1,
+      ApplyColor: true,
     },
     {
       Name: 'Rock-1',
       Format: 'img',
       Ext: 'png',
       TilesWide: 4,
+      ApplyColor: true,
     },
   ]
 
@@ -105,7 +119,7 @@ class GridMapTiles extends AppSidebarWidget {
    * 0010 Fills the Bottom-Left of the Tile
    * 0101 Fill the Top-Right and Bottom-Right of the Tile
    */
-  TileIndex: Array<string> = [
+  TileIndex: Array<SurroundingMapData> = [
     '0010', '0101', '1011', '0011',
     '1001', '0111', '1111', '1110',
     '0100', '1100', '1101', '1010',
@@ -222,7 +236,7 @@ class GridMapTiles extends AppSidebarWidget {
 
       if (tileSet.Format == 'img') {
         const blob = await response.blob()
-        this.SaveBlobAsImgIntoTiles(tileSet, blob)
+        this.SaveBlobAsImgIntoTiles(tileSet.Name, blob)
       }
 
     }
@@ -239,13 +253,13 @@ class GridMapTiles extends AppSidebarWidget {
 
     // calc scale to fit  result into 64x64 tiles
     const sheetBmp = await createImageBitmap(sheet)
-    const scale = Math.floor(sheetBmp.width/tileSet.TilesWide)
+    const scale = Math.floor(sheetBmp.width / tileSet.TilesWide)
     sheetBmp.close()
 
     // temp canvas to hold the result
     const canvas = new OffscreenCanvas(64, 64)!
 
-    
+
     for (var y = 0; y < tileSet.TilesWide; y++) {
       for (var x = 0; x < 4; x++) {
         // cut up the sheet blob
@@ -264,18 +278,89 @@ class GridMapTiles extends AppSidebarWidget {
         canvas.getContext('bitmaprenderer')?.transferFromImageBitmap(tileBmp)
         const blob = await canvas.convertToBlob({ type: 'image/png' })
         // save the blob as an image
-        this.SaveBlobAsImgIntoTiles(tileSet, blob)
+        this.SaveBlobAsImgIntoTiles(tileSet.Name, blob)
         tileBmp.close()
       }
     }
   }
 
 
-  SaveBlobAsImgIntoTiles(tileSet: Tileset, blob: Blob) {
+  SaveBlobAsImgIntoTiles(name: string, blob: Blob) {
     const imageURL = URL.createObjectURL(blob)
     const image = new Image()
     image.src = imageURL
-    this.Tiles[tileSet.Name].push(image)
+    this.Tiles[name].push(image)
+  }
+
+
+  /** Generate Tile with color correction as needed */
+  async LoadColorizedTiles(tileSet: Tileset, color: string) {
+
+    // only load if img type and not previously loaded
+    if (
+      tileSet.Format != 'img'
+      || !tileSet.ApplyColor
+      || this.Tiles[tileSet.Name + color] != undefined
+    ) return
+
+    const startTime = window.performance.now()
+
+    const colorObj = Color.ColorFromHex(color)
+
+    // init storage location
+    this.Tiles[tileSet.Name + color] = []
+
+    // loop over original tiles
+    const tiles = this.Tiles[tileSet.Name] as HTMLImageElement[]
+    for (var tileIdx = 0; tileIdx < tiles.length; tileIdx++) {
+
+      // canvas to hold output
+      const canvas = new OffscreenCanvas(64, 64)!
+      const context = canvas.getContext('2d')
+
+      if (context) {
+
+        const originalBmp = await createImageBitmap(tiles[tileIdx])
+
+        context.drawImage(originalBmp, 0, 0)
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+        const data = imageData.data
+
+        // Loop through each pixel
+        for (let i = 0; i < data.length; i += 4) {
+
+          // skip if alpha is 0
+          if (data[i + 3] == 0) continue
+
+          // get the current color
+          const rgba = Color.ColorFromRgba(
+            {
+              r: data[i],
+              g: data[i + 1],
+              b: data[i + 2],
+              a: data[i + 3],
+            }
+          ).TargetHsla(colorObj as HSLA)
+
+          data[i] = rgba.r
+          data[i + 1] = rgba.g
+          data[i + 2] = rgba.b
+          data[i + 3] = rgba.a
+        }
+
+        context.putImageData(imageData, 0, 0)
+
+        // save the blob as an image
+        const blob = await canvas.convertToBlob({ type: 'image/png' })
+        this.SaveBlobAsImgIntoTiles(tileSet.Name + color, blob)
+
+        originalBmp.close()
+
+      }
+    }
+
+    console.log('LoadColorizedTiles()', window.performance.now() - startTime)
+
   }
 
 
@@ -283,14 +368,30 @@ class GridMapTiles extends AppSidebarWidget {
    * Get a Tile based on the map data
    * 
    * @param {string} tileSet Tile Set to get tile from, i.e. Solid-1
-   * @param {string} surroundingMapData Map data to select correct tile, i.e. 0011
+   * @param {SurroundingMapData} surroundingMapData Map data used to select correct tile
    * 
    * @example GetTile('Solid-1', '0011')
    */
-  GetTile(tileSet: Tileset, surroundingMapData: string): SVGSVGElement | HTMLImageElement {
+  GetTile(
+    tileSet: Tileset,
+    surroundingMapData: SurroundingMapData,
+    color: string
+  ): SVGSVGElement | HTMLImageElement {
+
     const tileIdx = this.TileIndex.indexOf(surroundingMapData)
-    const tileCache = this.Tiles[tileSet.Name]
-    return tileCache[tileIdx].cloneNode(true) as SVGSVGElement | HTMLImageElement
+
+    // svg color is applied elsewhere
+    if (tileSet.Format == 'svg') {
+      return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as SVGSVGElement
+    }
+
+    // img with no color change
+    if (!tileSet.ApplyColor) {
+      return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as HTMLImageElement
+    }
+
+    // img with color change
+    return this.Tiles[tileSet.Name + color][tileIdx].cloneNode(true) as HTMLImageElement
   }
 
 }
