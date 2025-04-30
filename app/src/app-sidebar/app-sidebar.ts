@@ -1,11 +1,16 @@
 import GridBase from '../shared/grid-base'
 import AnimatedCollapse from '../animated-collapse/animated-collapse'
+import GridMapDisplay from '../grid-map-display/grid-map-display'
 
 // markup and style
 import html from './app-sidebar.html?raw'
 import css from './app-sidebar.css?raw'
 
 
+/**
+ * @fires GridMapDisplay.EventEditState
+ * @fires GridMapDisplay.EventNormalState
+ */
 export default class AppSidebar extends GridBase {
 
   Sidebar: AnimatedCollapse | null = null
@@ -40,13 +45,19 @@ export default class AppSidebar extends GridBase {
       // this.SidebarOption?.classList.add('active')
       this.setAttribute('expanded', 'true')
       document.dispatchEvent(
-        new Event('grid-map-set-edit-state-edit', { bubbles: true })
+        new Event(
+          GridMapDisplay.EventEditState,
+          { bubbles: true }
+        )
       )
     } else {
       // this.SidebarOption?.classList.remove('active')
       this.removeAttribute('expanded')
       document.dispatchEvent(
-        new Event('grid-map-set-edit-state-normal', { bubbles: true })
+        new Event(
+          GridMapDisplay.EventNormalState,
+          { bubbles: true }
+        )
       )
     }
 

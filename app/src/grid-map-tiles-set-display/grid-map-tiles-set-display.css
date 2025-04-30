@@ -29,6 +29,11 @@
   width: 256px;
 }
 
+.tileset-display>div>svg {
+  height: 64px;
+  width: 64px;
+}
+
 .tileset-name {
   text-shadow: 0 0 4px black;
 }

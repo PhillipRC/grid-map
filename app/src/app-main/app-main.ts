@@ -1,11 +1,14 @@
 import GridBase from '../shared/grid-base'
 import AppSidebar from '../app-sidebar/app-sidebar'
+import GridConsole from '../app-console/app-console'
 
 // markup and style
 import html from './app-main.html?raw'
 import css from './app-main.css?raw'
 
-
+/**
+ * @fires GridConsole.ToggleDisplay
+ */
 export default class AppMain extends GridBase {
 
   Sidebar: AppSidebar | null = null
@@ -40,7 +43,11 @@ export default class AppMain extends GridBase {
     if (event.key == '`') {
       this.dispatchEvent(
         new CustomEvent(
-          'grid-console-toggle', { bubbles: true, detail: null }
+          GridConsole.ToggleDisplay,
+          {
+            bubbles: true,
+            detail: null
+          }
         )
       )
     }

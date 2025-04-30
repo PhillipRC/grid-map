@@ -1,13 +1,24 @@
 
 import GridBase from '../shared/grid-base'
+import GridMapData from '../grid-map-data/grid-map-data'
 
 // markup and style
 import html from './app-console.html?raw'
 import css from './app-console.css?raw'
 import consoleCss from '../shared/console.css?raw'
 
-
+/**
+ * @fires GridMapData.EventGenerateRandom
+ * 
+ * @listens GridConsole.ToggleDisplay
+ */
 export default class GridConsole extends GridBase {
+
+  /** listens: Toggle console display */
+  static ToggleDisplay = 'grid-console-toggle-display'
+
+  /** listens: display message on console */
+  static LogMessage = 'grid-console-log'
 
   Textarea: HTMLTextAreaElement | null = null
 
@@ -39,16 +50,23 @@ export default class GridConsole extends GridBase {
 
     // listen for console button click
     this.shadowRoot?.querySelector('.console-button')?.addEventListener(
-        'click',
-        () => { this.HandleConsoleToggle() },
-        false
-      )
+      'click',
+      () => { this.HandleConsoleToggle() },
+      false
+    )
 
     // listen for mouse click
     document.addEventListener(
-      'grid-console-toggle',
+      GridConsole.ToggleDisplay,
       () => { this.HandleConsoleToggle() },
       false
+    )
+
+    document.addEventListener(
+      GridConsole.LogMessage,
+      (event: CustomEventInit<string>) => {
+        if (event.detail != undefined) this.HandleLogMessage(event.detail)
+      }
     )
 
     // listen for events from the textarea
@@ -79,7 +97,7 @@ export default class GridConsole extends GridBase {
   }
 
   ScrollToBottom() {
-    if(this.Textarea) this.Textarea.scrollTop = this.Textarea.scrollHeight
+    if (this.Textarea) this.Textarea.scrollTop = this.Textarea.scrollHeight
   }
 
   HandleKeydown(event: KeyboardEvent) {
@@ -100,13 +118,13 @@ export default class GridConsole extends GridBase {
 
   async ProcessCommand() {
 
-    if(!this.Textarea) return
+    if (!this.Textarea) return
 
     const value = this.Textarea.value
     const lastPrompt = value.lastIndexOf(this.Prompt) + this.Prompt.length
     const command = value.substring(lastPrompt, value.length).toLowerCase().split(' ')
-    
-    
+
+
     // TODO an array would be better than this
     switch (command[0]) {
       case 'clear':
@@ -133,36 +151,36 @@ export default class GridConsole extends GridBase {
         break
     }
 
-    if(this.Textarea.value.length != 0) {
+    if (this.Textarea.value.length != 0) {
       this.Textarea.value += '\r'
     }
     this.Textarea.value += this.Prompt
-    
+
     this.ScrollToBottom()
 
   }
 
   Clear() {
-    if(this.Textarea) this.Textarea.value = ''
+    if (this.Textarea) this.Textarea.value = ''
   }
 
   Help(command: any[]) {
 
-    if(!this.Textarea) return
+    if (!this.Textarea) return
 
-    if(command?.length == 2) {
+    if (command?.length == 2) {
 
       switch (command[1].toLowerCase()) {
         case 'generate':
         case 'g':
           this.Textarea.value += '\r'
-          + this.PromptSpace + 'Generates a random map with 4 layers.'
+            + this.PromptSpace + 'Generates a random map with 4 layers.'
           return
           break
         case 'joke':
         case 'j':
           this.Textarea.value += '\r'
-          + this.PromptSpace + 'There is no help for you. 😐'
+            + this.PromptSpace + 'There is no help for you. 😐'
           return
           break
       }
@@ -170,24 +188,29 @@ export default class GridConsole extends GridBase {
     }
 
     this.Textarea.value += '\r'
-    + this.PromptSpace + ' Command     Description\r'
-    + this.PromptSpace + '----------  ---------------------\r'
-    + this.PromptSpace + ' Generate    Create map\r'
-    + this.PromptSpace + ' Joke        Dad joke\r'
-    + this.PromptSpace + ' Help        Command details\r'    
+      + this.PromptSpace + ' Command     Description\r'
+      + this.PromptSpace + '----------  ---------------------\r'
+      + this.PromptSpace + ' Generate    Create map\r'
+      + this.PromptSpace + ' Joke        Dad joke\r'
+      + this.PromptSpace + ' Help        Command details\r'
+  }
+
+  HandleLogMessage(text: string) {
+    if (this.Textarea) this.Textarea.value += `\r ${text}`
   }
 
   Generate() {
     document.dispatchEvent(
       new Event(
-        'grid-map-data-generate-random', { bubbles: true }
+        GridMapData.EventGenerateRandom,
+        { bubbles: true }
       )
     )
   }
 
   async Joke() {
 
-    if(!this.Textarea) return
+    if (!this.Textarea) return
 
     const response = await fetch(
       'https://icanhazdadjoke.com/',

@@ -4,6 +4,8 @@ import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapPointer from '../grid-map-pointer/grid-map-pointer'
 import PointerType from '../grid-map-pointer/PointerType'
 import Color from '../Color'
+import GridMapDataEdit from '../grid-map-data-edit/grid-map-data-edit'
+import GridMapTilesSetDisplay from '../grid-map-tiles-set-display/grid-map-tiles-set-display'
 
 import {
   XY,
@@ -23,8 +25,41 @@ import html from './grid-map-display.html?raw'
  * Handles displaying GridMapData using GridMapTiles.
  * 
  * Tiles are added and removed as they enter and leave the Render Area.
+ * 
+ * @fires GridMapDisplay.EventLayerSelected
+ * @fires GridMapDisplay.EventPointerTypeSelected
+ * @fires GridMapData.EventGenerateRandom
+ * 
+ * @listens AppSidebar.EventNormalState
+ * @listens AppSidebar.EventEditState
+ * 
+ * @listens GridMapTiles.EventLoaded
+ *
+ * @listens GridMapData.EventLoading
+ * @listens GridMapData.EventLoaded 
+ * @listens GridMapData.EventLayerUpdated
+ * @listens GridMapData.EventLayerRemoved
+ * @listens GridMapData.EventLayerAdded
+ * @listens GridMapData.EventLayerTilesetUpdateSet
+ * 
+ * @listens GridMapDataEdit.EventPointerTypeSelected
+ * @listens GridMapDataEdit.EventLayerSelected
+ *
+ * @listens GridMapTilesSetDisplay.EventSelected
  */
 export default class GridMapDisplay extends GridBase {
+
+  /** fires: Layer Selected */
+  static EventLayerSelected = 'grid-map-display-select-layer'
+
+  /** fires: Pointer Type Selected */
+  static EventPointerTypeSelected = 'grid-map-display-select-pointer'
+
+  /** listens: normal state */
+  static EventNormalState = 'grid-map-display-state-normal'
+  
+  /** listens: edit state */
+  static EventEditState = 'grid-map-display-state-edit'
 
   /** Component handling Tile data: loading and creating */
   GridMapTiles: GridMapTiles | null = null
@@ -193,20 +228,9 @@ export default class GridMapDisplay extends GridBase {
 
   UpdateTime: number = 0
 
-  #State: string = 'normal'
-
   #Focus: boolean = false
 
-  set State(value) {
-    if (!(value == 'normal' || value == 'edit')) return
-    this.#State = value
-    if (value == 'normal') this.SetStateNormal()
-    if (value == 'edit') this.SetStateEdit()
-  }
-
-  get State() {
-    return this.#State
-  }
+  State: 'normal' | 'edit' = 'normal'
 
 
   constructor() {
@@ -335,105 +359,131 @@ export default class GridMapDisplay extends GridBase {
     // #region Custom Event Listeners
 
     document.addEventListener(
-      'grid-map-set-edit-state-normal',
-      () => { this.State = 'normal' }
+      GridMapData.EventLoading,
+      () => {
+        
+        // if its not yet init its the first fun
+        if (!this.IsInitialized) return
+
+        this.Queue.Clear()
+        this.HandleGridMapLoading()
+      }
     )
 
     document.addEventListener(
-      'grid-map-set-edit-state-edit',
-      () => { this.State = 'edit' }
-    )
-
-    document.addEventListener(
-      GridMapData.EventGridMapDataLoading,
-      () => { this.HandleGridMapLoading() }
-    )
-
-    document.addEventListener(
-      'grid-map-data-loaded',
+      GridMapData.EventLoaded,
       (event: CustomEventInit<GridMapData>) => {
+        // do not queue map loaded
         if (event.detail != undefined) this.HandleGridMapLoaded(event.detail)
       }
     )
 
     document.addEventListener(
-      'grid-map-cursor-move',
-      (event: CustomEventInit<XY>) => {
-        if (event.detail != undefined) this.CursorMoveBy(event.detail)
-      }
-    )
-
-    document.addEventListener(
-      'grid-map-display-clear',
-      () => { this.Clear() }
-    )
-
-    document.addEventListener(
-      'grid-map-tiles-loaded',
+      GridMapTiles.EventLoaded,
       (event: CustomEventInit<GridMapTiles>) => {
+        // do not queue tiles loaded
         if (event.detail != undefined) this.HandleTilesLoaded(event.detail)
       }
     )
 
     document.addEventListener(
-      'tile-set-selected',
+      GridMapDisplay.EventNormalState,
+      () => {
+        const GridMapDisplay_SetStateNormal = () => { this.SetStateNormal() }
+        this.Queue.Add(GridMapDisplay_SetStateNormal)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapDisplay.EventEditState,
+      () => {
+        const GridMapDisplay_SetStateEdit = () => { this.SetStateEdit() }
+        this.Queue.Add(GridMapDisplay_SetStateEdit)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapTilesSetDisplay.EventSelected,
       (event: CustomEventInit<string>) => {
-        if (event.detail != undefined) this.HandleTileSetSelected(event.detail)
+        const GridMapDisplay_HandleTileSetSelected = () => {
+          if (event.detail != undefined) this.HandleTileSetSelected(event.detail)
+        }
+        this.Queue.Add(GridMapDisplay_HandleTileSetSelected)
+        if (this.IsInitialized) this.Queue.Process()
       }
     )
 
     /** Handle Color, CanWalk, etc. is updated */
     document.addEventListener(
-      GridMapData.EventGridMapUpdated,
-      () => { this.ResetTiles() }
-    )
-
-    document.addEventListener(
-      GridMapData.EventGridMapLayerRemoved,
-      (event: CustomEventInit<number>) => {
-        if (event.detail != undefined) this.ResetLayers(event.detail)
-      }
-    )
-
-    document.addEventListener(
-      GridMapData.EventGridMapLayerAdded,
-      (event: CustomEventInit<number>) => {
-        if (event.detail != undefined) this.ResetLayers(event.detail)
-      }
-    )
-
-    document.addEventListener(
-      GridMapData.EventGridMapLayerTilesetUpdateSet,
-      (event: CustomEventInit<number>) => {
-        if (event.detail != undefined) this.ResetLayers(event.detail)
-      }
-    )
-
-    document.addEventListener(
-      'grid-map-display-select-tile',
+      GridMapData.EventLayerUpdated,
       () => {
-        if (this.State == 'edit') this.SetPointer(PointerType.Select)
+        const GridMapDisplay_ResetTiles = () => {
+          this.ResetTiles()
+        }
+        this.Queue.Add(GridMapDisplay_ResetTiles)
+        if (this.IsInitialized) this.Queue.Process()
       }
     )
 
     document.addEventListener(
-      'grid-map-display-remove-tile',
-      () => {
-        if (this.State == 'edit') this.SetPointer(PointerType.Remove)
-      }
-    )
-
-    document.addEventListener(
-      'grid-map-display-add-tile',
-      () => {
-        if (this.State == 'edit') this.SetPointer(PointerType.Add)
-      }
-    )
-
-    document.addEventListener(
-      'grid-map-edit-selected-layer',
+      GridMapData.EventLayerRemoved,
       (event: CustomEventInit<number>) => {
-        if (event.detail != undefined) this.HandleLayerSelected(event.detail)
+        const ResetLayers = () => {
+          if (event.detail != undefined) this.ResetLayers(event.detail)
+        }
+        this.Queue.Add(ResetLayers)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapData.EventLayerAdded,
+      (event: CustomEventInit<number>) => {
+        const ResetLayers = () => {
+          if (event.detail != undefined) this.ResetLayers(event.detail)
+        }
+        this.Queue.Add(ResetLayers)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapData.EventLayerTilesetUpdateSet,
+      (event: CustomEventInit<number>) => {
+        const ResetLayers = () => {
+          if (event.detail != undefined) this.ResetLayers(event.detail)
+        }
+        this.Queue.Add(ResetLayers)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapDataEdit.EventPointerTypeSelected,
+      (custeomEvent: CustomEventInit<number>) => {
+        const GridMapDisplay_SetPointer = () => {
+          if (
+            this.State == 'edit'
+            && custeomEvent.detail
+          ) {
+            this.SetPointer(custeomEvent.detail)
+          }
+        }
+        this.Queue.Add(GridMapDisplay_SetPointer)
+        if (this.IsInitialized) this.Queue.Process()
+      }
+    )
+
+    document.addEventListener(
+      GridMapDataEdit.EventLayerSelected,
+      (event: CustomEventInit<number>) => {
+        const GridMapDisplay_HandleLayerSelected = () => {
+          if (event.detail != undefined) this.HandleLayerSelected(event.detail)
+        }
+        this.Queue.Add(GridMapDisplay_HandleLayerSelected)
+        if (this.IsInitialized) this.Queue.Process()
       }
     )
 
@@ -459,10 +509,13 @@ export default class GridMapDisplay extends GridBase {
     // set the starting location
     this.CenterLocation.x = this.GridMapData.MapData.Start.x
     this.CenterLocation.y = this.GridMapData.MapData.Start.y
-
+    
     this.SetGridPixelSize()
     await this.ResetLayers()
     this.HandleResize()
+
+    this.IsInitialized = true
+    this.Queue.Process()
 
   }
 
@@ -609,10 +662,20 @@ export default class GridMapDisplay extends GridBase {
 
 
   SetStateNormal() {
+    this.State = 'normal'
     this.EditToolsPanel?.setAttribute('hidden', 'true')
     this.Container?.classList.remove('edit')
     this.SetPointer(PointerType.None)
     this.ReticleShow()
+  }
+
+
+  SetStateEdit() {
+    this.State = 'edit'
+    this.EditToolsPanel?.removeAttribute('hidden')
+    this.Container?.classList.add('edit')
+    this.SetPointer(PointerType.Select)
+    this.ReticleHide()
   }
 
 
@@ -629,14 +692,6 @@ export default class GridMapDisplay extends GridBase {
 
   ReticleHide() {
     this.Reticle?.setAttribute('hidden', 'true')
-  }
-
-
-  SetStateEdit() {
-    this.EditToolsPanel?.removeAttribute('hidden')
-    this.Container?.classList.add('edit')
-    this.SetPointer(PointerType.Select)
-    this.ReticleHide()
   }
 
 
@@ -973,11 +1028,11 @@ export default class GridMapDisplay extends GridBase {
 
     if (this.State == 'edit') this.SetPointer(PointerType.Select)
 
-    // grid-map-data-generate-random
     if (event.key == 'g') {
       document.dispatchEvent(
         new Event(
-          'grid-map-data-generate-random', { bubbles: true }
+          GridMapData.EventGenerateRandom,
+          { bubbles: true }
         )
       )
     }
@@ -1039,8 +1094,11 @@ export default class GridMapDisplay extends GridBase {
 
     document.dispatchEvent(
       new CustomEvent(
-        'grid-map-display-select-pointer',
-        { bubbles: true, detail: pointer }
+        GridMapDisplay.EventPointerTypeSelected,
+        {
+          bubbles: true,
+          detail: pointer
+        }
       )
     )
   }
@@ -1125,8 +1183,11 @@ export default class GridMapDisplay extends GridBase {
         if (tileData) this.SavedTileData = tileData
         document.dispatchEvent(
           new CustomEvent(
-            'grid-map-display-select-layer',
-            { bubbles: true, detail: tileData }
+            GridMapDisplay.EventLayerSelected,
+            {
+              bubbles: true,
+              detail: tileData
+            }
           )
         )
         // no need to update the map with select

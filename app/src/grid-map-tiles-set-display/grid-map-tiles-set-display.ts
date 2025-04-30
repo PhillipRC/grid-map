@@ -11,9 +11,13 @@ import html from './grid-map-tiles-set-display.html?raw'
 
 /**
  * Display a Tile Set in a 4x4 configuration
+ * 
+ * @fires GridMapTilesSetDisplay.EventSelected 
  */
 export default class GridMapTilesSetDisplay extends GridBase {
 
+  /** fires: Tileset is selected */
+  static EventSelected = 'tile-set-selected'
 
   Display: HTMLElement | null = null
 
@@ -83,7 +87,7 @@ export default class GridMapTilesSetDisplay extends GridBase {
   DispatchTileSetSelected() {
     document.dispatchEvent(
       new CustomEvent(
-        'tile-set-selected',
+        GridMapTilesSetDisplay.EventSelected,
         {
           bubbles: true,
           detail: this.#TileSetName,

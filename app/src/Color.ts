@@ -134,7 +134,7 @@ export default class Color {
           h = (r - g) / d + 4
           break
       }
-      h /= 6;
+      h /= 6
     }
 
     return {

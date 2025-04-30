@@ -4,6 +4,7 @@ import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
 import PointerType from '../grid-map-pointer/PointerType'
 import { TileData } from '../types'
+import GridMapDisplay from '../grid-map-display/grid-map-display'
 
 // markup and styles
 import DataEditHtml from './grid-map-data-edit.html?raw'
@@ -12,9 +13,28 @@ import css from './grid-map-data-edit.css?raw'
 
 /**
  * Handles Form for 
+ * 
+ * @fires GridMapDataEdit.EventPointerTypeSelected
+ * @fires GridMapDataEdit.EventLayerSelected
+ * 
+ * @listens GridMapData.EventLoaded
+ * @listens GridMapData.EventLayerRemoved
+ * @listens GridMapData.EventLayerAdded
+ * 
+ * @listens GridMapTiles.EventLoaded
+ * 
+ * @listens GridMapDisplay.EventLayerSelected
+ * @listens GridMapDisplay.EventPointerTypeSelected
  */
 export default class GridMapDataEdit extends AppSidebarWidget {
 
+  /** fires: Pointer Type Selected */
+  static EventPointerTypeSelected = 'grid-map-data-edit-select-pointer'
+  
+  /** fires: Layer Selected */
+  static EventLayerSelected = 'grid-map-edit-selected-layer'
+
+  
   /**
    * Component handling Map data: loading, generating, getting
    */
@@ -106,7 +126,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-data-loaded',
+      GridMapData.EventLoaded,
       (event: CustomEventInit<GridMapData>) => {
         if (event.detail != undefined) {
           this.GridMapData = event.detail
@@ -116,7 +136,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-tiles-loaded',
+      GridMapTiles.EventLoaded,
       (event: CustomEventInit<GridMapTiles>) => {
         if (event.detail != undefined) {
           this.GridMapTilesRef = event.detail
@@ -126,7 +146,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-data-layer-removed',
+      GridMapData.EventLayerRemoved,
       (event: CustomEventInit<number>) => {
         if (event.detail != undefined) {
           this.HandleLayerRemoved(event.detail)
@@ -135,7 +155,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-data-layer-added',
+      GridMapData.EventLayerAdded,
       (event: CustomEventInit<number>) => {
         if (event.detail != undefined) {
           this.HandleLayerAdded(event.detail)
@@ -144,7 +164,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-display-select-layer',
+      GridMapDisplay.EventLayerSelected,
       (event: CustomEventInit<TileData>) => {
         if (event.detail != undefined) {
           if (event.detail != null && event.detail.Layer != null) {
@@ -155,7 +175,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-display-select-pointer',
+      GridMapDisplay.EventPointerTypeSelected,
       (event: CustomEventInit<PointerType>) => {
         if (event.detail) this.HandlePointerSelection(event.detail)
       }
@@ -304,43 +324,35 @@ export default class GridMapDataEdit extends AppSidebarWidget {
   }
 
 
+  /** Handle when user selects one of the available layers */
   HandleLayerChanged() {
+    let selectedLayer = this.Layers?.Tabs?.selectedIndex
+    selectedLayer = (selectedLayer == undefined || selectedLayer == null ? 0 : selectedLayer)
     document.dispatchEvent(
       new CustomEvent(
-        'grid-map-edit-selected-layer',
+        GridMapDataEdit.EventLayerSelected,
         {
           bubbles: true,
-          detail: this.Layers?.Tabs?.selectedIndex,
+          detail: selectedLayer,
         }
       )
     )
   }
 
+  /** Handle when user selects one of the available pointers */
   HandlePointerOptionSelection(pointerType: PointerType) {
-    if (pointerType == PointerType.Add) {
-      document.dispatchEvent(
-        new Event('grid-map-display-add-tile')
+    document.dispatchEvent(
+      new CustomEvent(
+        GridMapDataEdit.EventPointerTypeSelected,
+        { bubbles: true, detail: pointerType }
       )
-    }
+    )
 
-    if (pointerType == PointerType.Remove) {
-      document.dispatchEvent(
-        new Event('grid-map-display-remove-tile')
-      )
-    }
-
-    if (pointerType == PointerType.Select) {
-      document.dispatchEvent(
-        new Event('grid-map-display-select-tile')
-      )
-    }
     this.HandlePointerSelection(pointerType)
   }
 
 
-  /**
-   * Handle Pointer Select
-   */
+  /** Handle Pointer Select */
   HandlePointerSelection(pointerType: PointerType) {
 
     this.ClearSelected()

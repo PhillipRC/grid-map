@@ -65,7 +65,12 @@ grid-map-pointer {
 }
 
 .edit .scale-container>div.selected>img {
-  filter: drop-shadow(0 0 2px black);
+  border-color: var(--stroke-color, #fff);
+  border-style: dashed;
+  border-width: 1px;
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-top: -1px;
 }
 
 .edit-tools-panel {

@@ -1,3 +1,5 @@
+import { FunctionCallQueue } from "./FunctionCallQueue"
+
 /**
  * Helper to remove redundant code creating shadowRoot
  */
@@ -8,6 +10,11 @@ export default class GridBase extends HTMLElement {
    * Track if connectedCallback() has been called
    */
   ConnectedCallback: boolean = false
+
+
+  IsInitialized: boolean = false
+
+  Queue = new FunctionCallQueue()
 
 
   /**

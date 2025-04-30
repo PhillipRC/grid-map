@@ -15,8 +15,13 @@ import Color from '../Color'
 
 /**
  * Handles Tile Data
+ * 
+ * @fires GridMapTiles.EventLoaded
  */
 class GridMapTiles extends AppSidebarWidget {
+
+  /** fires: Tiles are loaded */
+  static EventLoaded = 'grid-map-tiles-loaded'
 
   /** Available Tile Sets */
   TileSets: Array<Tileset> = [
@@ -191,7 +196,7 @@ class GridMapTiles extends AppSidebarWidget {
     // let eveyone know we are loaded up
     document.dispatchEvent(
       new CustomEvent(
-        'grid-map-tiles-loaded',
+        GridMapTiles.EventLoaded,
         {
           bubbles: true,
           detail: this,
@@ -278,18 +283,24 @@ class GridMapTiles extends AppSidebarWidget {
         canvas.getContext('bitmaprenderer')?.transferFromImageBitmap(tileBmp)
         const blob = await canvas.convertToBlob({ type: 'image/png' })
         // save the blob as an image
-        this.SaveBlobAsImgIntoTiles(tileSet.Name, blob)
+        await this.SaveBlobAsImgIntoTiles(tileSet.Name, blob)
         tileBmp.close()
       }
     }
   }
 
 
-  SaveBlobAsImgIntoTiles(name: string, blob: Blob) {
-    const imageURL = URL.createObjectURL(blob)
-    const image = new Image()
-    image.src = imageURL
-    this.Tiles[name].push(image)
+  async SaveBlobAsImgIntoTiles(name: string, blob: Blob) {
+    return new Promise(
+      (resolve, reject) => {
+        const imageURL = URL.createObjectURL(blob)
+        const image = new Image()
+        image.onload = () => resolve(image.width)
+        image.onerror = reject
+        image.src = imageURL
+        this.Tiles[name].push(image)
+      }
+    )
   }
 
 
@@ -320,7 +331,8 @@ class GridMapTiles extends AppSidebarWidget {
 
       if (context) {
 
-        const originalBmp = await createImageBitmap(tiles[tileIdx])
+        let originalBmp:ImageBitmap | null = null
+        originalBmp = await createImageBitmap(tiles[tileIdx])
 
         context.drawImage(originalBmp, 0, 0)
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -359,7 +371,7 @@ class GridMapTiles extends AppSidebarWidget {
       }
     }
 
-    console.log('LoadColorizedTiles()', window.performance.now() - startTime)
+    console.debug('LoadColorizedTiles()', window.performance.now() - startTime)
 
   }
 

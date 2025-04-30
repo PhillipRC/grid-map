@@ -6,6 +6,9 @@ import html from './grid-map-data-persist.html?raw'
 import css from './grid-map-data-persist.css?raw'
 
 
+/**
+ * @listens GridMapData.EventLoaded
+ */
 export default class GridMapDataPersist extends AppSidebarWidget {
 
 
@@ -53,7 +56,7 @@ export default class GridMapDataPersist extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-data-loaded',
+      GridMapData.EventLoaded,
       (customEvent: CustomEventInit<GridMapData>) => {
         if (customEvent.detail) this.GridMapData = customEvent.detail
       }

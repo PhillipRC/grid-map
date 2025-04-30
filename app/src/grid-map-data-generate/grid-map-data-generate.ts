@@ -1,6 +1,7 @@
 import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
 import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
+import GridMapData from '../grid-map-data/grid-map-data'
 import PerlinNoise from '../Noise'
 
 import {
@@ -22,8 +23,19 @@ import css from './grid-map-data-generate.css?raw'
  * Handles Form for Generatig Map data
  * 
  * The code contains partial support for multiple noiseLayers
+ * 
+ * @fires GridMapData.EventGenerate
+ * 
+ * @listens GridMapTiles.EventLoaded
+ * @listens GridMapData.EventLoading
+ * @listens GridMapData.EventFormUpdate
+ * 
+ * @listens GridMapDataGenerate.EventUpdate
  */
 export default class GridMapDataGenerate extends AppSidebarWidget {
+
+  /** fires: Form input updated */
+  static EventFormUpdate = 'grid-map-generate-update'
 
   GridMapTilesRef: GridMapTiles | null = null
 
@@ -104,7 +116,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Color: '#72787E',
       Cutoff: .15,
       CutoffCap: 1,
-      Tileset: 'Block-2',
+      Tileset: 'Rock-1',
     },
 
   ]
@@ -185,19 +197,19 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-generate-update',
+      GridMapDataGenerate.EventFormUpdate,
       () => { this.RenderPreview() }
     )
 
     document.addEventListener(
-      'grid-map-data-loading',
+      GridMapData.EventLoading,
       () => {
         this.MapDataLoading = true
       }
     )
 
     document.addEventListener(
-      'grid-map-tiles-loaded',
+      GridMapTiles.EventLoaded,
       (event: CustomEventInit<GridMapTiles>) => {
         if (event.detail != undefined) {
           this.GridMapTilesRef = event.detail
@@ -207,7 +219,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      'grid-map-data-loaded',
+      GridMapData.EventLoaded,
       () => {
         this.MapDataLoading = false
         this.SubmitButton?.classList.remove('disabled')
@@ -808,7 +820,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       () => {
         document.dispatchEvent(
           new CustomEvent(
-            'grid-map-data-generate',
+            GridMapData.EventGenerate,
             {
               bubbles: true,
               detail: this.GetFormData(),

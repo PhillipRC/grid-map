@@ -18,6 +18,16 @@ import html from './grid-map-data.html?raw'
 
 /**
  * Handles Map Data
+ * 
+ * @fires GridMapData.EventLoading
+ * @fires GridMapData.EventLoaded
+ * @fires GridMapData.EventLayerRemoved
+ * @fires GridMapData.EventLayerAdded
+ * @fires GridMapData.EventLayerTilesetUpdateSet
+ * @fires GridMapData.EventLayerUpdated
+ * 
+ * @listens GridMapData.EventGenerateRandom
+ * @listens GridMapData.EventGenerate
  */
 export default class GridMapData extends GridBase {
 
@@ -27,20 +37,29 @@ export default class GridMapData extends GridBase {
 
   Noise: Noise = new Noise()
   
-  /** Color, CanWalk udpated */
-  static EventGridMapUpdated = 'grid-map-data-layer-updated'
+  /** listens: Color, CanWalk udpated */
+  static EventLayerUpdated = 'grid-map-data-layer-updated'
   
-  /** Layer Removed */
-  static EventGridMapLayerRemoved = 'grid-map-data-layer-removed'
+  /** fires: Layer Removed */
+  static EventLayerRemoved = 'grid-map-data-layer-removed'
   
-  /** Layer Added */
-  static EventGridMapLayerAdded = 'grid-map-data-layer-added'
+  /** fires: Layer Added */
+  static EventLayerAdded = 'grid-map-data-layer-added'
   
-  /** Layer Tileset updated */
-  static EventGridMapLayerTilesetUpdateSet = 'grid-map-data-layer-tileset-updated'
+  /** fires: Layer Tileset updated */
+  static EventLayerTilesetUpdateSet = 'grid-map-data-layer-tileset-updated'
 
-  /** Map Loading */
-  static EventGridMapDataLoading = 'grid-map-data-loading'
+  /** fires: Map Loading */
+  static EventLoading = 'grid-map-data-loading'
+  
+  /** fires: Map Loaded */
+  static EventLoaded = 'grid-map-data-loaded'
+
+  /** listens: Generate a Random Map */
+  static EventGenerateRandom = 'grid-map-data-generate-random'
+
+  /** listens: Generate a Map with parameters */
+  static EventGenerate = 'grid-map-data-generate'
 
   Display: HTMLElement | null = null
 
@@ -59,14 +78,14 @@ export default class GridMapData extends GridBase {
     this.Display = this.shadowRoot?.querySelector('.display')!
 
     document.addEventListener(
-      'grid-map-data-generate',
+      GridMapData.EventGenerate,
       (customEvent: CustomEventInit<MapData>) => {
         if (customEvent.detail != undefined) this.GenerateHandler(customEvent.detail)
       }
     )
 
     document.addEventListener(
-      'grid-map-data-generate-random',
+      GridMapData.EventGenerateRandom,
       () => { this.GenerateRandomMap() }
     )
 
@@ -92,7 +111,7 @@ export default class GridMapData extends GridBase {
     if (!this.MapData) return
 
     this.MapData.Layers[layerIdx].Color = color
-    this.SendEvent(GridMapData.EventGridMapUpdated)
+    this.SendEvent(GridMapData.EventLayerUpdated)
   }
 
 
@@ -105,7 +124,13 @@ export default class GridMapData extends GridBase {
     this.MapData.Layers[layerIdx].Tileset = tileSet
 
     document.dispatchEvent(
-      new CustomEvent(GridMapData.EventGridMapLayerTilesetUpdateSet, { bubbles: true, detail: layerIdx })
+      new CustomEvent(
+        GridMapData.EventLayerTilesetUpdateSet,
+        {
+          bubbles: true,
+          detail: layerIdx
+        }
+      )
     )
   }
 
@@ -116,7 +141,7 @@ export default class GridMapData extends GridBase {
     if (layerIdx < 0 || layerIdx > this.MapData.Layers.length) return
 
     this.MapData.Layers[layerIdx].CanWalk = canWalk
-    this.SendEvent(GridMapData.EventGridMapUpdated)
+    this.SendEvent(GridMapData.EventLayerUpdated)
   }
 
 
@@ -132,7 +157,13 @@ export default class GridMapData extends GridBase {
     // remove the layer
     this.MapData.Layers.splice(layerIdx, 1)
     document.dispatchEvent(
-      new CustomEvent(GridMapData.EventGridMapLayerRemoved, { bubbles: true, detail: layerIdx })
+      new CustomEvent(
+        GridMapData.EventLayerRemoved,
+        {
+          bubbles: true,
+          detail: layerIdx
+        }
+      )
     )
   }
 
@@ -150,7 +181,13 @@ export default class GridMapData extends GridBase {
     }
     this.MapData?.Layers.splice(layerIdx, 0, newLayer)
     document.dispatchEvent(
-      new CustomEvent(GridMapData.EventGridMapLayerAdded, { bubbles: true, detail: layerIdx })
+      new CustomEvent(
+        GridMapData.EventLayerAdded,
+        {
+          bubbles: true,
+          detail: layerIdx
+        }
+      )
     )
   }
 
@@ -160,7 +197,9 @@ export default class GridMapData extends GridBase {
     setTimeout(
       () => {
         document.dispatchEvent(
-          new CustomEvent('grid-map-data-loaded', { detail: this, bubbles: true })
+          new CustomEvent(
+            GridMapData.EventLoaded,
+            { detail: this, bubbles: true })
         )
       }
       , 0
@@ -174,7 +213,7 @@ export default class GridMapData extends GridBase {
   async Load(url = './maps/map-01.json') {
     try {
 
-      this.SendEvent(GridMapData.EventGridMapDataLoading)
+      this.SendEvent(GridMapData.EventLoading)
 
       this.MapData = null
 
@@ -202,7 +241,7 @@ export default class GridMapData extends GridBase {
   }
 
   LoadMapData(json: MapRenderData) {
-    this.SendEvent(GridMapData.EventGridMapDataLoading)
+    this.SendEvent(GridMapData.EventLoading)
     // let the event cycle
     setTimeout(
       () => {
@@ -286,7 +325,7 @@ export default class GridMapData extends GridBase {
 
     if (noiseLayers == null) return
 
-    this.SendEvent(GridMapData.EventGridMapDataLoading)
+    this.SendEvent(GridMapData.EventLoading)
 
     const tileLayers: Array<TileLayer> = []
 
