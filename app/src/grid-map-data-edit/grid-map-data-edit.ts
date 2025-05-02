@@ -1,6 +1,6 @@
 import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
 import GridMapData from '../grid-map-data/grid-map-data'
-import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
+import GridMapTilesets from '../grid-map-tilesets/grid-map-tilesets'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
 import PointerType from '../grid-map-pointer/PointerType'
 import { TileData } from '../types'
@@ -30,18 +30,18 @@ export default class GridMapDataEdit extends AppSidebarWidget {
 
   /** fires: Pointer Type Selected */
   static EventPointerTypeSelected = 'grid-map-data-edit-select-pointer'
-  
+
   /** fires: Layer Selected */
   static EventLayerSelected = 'grid-map-edit-selected-layer'
 
-  
+
   /**
    * Component handling Map data: loading, generating, getting
    */
   GridMapData: GridMapData | null = null
 
 
-  GridMapTilesRef: GridMapTiles | null = null
+  GridMapTilesRef: GridMapTilesets | null = null
 
 
   /**
@@ -136,8 +136,8 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      GridMapTiles.EventLoaded,
-      (event: CustomEventInit<GridMapTiles>) => {
+      GridMapTilesets.EventLoaded,
+      (event: CustomEventInit<GridMapTilesets>) => {
         if (event.detail != undefined) {
           this.GridMapTilesRef = event.detail
           this.HandleDataLoaded()

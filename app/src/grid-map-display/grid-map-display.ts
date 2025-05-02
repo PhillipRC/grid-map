@@ -1,11 +1,11 @@
 import GridBase from '../shared/grid-base'
 import GridMapData from '../grid-map-data/grid-map-data'
-import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
+import GridMapTilesets from '../grid-map-tilesets/grid-map-tilesets'
 import GridMapPointer from '../grid-map-pointer/grid-map-pointer'
 import PointerType from '../grid-map-pointer/PointerType'
 import Color from '../Color'
 import GridMapDataEdit from '../grid-map-data-edit/grid-map-data-edit'
-import GridMapTilesSetDisplay from '../grid-map-tiles-set-display/grid-map-tiles-set-display'
+import GridMapTilesetDisplay from '../grid-map-tileset-display/grid-map-tileset-display'
 
 import {
   XY,
@@ -45,7 +45,7 @@ import html from './grid-map-display.html?raw'
  * @listens GridMapDataEdit.EventPointerTypeSelected
  * @listens GridMapDataEdit.EventLayerSelected
  *
- * @listens GridMapTilesSetDisplay.EventSelected
+ * @listens GridMapTilesetDisplay.EventSelected
  */
 export default class GridMapDisplay extends GridBase {
 
@@ -57,12 +57,12 @@ export default class GridMapDisplay extends GridBase {
 
   /** listens: normal state */
   static EventNormalState = 'grid-map-display-state-normal'
-  
+
   /** listens: edit state */
   static EventEditState = 'grid-map-display-state-edit'
 
   /** Component handling Tile data: loading and creating */
-  GridMapTiles: GridMapTiles | null = null
+  GridMapTiles: GridMapTilesets | null = null
 
   /** Component handling Map data: loading, generating, getting */
   GridMapData: GridMapData | null = null
@@ -361,7 +361,7 @@ export default class GridMapDisplay extends GridBase {
     document.addEventListener(
       GridMapData.EventLoading,
       () => {
-        
+
         // if its not yet init its the first fun
         if (!this.IsInitialized) return
 
@@ -379,8 +379,8 @@ export default class GridMapDisplay extends GridBase {
     )
 
     document.addEventListener(
-      GridMapTiles.EventLoaded,
-      (event: CustomEventInit<GridMapTiles>) => {
+      GridMapTilesets.EventLoaded,
+      (event: CustomEventInit<GridMapTilesets>) => {
         // do not queue tiles loaded
         if (event.detail != undefined) this.HandleTilesLoaded(event.detail)
       }
@@ -405,8 +405,8 @@ export default class GridMapDisplay extends GridBase {
     )
 
     document.addEventListener(
-      GridMapTilesSetDisplay.EventSelected,
-      (event: CustomEventInit<string>) => {
+      GridMapTilesetDisplay.EventSelected,
+      (event: CustomEventInit<Tileset>) => {
         const GridMapDisplay_HandleTileSetSelected = () => {
           if (event.detail != undefined) this.HandleTileSetSelected(event.detail)
         }
@@ -509,7 +509,7 @@ export default class GridMapDisplay extends GridBase {
     // set the starting location
     this.CenterLocation.x = this.GridMapData.MapData.Start.x
     this.CenterLocation.y = this.GridMapData.MapData.Start.y
-    
+
     this.SetGridPixelSize()
     await this.ResetLayers()
     this.HandleResize()
@@ -695,15 +695,12 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  /**
-   * @param {string} tileSet 
-   */
-  HandleTileSetSelected(tileSet: string) {
+  HandleTileSetSelected(tileSet: Tileset) {
     if (this.GridMapData == null) return
 
     this.GridMapData.SetLayerTileSet(
       this.SelectedLocationData.Layer,
-      tileSet
+      tileSet.Name
     )
   }
 
@@ -725,10 +722,7 @@ export default class GridMapDisplay extends GridBase {
   }
 
 
-  /**
-   * @param {GridMapTiles} event 
-   */
-  HandleTilesLoaded(event: GridMapTiles) {
+  HandleTilesLoaded(event: GridMapTilesets) {
     this.GridMapTiles = event
     this.Init()
   }

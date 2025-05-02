@@ -20,20 +20,17 @@ customElements.define('app-console', AppConsole)
 import AppSidebar from './app-sidebar/app-sidebar'
 customElements.define('app-sidebar', AppSidebar)
 
-import AnimatedCollapse from './animated-collapse/animated-collapse.ts'
+import AnimatedCollapse from './animated-collapse/animated-collapse'
 customElements.define('animated-collapse', AnimatedCollapse)
 
-import GridMapDisplay from './grid-map-display/grid-map-display.ts'
+import GridMapDisplay from './grid-map-display/grid-map-display'
 customElements.define('grid-map-display', GridMapDisplay)
 
-import GridMapTiles from './grid-map-tiles/grid-map-tiles'
-customElements.define('grid-map-tiles', GridMapTiles)
+import GridMapTilesets from './grid-map-tilesets/grid-map-tilesets'
+customElements.define('grid-map-tilesets', GridMapTilesets)
 
 import GridMapPointer from './grid-map-pointer/grid-map-pointer'
 customElements.define('grid-map-pointer', GridMapPointer)
-
-import GridMapTilesSetDisplay from './grid-map-tiles-set-display/grid-map-tiles-set-display'
-customElements.define('grid-map-tiles-set-display', GridMapTilesSetDisplay)
 
 import GridMapData from './grid-map-data/grid-map-data'
 customElements.define('grid-map-data', GridMapData)
@@ -49,6 +46,12 @@ customElements.define('grid-map-form-tile-layers', GridMapFormTileLayers)
 
 import GridMapDataPersist from './grid-map-data-persist/grid-map-data-persist'
 customElements.define('grid-map-data-persist', GridMapDataPersist)
+
+import GridMapTilesetsDisplay from './grid-map-tilesets-display/grid-map-tilesets-display'
+customElements.define('grid-map-tilesets-display', GridMapTilesetsDisplay)
+
+import GridMapTilesetDisplay from './grid-map-tileset-display/grid-map-tileset-display'
+customElements.define('grid-map-tileset-display', GridMapTilesetDisplay)
 
 // disable touchmove
 window.addEventListener('touchmove', (event) => { event.preventDefault() })

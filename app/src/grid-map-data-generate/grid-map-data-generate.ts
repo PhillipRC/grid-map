@@ -1,5 +1,5 @@
 import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
-import GridMapTiles from '../grid-map-tiles/grid-map-tiles'
+import GridMapTilesets from '../grid-map-tilesets/grid-map-tilesets'
 import GridMapFormTileLayers from '../grid-map-form-tile-layers/grid-map-form-tile-layers'
 import GridMapData from '../grid-map-data/grid-map-data'
 import PerlinNoise from '../Noise'
@@ -37,7 +37,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
   /** fires: Form input updated */
   static EventFormUpdate = 'grid-map-generate-update'
 
-  GridMapTilesRef: GridMapTiles | null = null
+  GridMapTilesRef: GridMapTilesets | null = null
 
   Form: HTMLFormElement | null | undefined = null
 
@@ -121,9 +121,9 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
   ]
   SubmitButton: HTMLButtonElement | null = null
-  
+
   MapDataLoading: boolean = false
-  
+
   RemoveTilesetOption: any
 
   constructor() {
@@ -209,8 +209,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     )
 
     document.addEventListener(
-      GridMapTiles.EventLoaded,
-      (event: CustomEventInit<GridMapTiles>) => {
+      GridMapTilesets.EventLoaded,
+      (event: CustomEventInit<GridMapTilesets>) => {
         if (event.detail != undefined) {
           this.GridMapTilesRef = event.detail
           this.Init()
@@ -287,7 +287,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     if (!height) height = this.DefaultMap.Height
     if (!start) start = this.DefaultMap.Start
 
-    let widthInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="width"]')    
+    let widthInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="width"]')
     let heightInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="height"]')
 
     if (widthInput) widthInput.value = width.toString()
@@ -694,13 +694,13 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     const lastNoiseLayer = this.GetLastNoiseLayer()
     if (!lastNoiseLayer) return
 
-    
-    if(!this.Layers || !this.Layers.TileLayers || !Array.isArray(this.Layers.TileLayers)) return 
-      
+
+    if (!this.Layers || !this.Layers.TileLayers || !Array.isArray(this.Layers.TileLayers)) return
+
     const tileSetLayerCount = this.Layers.TileLayers.length
-      
-    
-    
+
+
+
 
     if (tileSetLayerCount > 1) {
       this.Layers?.RemoveLayer(tileSetLayerCount - 1)
@@ -730,7 +730,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
    */
   GetFormData(): MapData | undefined {
 
-    if (!this.Form) throw new  Error('there is no form')
+    if (!this.Form) throw new Error('there is no form')
 
     const formData: FormData = new FormData(this.Form)
 
@@ -782,12 +782,12 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       tileSet.forEach(
         () => {
           const data = {
-                Tileset: tileSet[totalIdx].toString(),
-                CanWalk: canWalk[totalIdx] == "true" ? true : false,
-                Cutoff: parseFloat(cutoff[totalIdx].toString()),
-                CutoffCap: parseFloat(cutoffcap[totalIdx].toString()),
-                Color: color[totalIdx].toString(),
-              }
+            Tileset: tileSet[totalIdx].toString(),
+            CanWalk: canWalk[totalIdx] == "true" ? true : false,
+            Cutoff: parseFloat(cutoff[totalIdx].toString()),
+            CutoffCap: parseFloat(cutoffcap[totalIdx].toString()),
+            Color: color[totalIdx].toString(),
+          }
           returnData.NoiseLayers[noiseLayer].TileLayers.push(data)
           totalIdx++
         }

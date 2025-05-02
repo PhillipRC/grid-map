@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  user-select: none;
+}
+
+.tileset {
+  align-items: center;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding: 10px;
+  position: relative;
+  transition: all .2s;
+}
+
+.tileset-title {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.tileset-type {
+  text-shadow: 0 0 4px black;
+}
+
+.tileset-display {
+  max-width: 256px;
+  min-width: 256px;
+  padding-top: 5px;
+  width: 256px;
+}
+
+.tileset-display>div {
+  display: grid;
+}
+
+.tileset-display img:hover {
+  -webkit-user-drag: none;
+  position: relative;
+}
+
+.tileset-display:not(.terrain) img:hover {
+  background-color: rgba(0,0,0,.4);
+  border-color: white;
+  border-style: dashed;
+  border-width: 2px;
+  filter: drop-shadow(0 0 4px black);
+  margin: -16px;
+  z-index: 100;
+  zoom: 1.8;
+}
+
+.tileset-display.terrain {
+  zoom: .5;
+}
+
+.tileset-display>div>svg {
+  height: 64px;
+  width: 64px;
+}
+
+.tileset-name {
+  align-self: flex-start;
+  flex-grow: 1;
+  text-shadow: 0 0 4px black;
+}
+
+.tileset-footer {
+  padding-top: 5px;
+  text-align: right;
+  width: 100%;
+}
+
+.tileset:hover,
+.tileset:focus-visible {
+  background-color: rgba(255,255,0,.1);
+}
+
+.fills, .fills-o {
+  fill: #339933;
+}
+.fills-o {
+  fill-opacity: .5;
+}
+
+.fills-1 {
+  fill: #116611;
+}
+
+.fills-2 {
+  fill: #003300;
+}
+
+.console-display a:link,
+.console-display a:visited {
+  color: limegreen;
+}
+
+a:link {
+  color: red;
+}
+
+
+a:link,
+a:visited {
+  color: limegreen;
+}
+
+a:hover {
+  color: white;
+}
+
+a:active {
+  color: limegreen;
+}

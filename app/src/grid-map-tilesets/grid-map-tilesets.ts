@@ -1,5 +1,4 @@
-import GridMapTilesSetDisplay from '../grid-map-tiles-set-display/grid-map-tiles-set-display'
-import AppSidebarWidget from '../app-side-bar-widget/app-side-bar-widget'
+import Color from '../Color'
 
 import {
   HSLA,
@@ -8,20 +7,30 @@ import {
   XY,
 } from '../types'
 
-// style
-import css from './grid-map-tiles.css?raw'
-import Color from '../Color'
-
 
 /**
- * Handles Tile Data
+ * Manages Tile data, no UI
  * 
  * @fires GridMapTiles.EventLoaded
  */
-class GridMapTiles extends AppSidebarWidget {
+class GridMapTilesets extends HTMLElement {
 
   /** fires: Tiles are loaded */
   static EventLoaded = 'grid-map-tiles-loaded'
+
+  /** fires: Indicates a tileset that could not be loaded */
+  static EventTilesetLoadError = 'grid-map-tiles-tileset-load-error'
+
+  static DefaultRegistry = './tiles/tile-registry.json'
+
+  ErrorImg: HTMLImageElement = new Image()
+
+  TilesetRegistry: any
+
+  /**
+   * Track if connectedCallback() has been called
+   */
+  ConnectedCallback: boolean = false
 
   /** Available Tile Sets */
   TileSets: Array<Tileset> = [
@@ -29,78 +38,145 @@ class GridMapTiles extends AppSidebarWidget {
       Name: 'Solid-1',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Solid-1-Edge',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Solid-1-Edge-2',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Rough-1',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Rough-1-Edge',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Brick-1',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Brick-2',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Brick-3',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Block-1',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Block-2',
       Format: 'svg',
       Ext: 'svg',
+      TilesTall: 1,
       TilesWide: 1,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
     },
     {
       Name: 'Rock-1',
       Format: 'img',
       Ext: 'png',
+      TilesTall: 4,
       TilesWide: 4,
       ApplyColor: true,
+      AutoTerrain: 'dualgrid',
+      IsLoaded: false,
+    },
+    {
+      Name: 'Four-Seasons',
+      Format: 'img',
+      Ext: 'png',
+      TilesTall: 16,
+      TilesWide: 11,
+      ApplyColor: false,
+      AutoTerrain: null,
+      IsLoaded: false,
+      Credit: {
+        Name: 'Kevins Moms House',
+        Url: 'https://kevins-moms-house.itch.io/',
+      }
+    },
+    {
+      Name: 'Dungeon-Set',
+      Format: 'img',
+      Ext: 'png',
+      TilesTall: 15,
+      TilesWide: 13,
+      ApplyColor: false,
+      AutoTerrain: null,
+      IsLoaded: false,
+      Margin: {
+        Left: 16,
+        Right: 16,
+        Top: 16,
+        Bottom: 32
+      },
+      Credit: {
+        Name: 'Incol Games',
+        Url: 'https://incolgames.itch.io/'
+      }
     },
   ]
 
@@ -139,39 +215,41 @@ class GridMapTiles extends AppSidebarWidget {
 
 
   constructor() {
-    super(
-      css
-    )
+    super()
   }
 
   connectedCallback() {
-
-    super.connectedCallback()
 
     // only handle once
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    this.WidgetTitle = 'Tilesets'
     this.LoadTiles()
   }
 
+  async LoadRegistry() {
 
-  /**
-   * Display loaded Tile Sets
-   */
-  Show() {
-
-    // loop over the Tile Sets
-    this.TileSets.forEach(
-      (tileSet) => {
-        const tileSetDisplay = new GridMapTilesSetDisplay()
-        tileSetDisplay.TileSetName = tileSet.Name
-        const tileset = this.Tiles[tileSet.Name]
-        if (tileset) tileSetDisplay.Tileset = tileset
-        this.WidgetContent?.appendChild(tileSetDisplay)
+    const url = GridMapTilesets.DefaultRegistry
+    try {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`)
       }
-    )
+
+      this.TilesetRegistry = await response.json()
+
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        console.error(error.message)
+      } else if (error instanceof Error) {
+        console.error(error.message)
+      } else {
+        console.error(error)
+      }
+    }
+
+    if (this.TilesetRegistry != null) this.LoadTiles()
+
   }
 
 
@@ -188,7 +266,7 @@ class GridMapTiles extends AppSidebarWidget {
 
   async LoadTiles() {
     for (const [_idx, tileSet] of this.TileSets.entries()) {
-      await this.LoadTileSet(tileSet)
+      tileSet.IsLoaded = await this.LoadTileSet(tileSet)
     }
 
     this.IsLoaded = true
@@ -196,27 +274,41 @@ class GridMapTiles extends AppSidebarWidget {
     // let eveyone know we are loaded up
     document.dispatchEvent(
       new CustomEvent(
-        GridMapTiles.EventLoaded,
+        GridMapTilesets.EventLoaded,
         {
           bubbles: true,
           detail: this,
         }
       )
     )
-
-    this.Show()
   }
 
 
-  async LoadTileSet(tileSet: Tileset) {
+  async LoadTileSet(tileSet: Tileset): Promise<boolean> {
 
     // init tiles
     this.Tiles[tileSet.Name] = []
 
-    if (tileSet.Format == 'svg' || tileSet.TilesWide == 1) {
-      await this.LoadTilesIndividually(tileSet)
-    } else {
-      await this.LoadTilesFromSheet(tileSet)
+    try {
+      if (tileSet.Format == 'svg' || tileSet.TilesWide == 1) {
+        await this.LoadTilesIndividually(tileSet)
+      } else {
+        await this.LoadTilesFromSheet(tileSet)
+      }
+      return true
+    } catch {
+      delete this.Tiles[tileSet.Name]
+      document.dispatchEvent(
+        new CustomEvent(
+          GridMapTilesets.EventTilesetLoadError,
+          {
+            bubbles: true,
+            detail: tileSet,
+          }
+        )
+      )
+
+      return false
     }
 
   }
@@ -258,25 +350,36 @@ class GridMapTiles extends AppSidebarWidget {
 
     // calc scale to fit  result into 64x64 tiles
     const sheetBmp = await createImageBitmap(sheet)
-    const scale = Math.floor(sheetBmp.width / tileSet.TilesWide)
+
+    // handle Margins if set
+    const marginX = (tileSet.Margin?.Left && tileSet.Margin?.Right ? (tileSet.Margin.Left + tileSet.Margin.Right) : 0)
+    const marginY = (tileSet.Margin?.Top && tileSet.Margin?.Bottom ? (tileSet.Margin.Top + tileSet.Margin.Bottom) : 0)
+    const scaleX = Math.floor((sheetBmp.width - marginX) / tileSet.TilesWide)
+    const scaleY = Math.floor((sheetBmp.height - marginY) / tileSet.TilesTall)
+
     sheetBmp.close()
 
     // temp canvas to hold the result
     const canvas = new OffscreenCanvas(64, 64)!
 
+    for (var y = 0; y < tileSet.TilesTall; y++) {
+      const marginTop = (tileSet.Margin?.Top ? tileSet.Margin.Top : 0)
 
-    for (var y = 0; y < tileSet.TilesWide; y++) {
-      for (var x = 0; x < 4; x++) {
+      for (var x = 0; x < tileSet.TilesWide; x++) {
+        const marginLeft = (tileSet.Margin?.Left ? tileSet.Margin.Left : 0)
+
         // cut up the sheet blob
         var tileBmp = await createImageBitmap(
           sheet,
-          x * scale,  // start x
-          y * scale,  // start y
-          scale,      // width
-          scale,      // height
+          marginLeft + (x * scaleX),  // start x
+          marginTop + (y * scaleY),  // start y
+          scaleX,      // width
+          scaleY,      // height
           {
             resizeWidth: 64,
             resizeHeight: 64,
+            // TODO pixelated if growing - high if shrinking
+            resizeQuality: 'pixelated',
           }
         )
         // create a 64x64 blob
@@ -287,6 +390,8 @@ class GridMapTiles extends AppSidebarWidget {
         tileBmp.close()
       }
     }
+
+
   }
 
 
@@ -295,7 +400,7 @@ class GridMapTiles extends AppSidebarWidget {
       (resolve, reject) => {
         const imageURL = URL.createObjectURL(blob)
         const image = new Image()
-        image.onload = () => resolve(image.width)
+        image.onload = () => resolve(imageURL)
         image.onerror = reject
         image.src = imageURL
         this.Tiles[name].push(image)
@@ -309,7 +414,9 @@ class GridMapTiles extends AppSidebarWidget {
 
     // only load if img type and not previously loaded
     if (
-      tileSet.Format != 'img'
+      tileSet == undefined
+      || this.Tiles[tileSet.Name] == undefined
+      || tileSet.Format != 'img'
       || !tileSet.ApplyColor
       || this.Tiles[tileSet.Name + color] != undefined
     ) return
@@ -331,7 +438,7 @@ class GridMapTiles extends AppSidebarWidget {
 
       if (context) {
 
-        let originalBmp:ImageBitmap | null = null
+        let originalBmp: ImageBitmap | null = null
         originalBmp = await createImageBitmap(tiles[tileIdx])
 
         context.drawImage(originalBmp, 0, 0)
@@ -394,18 +501,32 @@ class GridMapTiles extends AppSidebarWidget {
 
     // svg color is applied elsewhere
     if (tileSet.Format == 'svg') {
-      return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as SVGSVGElement
+      try {
+        return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as SVGSVGElement
+      } catch {
+        return this.ErrorImg
+      }
+
     }
 
     // img with no color change
     if (!tileSet.ApplyColor) {
-      return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as HTMLImageElement
+      try {
+        return this.Tiles[tileSet.Name][tileIdx].cloneNode(true) as HTMLImageElement
+      } catch {
+        return this.ErrorImg
+      }
+
     }
 
     // img with color change
-    return this.Tiles[tileSet.Name + color][tileIdx].cloneNode(true) as HTMLImageElement
+    try {
+      return this.Tiles[tileSet.Name + color][tileIdx].cloneNode(true) as HTMLImageElement
+    } catch {
+      return this.ErrorImg
+    }
   }
 
 }
 
-export default GridMapTiles
+export default GridMapTilesets

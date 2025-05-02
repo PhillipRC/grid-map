@@ -1,6 +1,5 @@
-grid-map-tiles-set-display:not(:last-child) {
+grid-map-tileset-display:not(:last-child) {
   border-bottom-color: rgba(255,255,0,.6);
   border-bottom-style: solid;
   border-bottom-width: 1px;
-  margin-bottom: 4px;
 }

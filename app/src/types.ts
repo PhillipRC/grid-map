@@ -61,10 +61,30 @@ export type Tileset = {
   Format: 'svg' | 'img'
   /** File extension */
   Ext: 'svg' | 'png'
+  /** Number of tiles the sheet is tall */
+  TilesTall: number
   /** Number of tiles the sheet is wide */
   TilesWide: number
   /** Enable color option */
   ApplyColor: boolean
+  /** Type of auto terrain */
+  AutoTerrain: 'dualgrid' | null
+  /** Tileset is loaded */
+  IsLoaded: boolean
+  /** Spacing around the tiles in the sheet */
+  Margin?: {
+    Left: number
+    Right: number
+    Top: number
+    Bottom: number
+  }
+  /** Tile source */
+  Credit?: Credit
+}
+
+export type Credit = {
+  Name: string
+  Url: string
 }
 
 // TODO: only need this for loading individual files, this could be reduced to an int in other cases
@@ -96,7 +116,7 @@ export type TileLayerDefault = {
 
 export type TileData = {
   Layer: number
-  Tileset: string|null
+  Tileset: string | null
   CanWalk: boolean
 }
 
