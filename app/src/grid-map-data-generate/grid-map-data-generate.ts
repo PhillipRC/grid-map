@@ -85,41 +85,55 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
   DefaultsLayer: TileLayerDefault[] = [
     {
       CanWalk: true,
-      Color: '#F5D151',
+      Color: '#e6bd28',
       Cutoff: -0.05,
       CutoffCap: .1,
-      Tileset: 'Solid-1-Edge',
+      Tileset: 'Rough-Md-Edge',
     },
     {
       CanWalk: true,
-      Color: '#0F7110',
-      Cutoff: -0.03,
+      Color: '#e9bb16',
+      Cutoff: -0.02,
       CutoffCap: .1,
-      Tileset: 'Solid-1',
+      Tileset: 'Sand-Md-Rough',
     },
     {
       CanWalk: true,
-      Color: '#39302D',
-      Cutoff: 0.06,
-      CutoffCap: .16,
-      Tileset: 'Rough-1-Edge',
+      Color: '#24a326',
+      Cutoff: .02,
+      CutoffCap: .1,
+      Tileset: 'Grass-Md-Rough',
     },
     {
-      CanWalk: false,
-      Color: '#362521',
-      Cutoff: 0.1,
-      CutoffCap: .12,
-      Tileset: 'Solid-1-Edge-2',
+      CanWalk: true,
+      Color: '#49722c',
+      Cutoff: 0.08,
+      CutoffCap: .18,
+      Tileset: 'Grass-Md-Rough',
     },
     {
-      CanWalk: false,
+      CanWalk: true,
+      Color: '#294c2c',
+      Cutoff: 0.11,
+      CutoffCap: .14,
+      Tileset: 'Grass-Md-Rough',
+    },
+    {
+      CanWalk: true,
       Color: '#72787E',
-      Cutoff: .15,
+      Cutoff: .17,
+      CutoffCap: 1,
+      Tileset: 'Brick-Md-Smooth',
+    },
+    {
+      CanWalk: false,
+      Color: '#949494',
+      Cutoff: .16,
       CutoffCap: 1,
       Tileset: 'Rock-1',
     },
-
   ]
+  
   SubmitButton: HTMLButtonElement | null = null
 
   MapDataLoading: boolean = false
@@ -249,6 +263,9 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
     // add initial layer
     this.AddNoiseLayer()
+    this.AddTileSetLayer()
+    this.AddTileSetLayer()
+    this.AddTileSetLayer()
     this.AddTileSetLayer()
     this.AddTileSetLayer()
     this.AddTileSetLayer()
@@ -662,7 +679,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     }
 
     // use DefaultLayers to set the initial values
-    let currentLength = this.Layers.TileLayers?.length
+    let currentLength = this.Layers?.TileLayers?.length
     currentLength = currentLength == null ? 0 : currentLength
     this.Layers.AddTileLayer(
       this.DefaultsLayer[currentLength % this.DefaultsLayer.length]

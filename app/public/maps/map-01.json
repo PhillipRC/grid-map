@@ -15,8 +15,8 @@
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
       ],
-      "Tileset": "Solid-1-Edge",
-      "Color": "#339933",
+      "Tileset": "Sand-Md-Rough",
+      "Color": "#e9bb16",
       "CanWalk": true
     },
     {
@@ -34,8 +34,8 @@
         0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1
       ],
-      "Tileset": "Rock-1",
-      "Color": "#c8c2c1",
+      "Tileset": "Grass-Md-Rough",
+      "Color": "#24a326",
       "CanWalk": true
     }
   ],

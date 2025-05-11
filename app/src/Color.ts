@@ -2,12 +2,18 @@ import { HSLA, RGBA } from "./types"
 
 export default class Color {
 
+  /** value 0 to 255 */
   r: number = 0
+  /** value 0 to 255 */
   g: number = 0
+  /** value 0 to 255 */
   b: number = 0
 
+  /** value 0 to 255 */
   h: number = 0
+  /** value 0 to 100 */
   s: number = 0
+  /** value 0 to 100 */
   l: number = 0
 
   a: number = 1
@@ -183,8 +189,8 @@ export default class Color {
     return Color.HslatoRgba(
       {
         h: this.h + target.h,
-        s: this.s * (target.s/100),
-        l: this.l * (target.l/100 * 2),
+        s: this.s = this.s * target.s / 100 * 1.2,
+        l: this.s = this.l * target.l / 100 * 2,
         a: this.a,
       }
     )

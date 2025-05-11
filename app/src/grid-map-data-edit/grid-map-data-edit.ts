@@ -216,7 +216,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
     this.GridMapData.AddLayer(
       layerIdx + 1,
       {
-        Tileset: 'Solid-1',
+        Tileset: 'Smooth-Md-Edge',
         CanWalk: true,
         Color: '#855785',
       }

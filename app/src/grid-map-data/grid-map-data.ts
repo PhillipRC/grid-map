@@ -274,33 +274,54 @@ export default class GridMapData extends GridBase {
         Persistence: 0.5,
         TileLayers: [
           {
-            Tileset: "Solid-1-Edge",
             CanWalk: true,
+            Color: '#e6bd28',
             Cutoff: -0.05,
-            CutoffCap: 0.1,
-            Color: "#f5d151"
+            CutoffCap: .1,
+            Tileset: 'Rough-Md-Edge',
           },
           {
-            Tileset: "Solid-1",
             CanWalk: true,
-            Cutoff: -0.03,
-            CutoffCap: 0.1,
-            Color: "#0f7110"
+            Color: '#e9bb16',
+            Cutoff: -0.02,
+            CutoffCap: .1,
+            Tileset: 'Sand-Md-Rough',
           },
           {
-            Tileset: "Rough-1-Edge",
             CanWalk: true,
-            Cutoff: 0.06,
-            CutoffCap: 0.16,
-            Color: "#39302d"
+            Color: '#24a326',
+            Cutoff: .02,
+            CutoffCap: .1,
+            Tileset: 'Grass-Md-Rough',
           },
           {
-            Tileset: "Rock-1",
+            CanWalk: true,
+            Color: '#49722c',
+            Cutoff: 0.08,
+            CutoffCap: .18,
+            Tileset: 'Grass-Md-Rough',
+          },
+          {
+            CanWalk: true,
+            Color: '#294c2c',
+            Cutoff: 0.11,
+            CutoffCap: .14,
+            Tileset: 'Grass-Md-Rough',
+          },
+          {
+            CanWalk: true,
+            Color: '#72787E',
+            Cutoff: .17,
+            CutoffCap: 1,
+            Tileset: 'Brick-Md-Smooth',
+          },
+          {
             CanWalk: false,
-            Cutoff: 0.1,
-            CutoffCap: 0.12,
-            Color: '#624c46'
-          }
+            Color: '#949494',
+            Cutoff: .16,
+            CutoffCap: 1,
+            Tileset: 'Rock-1',
+          },
         ]
       }
     ]
