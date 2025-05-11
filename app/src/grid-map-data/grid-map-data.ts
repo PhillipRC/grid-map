@@ -320,7 +320,7 @@ export default class GridMapData extends GridBase {
             Color: '#949494',
             Cutoff: .16,
             CutoffCap: 1,
-            Tileset: 'Rock-1',
+            Tileset: 'Rock-Sm-Rough',
           },
         ]
       }
