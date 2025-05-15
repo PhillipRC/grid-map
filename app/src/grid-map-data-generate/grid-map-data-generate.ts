@@ -130,7 +130,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Color: '#949494',
       Cutoff: .16,
       CutoffCap: 1,
-      Tileset: 'Rock-Sm-Rough',
+      Tileset: 'Rock-Wall-Md-Rough',
     },
   ]
   
