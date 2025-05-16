@@ -115,7 +115,7 @@ class GridMapTilesets extends HTMLElement {
       IsLoaded: false,
     },
     {
-      Name: 'Rock-Wall-Md-Rough',
+      Name: 'Rock-Wall-Lg-Rough',
       Format: 'img',
       Ext: 'png',
       TilesTall: 4,
