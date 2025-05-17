@@ -219,6 +219,7 @@ export default class GridMapDataEdit extends AppSidebarWidget {
         Tileset: 'Smooth-Md-Edge',
         CanWalk: true,
         Color: '#855785',
+        Carveout: false,
       }
     )
   }

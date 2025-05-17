@@ -54,6 +54,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     'CanWalk',
     'Cutoff',
     'CutoffCap',
+    'Carveout',
   ]
 
 

@@ -17,7 +17,8 @@
       ],
       "Tileset": "Sand-Md-Rough",
       "Color": "#e9bb16",
-      "CanWalk": true
+      "CanWalk": true,
+      "Carveout": false
     },
     {
       "Map": [
@@ -36,7 +37,8 @@
       ],
       "Tileset": "Grass-Md-Rough",
       "Color": "#24a326",
-      "CanWalk": true
+      "CanWalk": true,
+      "Carveout": false
     }
   ],
   "MapDataSize": {

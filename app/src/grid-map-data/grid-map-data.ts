@@ -279,6 +279,7 @@ export default class GridMapData extends GridBase {
             Cutoff: -0.05,
             CutoffCap: .1,
             Tileset: 'Rough-Md-Edge',
+            Carveout: false,
           },
           {
             CanWalk: true,
@@ -286,6 +287,7 @@ export default class GridMapData extends GridBase {
             Cutoff: -0.02,
             CutoffCap: .1,
             Tileset: 'Sand-Md-Rough',
+            Carveout: false,
           },
           {
             CanWalk: true,
@@ -293,6 +295,7 @@ export default class GridMapData extends GridBase {
             Cutoff: .02,
             CutoffCap: .1,
             Tileset: 'Grass-Md-Rough',
+            Carveout: false,
           },
           {
             CanWalk: true,
@@ -300,6 +303,7 @@ export default class GridMapData extends GridBase {
             Cutoff: 0.08,
             CutoffCap: .18,
             Tileset: 'Grass-Md-Rough',
+            Carveout: false,
           },
           {
             CanWalk: true,
@@ -307,6 +311,7 @@ export default class GridMapData extends GridBase {
             Cutoff: 0.11,
             CutoffCap: .14,
             Tileset: 'Grass-Md-Rough',
+            Carveout: false,
           },
           {
             CanWalk: true,
@@ -314,6 +319,7 @@ export default class GridMapData extends GridBase {
             Cutoff: .17,
             CutoffCap: 1,
             Tileset: 'Brick-Md-Smooth',
+            Carveout: false,
           },
           {
             CanWalk: false,
@@ -321,6 +327,7 @@ export default class GridMapData extends GridBase {
             Cutoff: .16,
             CutoffCap: 1,
             Tileset: 'Rock-Wall-Md-Rough',
+            Carveout: false,
           },
         ]
       }
@@ -420,6 +427,7 @@ export default class GridMapData extends GridBase {
             Tileset: tileLayer.Tileset,
             CanWalk: tileLayer.CanWalk,
             Color: tileLayer.Color,
+            Carveout: false,
           }
         )
       }

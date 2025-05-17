@@ -35,9 +35,17 @@ export type TileLayer = {
   CanWalk: boolean
   Color: string
   Map?: number[]
+  Carveout: boolean
 }
 
-export type TileLayerProperties = 'Tileset' | 'Cutoff' | 'CutoffCap' | 'CanWalk' | 'Color' | 'Map'
+export type TileLayerProperties =
+  'Tileset'
+  | 'Cutoff'
+  | 'CutoffCap'
+  | 'CanWalk'
+  | 'Color'
+  | 'Map'
+  | 'Carveout'
 
 export type RGBA = {
   r: number
@@ -111,6 +119,7 @@ export type TileLayerDefault = {
   CanWalk: boolean
   Color: string
   Map?: number[]
+  Carveout: boolean,
 }
 
 
