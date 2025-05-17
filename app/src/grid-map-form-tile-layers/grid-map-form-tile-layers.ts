@@ -64,7 +64,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
 
   connectedCallback() { }
 
-  /** @param {Array.<Tileset>} tileSets */
+
   SetTilesets(tileSets: Array<Tileset>) {
     this.AvailableTilesets = tileSets
   }

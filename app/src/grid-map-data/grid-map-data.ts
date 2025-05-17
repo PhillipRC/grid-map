@@ -311,7 +311,7 @@ export default class GridMapData extends GridBase {
             Cutoff: 0.11,
             CutoffCap: .14,
             Tileset: 'Grass-Md-Rough',
-            Carveout: false,
+            Carveout: true,
           },
           {
             CanWalk: true,
@@ -412,6 +412,15 @@ export default class GridMapData extends GridBase {
       }
     )
 
+    // apply carveout to layers with carveout set
+    tileLayers.forEach(
+      (tileLayer, tileSetIdx) => {
+        if(tileLayer.Carveout) {
+          layers[tileSetIdx] = this.Carveout(layers[tileSetIdx], mapDataSize)
+        }
+      }
+    )
+
     // create Map object
     this.MapData = {
       Layers: [],
@@ -427,7 +436,7 @@ export default class GridMapData extends GridBase {
             Tileset: tileLayer.Tileset,
             CanWalk: tileLayer.CanWalk,
             Color: tileLayer.Color,
-            Carveout: false,
+            // Carveout: false,
           }
         )
       }
@@ -437,6 +446,25 @@ export default class GridMapData extends GridBase {
 
     this.SendLoaded()
 
+  }
+
+  /** randomly remove mapdata */
+  Carveout(map:number[], mapDataSize:XY) {
+
+    // rnd set map data
+    var newMap = new Array(map.length).fill(0)
+    for (var x = 0; x < mapDataSize.x; x++) {
+      for (var y = 0; y < mapDataSize.y; y++) {
+        const mapDataIndex = x + (y * mapDataSize.x)
+        if(map[mapDataIndex] == 1) {
+          if(Math.random() > .1) newMap[mapDataIndex] = 1
+        } else {
+          newMap[mapDataIndex] = 0
+        }
+      }
+    }
+    
+    return newMap
   }
 
   /** Set Start to a walkable location */

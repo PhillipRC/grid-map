@@ -89,7 +89,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: -0.05,
       CutoffCap: .1,
       Tileset: 'Rough-Md-Edge',
-      Carveout: true,
+      Carveout: false,
     },
     {
       CanWalk: true,
@@ -137,7 +137,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: .16,
       CutoffCap: 1,
       Tileset: 'Rock-Wall-Md-Rough',
-      Carveout: false,
+      Carveout: true,
     },
   ]
   
@@ -798,6 +798,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     const cutoff = formData.getAll('Cutoff')
     const cutoffcap = formData.getAll('CutoffCap')
     const color = formData.getAll('Color')
+    const carveOut = formData.getAll('Carveout')
 
     let noiseLayer = 0
     for (const _element of this.NoiseLayers.children) {
@@ -811,7 +812,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
             Cutoff: parseFloat(cutoff[totalIdx].toString()),
             CutoffCap: parseFloat(cutoffcap[totalIdx].toString()),
             Color: color[totalIdx].toString(),
-            Carveout: false,
+            Carveout: carveOut[totalIdx] == "true" ? true : false,
           }
           returnData.NoiseLayers[noiseLayer].TileLayers.push(data)
           totalIdx++

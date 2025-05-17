@@ -35,7 +35,7 @@ export type TileLayer = {
   CanWalk: boolean
   Color: string
   Map?: number[]
-  Carveout: boolean
+  Carveout?: boolean
 }
 
 export type TileLayerProperties =
@@ -119,7 +119,7 @@ export type TileLayerDefault = {
   CanWalk: boolean
   Color: string
   Map?: number[]
-  Carveout: boolean,
+  Carveout?: boolean,
 }
 
 
