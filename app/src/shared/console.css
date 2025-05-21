@@ -19,12 +19,34 @@
   padding: 10px;
 }
 
-.console-display .row {
-  display: flex;
+.console-display .row.padding-lr {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
-.console-display .row >  * {
-  flex-grow: 1;
+.console-display .row.input,
+.console-display .row.inputs {
+  display: grid;
+}
+
+.console-display .row.input {
+  grid-template-columns: 100px;
+}
+
+.console-display .row.inputs {
+  grid-template-columns: 102px 12px 66px 12px 66px;
+}
+
+.console-display .row.input > *,
+.console-display .row.inputs > * {
+  grid-row: 1;
+}
+
+.console-display .row.section {
+  border-top-style: solid;
+  border-top-width: 1px;
+  margin-top: 5px;
+  padding-top: 5px;
 }
 
 .console-display .console-header {
@@ -88,11 +110,22 @@
   border-top-width: 0;
   caret-color: var(--yellow);
   margin-right: 2px;
-  max-width: 100px;
-  min-width: 100px;
+  width: 100%;
   transition: all .2s;
 }
 
+.console-display input:invalid {
+  background-color: rgba(255,0,0,.2);
+  /* background-color: ivory;
+  border: none; */
+  outline: 1px dashed red;
+  /* border-radius: 5px; */
+}
+
+.console-display .row.inputs input {
+  max-width: 56px;
+}
+
 .console-display input::selection {
   background-color: limegreen;
   color: black;
@@ -113,6 +146,9 @@
   -webkit-appearance: none;
 }
 
+.console-display input[type=color] {
+  background-color: rgba(0,0,0,.2);
+}
 
 /* Select */
 .console-display select {
@@ -125,8 +161,6 @@
   border-top: none;
   color: limegreen;
   height: 24px;
-  max-width: 104px;
-  min-width: 104px;
 }
 
 .console-display option {
@@ -163,15 +197,19 @@
   color: white;
 }
 
-.console-display .sub-buttons .button {
-  height: 22px;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  margin-top: 10px;
+.console-display .sub-buttons {
+  display: grid;
+  gap: 10px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
 }
 
-.console-display .sub-buttons .button:last-child {
-  margin-right: 0;
+.console-display .sub-buttons .button {
+  border-radius: 5px;
+  grid-row: 1;
+  height: 22px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 

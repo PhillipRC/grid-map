@@ -53,6 +53,7 @@
 }
 
 .tileset-display.terrain {
+  filter: hue-rotate(90deg);
   zoom: .5;
 }
 

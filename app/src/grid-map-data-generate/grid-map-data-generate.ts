@@ -11,6 +11,7 @@ import {
   TileLayerDefault,
   RGBA,
   MapData,
+  TileLayerModifier,
 } from '../types'
 
 // markup and styles
@@ -89,7 +90,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: -0.05,
       CutoffCap: .1,
       Tileset: 'Rough-Md-Edge',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: true,
@@ -97,7 +98,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: -0.02,
       CutoffCap: .1,
       Tileset: 'Sand-Md-Rough',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: true,
@@ -105,7 +106,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: .02,
       CutoffCap: .1,
       Tileset: 'Grass-Md-Rough',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: true,
@@ -113,7 +114,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: 0.08,
       CutoffCap: .18,
       Tileset: 'Grass-Md-Rough',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: true,
@@ -121,7 +122,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: 0.11,
       CutoffCap: .14,
       Tileset: 'Grass-Md-Rough',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: true,
@@ -129,7 +130,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: .17,
       CutoffCap: 1,
       Tileset: 'Brick-Md-Smooth',
-      Carveout: false,
+      ModifierName: 'None',
     },
     {
       CanWalk: false,
@@ -137,7 +138,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       Cutoff: .16,
       CutoffCap: 1,
       Tileset: 'Rock-Wall-Md-Rough',
-      Carveout: true,
+      ModifierName: 'Random Remove',
     },
   ]
   
@@ -426,6 +427,14 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
    * Renders a preview of the map using a HTMLCanvasElement
    */
   RenderPreview() {
+
+    if(this.Form == null) return
+
+    // validate Form
+    const isValid = this.Form.reportValidity()
+    if (isValid == false) return
+
+    // TODO add rate limiter
 
     const formData = this.GetFormData()
     const context = this.PreviewCanvas?.getContext('2d')
@@ -798,7 +807,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     const cutoff = formData.getAll('Cutoff')
     const cutoffcap = formData.getAll('CutoffCap')
     const color = formData.getAll('Color')
-    const carveOut = formData.getAll('Carveout')
+    const modifierName = formData.getAll('ModifierName')
 
     let noiseLayer = 0
     for (const _element of this.NoiseLayers.children) {
@@ -812,7 +821,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
             Cutoff: parseFloat(cutoff[totalIdx].toString()),
             CutoffCap: parseFloat(cutoffcap[totalIdx].toString()),
             Color: color[totalIdx].toString(),
-            Carveout: carveOut[totalIdx] == "true" ? true : false,
+            ModifierName: modifierName[totalIdx].toString() as TileLayerModifier,
           }
           returnData.NoiseLayers[noiseLayer].TileLayers.push(data)
           totalIdx++

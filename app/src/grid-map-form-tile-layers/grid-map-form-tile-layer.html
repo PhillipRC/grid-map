@@ -1,14 +1,14 @@
 <div>
 
   <!-- Tileset_input -->
-  <div class="row">
+  <div class="row input">
     <label for="##Tileset_id##">Tileset</label>
     <select id="##Tileset_id##" name="Tileset" data-layer-idx="##TileLayerIdx##"></select>
   </div>
   <!-- Tileset_input -->
 
   <!-- Color_input -->
-  <div class="row">
+  <div class="row input">
     <label for="##Color_id##">Color</label>
     <input
       class="console-font"
@@ -22,7 +22,7 @@
   <!-- Color_input -->
 
   <!-- CanWalk_input -->
-  <div class="row">
+  <div class="row input">
     <label for="##CanWalk_id##" title="Allow for Walking on the Tile">Can Walk</label>
     <select id="##CanWalk_id##" name="CanWalk" data-layer-idx="##TileLayerIdx##">
       <option value="true">Yes</option>
@@ -32,7 +32,7 @@
   <!-- CanWalk_input -->
 
   <!-- Cutoff_input -->
-  <div class="row">
+  <div class="row input section">
     <label for="##Cutoff_id##" title="Minimum value where the tile is rendered">Cutoff</label>
     <input
       class="console-font"
@@ -49,7 +49,7 @@
   <!-- Cutoff_input -->
 
   <!-- CutoffCap_input -->
-  <div class="row">
+  <div class="row input">
     <label for="##CutoffCap_id##" title="Minimum value where the tile is rendered">Cutoff Cap</label>
     <input
       class="console-font"
@@ -65,14 +65,14 @@
   </div>
   <!-- CutoffCap_input -->
 
-  <!-- Carveout_input -->
-  <div class="row">
-    <label for="##Carveout_id##" title="Allow for Walking on the Tile">Carveout</label>
-    <select id="##Carveout_id##" name="Carveout" data-layer-idx="##TileLayerIdx##">
-      <option value="true">Yes</option>
-      <option value="false">No</option>
+  <!-- ModifierName_input -->
+  <div class="row input section">
+    <label for="##ModifierName_id##" title="Allows for manipulationt he content of a layer">Modifer</label>
+    <select id="##ModifierName_id##" name="ModifierName" data-layer-idx="##TileLayerIdx##">
+      <option>None</option>
+      <option>Random Remove</option>
     </select>
   </div>
-  <!-- Carveout_input -->
+  <!-- ModifierName_input -->
 
 </div>

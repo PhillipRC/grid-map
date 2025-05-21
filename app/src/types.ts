@@ -27,6 +27,11 @@ export type NoiseLayer = {
   TileLayers: TileLayer[]
 }
 
+export type TileLayerModifier =
+  'None'
+  | 'Random Remove'
+  | undefined
+
 
 export type TileLayer = {
   Tileset: string
@@ -35,7 +40,7 @@ export type TileLayer = {
   CanWalk: boolean
   Color: string
   Map?: number[]
-  Carveout?: boolean
+  ModifierName?: TileLayerModifier
 }
 
 export type TileLayerProperties =
@@ -45,7 +50,7 @@ export type TileLayerProperties =
   | 'CanWalk'
   | 'Color'
   | 'Map'
-  | 'Carveout'
+  | 'ModifierName'
 
 export type RGBA = {
   r: number
@@ -119,7 +124,7 @@ export type TileLayerDefault = {
   CanWalk: boolean
   Color: string
   Map?: number[]
-  Carveout?: boolean,
+  ModifierName?: TileLayerModifier,
 }
 
 

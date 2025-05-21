@@ -1,5 +1,6 @@
 import GridBase from '../shared/grid-base'
 import Noise from '../Noise'
+import MapDataModifierRandom from '../Modifiers/MapDataModifierRandom'
 import {
   GridMapTileData,
   MapData,
@@ -8,6 +9,7 @@ import {
   SurroundingMapData,
   TileData,
   TileLayer,
+  TileLayerModifier,
   XY,
 } from '../types'
 
@@ -279,56 +281,56 @@ export default class GridMapData extends GridBase {
             Cutoff: -0.05,
             CutoffCap: .1,
             Tileset: 'Rough-Md-Edge',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
           {
             CanWalk: true,
             Color: '#e9bb16',
             Cutoff: -0.02,
             CutoffCap: .1,
             Tileset: 'Sand-Md-Rough',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
           {
             CanWalk: true,
             Color: '#24a326',
             Cutoff: .02,
             CutoffCap: .1,
             Tileset: 'Grass-Md-Rough',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
           {
             CanWalk: true,
             Color: '#49722c',
             Cutoff: 0.08,
             CutoffCap: .18,
             Tileset: 'Grass-Md-Rough',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
           {
             CanWalk: true,
             Color: '#294c2c',
             Cutoff: 0.11,
             CutoffCap: .14,
             Tileset: 'Grass-Md-Rough',
-            Carveout: true,
-          },
+            ModifierName: 'Random Remove',
+          } as TileLayer,
           {
             CanWalk: true,
             Color: '#72787E',
             Cutoff: .17,
             CutoffCap: 1,
             Tileset: 'Brick-Md-Smooth',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
           {
             CanWalk: false,
             Color: '#949494',
             Cutoff: .16,
             CutoffCap: 1,
             Tileset: 'Rock-Wall-Md-Rough',
-            Carveout: false,
-          },
+            ModifierName: 'None',
+          } as TileLayer,
         ]
       }
     ]
@@ -412,11 +414,14 @@ export default class GridMapData extends GridBase {
       }
     )
 
-    // apply carveout to layers with carveout set
+    // apply modifier to layers with a modifier set
     tileLayers.forEach(
       (tileLayer, tileSetIdx) => {
-        if(tileLayer.Carveout) {
-          layers[tileSetIdx] = this.Carveout(layers[tileSetIdx], mapDataSize)
+        if(tileLayer.ModifierName && tileLayer.ModifierName != 'None') {
+          layers[tileSetIdx] = this.ModifyMapData(
+            tileLayer.ModifierName,
+            layers[tileSetIdx]
+          )
         }
       }
     )
@@ -436,7 +441,6 @@ export default class GridMapData extends GridBase {
             Tileset: tileLayer.Tileset,
             CanWalk: tileLayer.CanWalk,
             Color: tileLayer.Color,
-            // Carveout: false,
           }
         )
       }
@@ -448,24 +452,16 @@ export default class GridMapData extends GridBase {
 
   }
 
-  /** randomly remove mapdata */
-  Carveout(map:number[], mapDataSize:XY) {
-
-    // rnd set map data
-    var newMap = new Array(map.length).fill(0)
-    for (var x = 0; x < mapDataSize.x; x++) {
-      for (var y = 0; y < mapDataSize.y; y++) {
-        const mapDataIndex = x + (y * mapDataSize.x)
-        if(map[mapDataIndex] == 1) {
-          if(Math.random() > .1) newMap[mapDataIndex] = 1
-        } else {
-          newMap[mapDataIndex] = 0
-        }
-      }
+  ModifyMapData(modifier:TileLayerModifier, map:number[]):number[] {
+    
+    /** randomly remove mapdata */
+    if(modifier == 'Random Remove') {
+      return MapDataModifierRandom.Modify(map, .9)
     }
     
-    return newMap
+    return map
   }
+
 
   /** Set Start to a walkable location */
   SetWalkableStart() {

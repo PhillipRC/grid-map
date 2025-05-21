@@ -2,10 +2,10 @@
 
   <hr/>
 
-  <div class="row">
+  <div class="row input padding-lr">
     <label
       for="seed-##layer_idx##"
-      title="The initial number feeding the algorithm - 0 chooses a random number"
+      title="Initial number feeding the algorithm - 0 chooses a random number"
       >
       Seed
     </label>
@@ -23,9 +23,9 @@
       />
   </div>
 
-  <div class="row">
-    <label for="zoom-##layer_idx##" title="Generate a layer of Perlin noise with values from -1 to 1">
-      Zoom 
+  <div class="row input padding-lr section">
+    <label for="zoom-##layer_idx##" title="Scales the noise">
+      Zoom
     </label>
     <input
       autocomplete="off"
@@ -40,8 +40,8 @@
       />
   </div>
 
-  <div class="row">
-    <label for="octaves-##layer_idx##" title="Number of Perlin noise layers with values from -1 to 1">
+  <div class="row input padding-lr">
+    <label for="octaves-##layer_idx##" title="Number of Perlin noise layers">
       Octaves
     </label>
     <input
@@ -54,14 +54,15 @@
       onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
       onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
       step="1"
+      title="1 to 10"
       type="number"
       value="##noise_octaves##"
       />
   </div>
 
-  <div class="row">
-    <label for="persistence-##layer_idx##" title="Intensity of subsequent noise layers with values from 0 to 1">
-      &nbsp;&nbsp;Persistence
+  <div class="row input padding-lr">
+    <label for="persistence-##layer_idx##" title="Intensity of subsequent Octaves">
+      Persistence
     </label>
     <input
       autocomplete="off"
@@ -73,6 +74,7 @@
       onchange="document.dispatchEvent(new Event('grid-map-generate-update'))"
       onmousewheel="document.dispatchEvent(new Event('grid-map-generate-update'))"
       step=".01"
+      title="0 to 10"
       type="number"
       value="##noise_persistence##"
       />
