@@ -4,7 +4,7 @@
  */
 export class FunctionCallQueue {
 
-  queue: Array<any> = []
+  queue: Array<QueueItem> = []
 
   isRunning: boolean = false
 
@@ -25,10 +25,16 @@ export class FunctionCallQueue {
       this.isRunning = false
       return
     }
-    const { func, args } = this.queue.shift()
-    console.debug('FunctionCallQueue.Process()', func.name)
-    await func(...args)
+    const next = this.queue.shift()
+    if (next == undefined) return
+    console.debug('FunctionCallQueue.Process()', next.func.name)
+    await next.func(...next.args)
     this.Process()
   }
 
+}
+
+export type QueueItem = {
+  func: Function
+  args: any
 }
