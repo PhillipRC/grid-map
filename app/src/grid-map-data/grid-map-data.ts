@@ -386,13 +386,18 @@ export default class GridMapData extends GridBase {
             : noiseLayer.Seed
         )
 
+        // calculate a zoom based the ratio of width to height - preventing the noise from looking stretched
+        const ratioY = mapDataSize.y / mapDataSize.x
+        const ratioX = mapDataSize.x / mapDataSize.y
+        const zoomX = noiseLayer.Zoom * (ratioX > ratioY ? ratioX : 1)
+        const zoomY = noiseLayer.Zoom * (ratioY > ratioX ? ratioY : 1)
 
         for (var x = 0; x < mapDataSize.x; x++) {
           for (var y = 0; y < mapDataSize.y; y++) {
 
             var value = this.Noise.Perlin2DWithOctaves(
-              x / mapDataSize.x * noiseLayer.Zoom,
-              y / mapDataSize.y * noiseLayer.Zoom,
+              (x / mapDataSize.x) * zoomX,
+              (y / mapDataSize.y) * zoomY,
               noiseLayer.Octaves,
               noiseLayer.Persistence
             )

@@ -3,6 +3,7 @@ button[type="submit"] {
 }
 
 .noise-preview-wrapper {
+  align-items: center;
   background-color: rgba(70, 70, 0, 0.3);
   border-radius: 10px;
   border-style: none;
@@ -13,6 +14,11 @@ button[type="submit"] {
   padding-top: 10px;
   position: relative;
   transition: all .2s;
+}
+
+.noise-preview-wrapper .noise-preview {
+  image-rendering: pixelated;
+  transition: none;
 }
 
 .noise-preview {
@@ -30,13 +36,6 @@ button[type="submit"] {
   cursor: none;
   grid-column: 1;
   grid-row: 1;
-  
-}
-
-.noise-preview {
-  border-color: rgba(0, 0, 0, .2);
-  border-style: solid;
-  border-width: 1px;
 }
 
 .noise-preview-wrapper:hover {

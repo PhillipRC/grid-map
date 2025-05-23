@@ -40,24 +40,26 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
   GridMapTilesRef: GridMapTilesets | null = null
 
-  Form: HTMLFormElement | null | undefined = null
+  Form: HTMLFormElement | null = null
 
   /** Component representing the TileLayer inputs and data */
   Layers: GridMapFormTileLayers | null = null
 
-  AddTileSetOption: HTMLButtonElement | null | undefined = null
+  AddTileSetOption: HTMLButtonElement | null = null
 
-  RemoveTileSetOption: HTMLButtonElement | null | undefined = null
+  RemoveTileSetOption: HTMLButtonElement | null = null
 
-  NoiseLayers: HTMLElement | null | undefined = null
+  NoiseLayers: HTMLElement | null = null
 
-  PreviewCanvas: HTMLCanvasElement | null | undefined = null
+  PreviewCanvas: HTMLCanvasElement | null = null
 
-  PreviewStartCanvas: HTMLCanvasElement | null | undefined = null
+  PreviewStartCanvas: HTMLCanvasElement | null = null
 
   Noise: PerlinNoise = new PerlinNoise()
 
   Seed: number = 0
+
+  PreviewSize: XY = { x: 256, y: 256 }
 
   DefaultMap: MapDefault = {
     Width: 512,
@@ -141,7 +143,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       ModifierName: 'Random Remove',
     },
   ]
-  
+
   SubmitButton: HTMLButtonElement | null = null
 
   MapDataLoading: boolean = false
@@ -165,15 +167,19 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     const node = this.HtmlToNode(html)
     if (node && this.WidgetContent) this.WidgetContent?.append(node)
 
-    // save references elements
-    this.Form = this.WidgetContent?.querySelector('.generate-form')
-    this.NoiseLayers = this.WidgetContent?.querySelector('.noise-layers')
-    this.AddTileSetOption = this.WidgetContent?.querySelector('.add-tileset')
+    // save references to display elements
+    this.Form = this.WidgetContent?.querySelector('.generate-form')!
+    this.NoiseLayers = this.WidgetContent?.querySelector('.noise-layers')!
+    this.AddTileSetOption = this.WidgetContent?.querySelector('.add-tileset')!
     this.RemoveTilesetOption = this.WidgetContent?.querySelector('.remove-tileset')!
     this.SubmitButton = this.WidgetContent?.querySelector('button[type=submit]')!
-    this.PreviewCanvas = this.WidgetContent?.querySelector('.noise-preview')
-    this.PreviewStartCanvas = this.WidgetContent?.querySelector('.noise-preview-start')
+    this.PreviewCanvas = this.WidgetContent?.querySelector('.noise-preview')!
+    this.PreviewStartCanvas = this.WidgetContent?.querySelector('.noise-preview-start')!
     this.Form?.addEventListener('submit', (event) => { this.HandleSubmit(event) })
+
+    // set size
+    this.PreviewStartCanvas.width = this.PreviewSize.x
+    this.PreviewStartCanvas.height = this.PreviewSize.x
 
     // add listeners
     this.WidgetContent?.querySelector('input[name="startx"]')?.addEventListener(
@@ -325,20 +331,40 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
   /**
    * Set Map Start, translating XY from Preview Map
-   * 
-   * @param {XY} start 
    */
-  SetStartFromPreviewStart(start: XY) {
+  SetStartFromPreviewStart(mouse: XY) {
 
     const formData = this.GetFormData()
 
     if (!this.PreviewCanvas || !formData) return
 
-    this.SetStart({
-      x: Math.floor(start.x * (formData?.Size.x / this.PreviewCanvas.width)),
-      y: Math.floor(start.y * (formData?.Size.y / this.PreviewCanvas.height))
-    })
+    const { scale, margin } = this.ScaleToFit(
+      formData.Size,
+      this.PreviewSize
+    )
 
+    // if selection is within the preview area
+    if (
+      mouse.x > margin.x
+      && mouse.x < (this.PreviewSize.x - margin.x)
+      && mouse.y > margin.y
+      && mouse.y < (this.PreviewSize.y - margin.y)
+    ) {
+
+      const x = Math.floor(
+        (mouse.x - margin.x)
+        * (formData?.Size.x / this.PreviewCanvas.width)
+        * 1/scale.x
+      )
+      
+      const y = Math.floor(
+        (mouse.y - margin.y)
+        * (formData?.Size.y / this.PreviewCanvas.height )
+        * 1/scale.y
+      )
+
+      this.SetStart({ x: x, y: y })
+    }
   }
 
   /**
@@ -428,7 +454,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
    */
   RenderPreview() {
 
-    if(this.Form == null) return
+    if (this.Form == null) return
 
     // validate Form
     const isValid = this.Form.reportValidity()
@@ -441,12 +467,22 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
     if (!formData || !this.PreviewCanvas || !context) return
 
-    const aspectRatio = formData.Size.y / formData.Size.x
+    const { ratio, scale, size } = this.ScaleToFit(
+      formData.Size,
+      this.PreviewSize
+    )
 
-    // update canvas to fit aspect ratio
+    // scale preview to fit the space
+    this.PreviewCanvas.style.transform = `scale3d(${scale.x}, ${scale.y}, 1)`
+
+    this.PreviewCanvas.setAttribute(
+      'width',
+      size.x.toString()
+    )
+
     this.PreviewCanvas.setAttribute(
       'height',
-      (256 * aspectRatio).toString()
+      size.y.toString()
     )
 
     const canvasWidth = this.PreviewCanvas.width
@@ -467,6 +503,10 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
         if (!this.Layers || !this.Layers.TileLayers) return
 
+        // calculate a zoom based the ratio of width to height - preventing the noise from looking stretched
+        const zoomX = layer.Zoom * ratio.x
+        const zoomY = layer.Zoom * ratio.y
+
         this.Layers.TileLayers.forEach(
           (tileLayer, tileLayerIdx) => {
 
@@ -476,8 +516,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
               for (var y = 0; y < canvasHeight; y++) {
 
                 var value = this.Noise.Perlin2DWithOctaves(
-                  x / canvasWidth * layer.Zoom,
-                  y / canvasHeight * layer.Zoom,
+                  (x / canvasWidth) * zoomX,
+                  (y / canvasHeight) * zoomY,
                   layer.Octaves,
                   layer.Persistence
                 )
@@ -513,30 +553,113 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       }
     )
 
+    this.RenderStartPreview()
+
+  }
+
+  
+  /**
+   * Scale one size to fit within another size,
+   * accounting for smaller and larger
+   */
+  ScaleToFit(inputSize: XY, targetSize: XY): ScaleToFit {
+
+    const aspectRatio = {
+      x: inputSize.x / inputSize.y,
+      y: inputSize.y / inputSize.x
+    }
+
+    const scaleMin = Math.min(
+      targetSize.x / inputSize.y,
+      targetSize.y / inputSize.x,
+    )
+
+    var size = { ...targetSize }
+    var scale = {
+      x: 1,
+      y: 1
+    }
+
+    // x is smaller than preview
+    if (inputSize.x <= targetSize.x) {
+      size.x = inputSize.x
+      scale.x = scaleMin
+    }
+
+    // x is bigger than preview
+    if (inputSize.x > targetSize.x) {
+      // x is bigger than y
+      if (inputSize.x > inputSize.y) {
+        scale.x = 1
+      } else {
+        scale.x = aspectRatio.x
+      }
+    }
+
+    // y is smaller than preview
+    if (inputSize.y <= targetSize.y) {
+      size.y = inputSize.y
+      scale.y = scaleMin
+    }
+
+    // y is bigger than preview
+    if (inputSize.y > targetSize.y) {
+      // y is bigger than x
+      if (inputSize.y > inputSize.x) {
+        scale.y = 1
+      } else {
+        scale.y = aspectRatio.y
+      }
+    }
+
+    const ratio = {
+      x: (aspectRatio.x > aspectRatio.y ? aspectRatio.x : 1),
+      y: (aspectRatio.y > aspectRatio.x ? aspectRatio.y : 1)
+    }
+
+    const margin = {
+      x: (targetSize.x - (scale.x * size.x)) / 2,
+      y: (targetSize.y - (scale.y * size.y)) / 2
+    }
+
+    return {
+      ratio: ratio,
+      scale: scale,
+      size: size,
+      margin: margin,
+    }
   }
 
   /**
-   * 
-   * @param {XY|null} cursor 
-   * @returns 
+   * Handle rendering the start location on the preview display
    */
   RenderStartPreview(cursor: XY | null = null) {
 
     const formData = this.GetFormData()
     const context = this.PreviewStartCanvas?.getContext('2d')
 
-    if (!formData || !this.PreviewCanvas || !context) return
+    if (!formData || !this.PreviewCanvas || !context || this.PreviewStartCanvas?.width == undefined) return
+
+    context.clearRect(0, 0, this.PreviewSize.x, this.PreviewSize.y)
+
+    const { scale, margin } = this.ScaleToFit(
+      formData.Size,
+      this.PreviewSize
+    )
 
     const scaledStart = {
-      x: formData.Start.x * (this.PreviewCanvas.width / formData?.Size.x),
-      y: formData.Start.y * (this.PreviewCanvas.height / formData?.Size.y)
+      x: (formData.Start.x * scale.x) * (this.PreviewCanvas.width / formData?.Size.x) + margin.x,
+      y: (formData.Start.y * scale.y) * (this.PreviewCanvas.height / formData?.Size.y) + margin.y
     }
 
-    context.clearRect(0, 0, 256, 256)
-
     // render cursor if provided
-    if (cursor != null) this.RenderCursor(context, cursor, scaledStart)
+    if (cursor != null) this.RenderCursor(
+      context,
+      cursor,
+      scaledStart
+    )
 
+    // circle around
     context.beginPath()
     context.globalAlpha = 1
     context.lineWidth = 2
@@ -564,12 +687,13 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     context.closePath()
 
 
+    // center dot
     context.beginPath()
     context.globalAlpha = 1
     context.fillStyle = 'white'
     context.arc(
-      formData.Start.x * (this.PreviewCanvas.width / formData?.Size.x),
-      formData.Start.y * (this.PreviewCanvas.height / formData?.Size.y),
+      scaledStart.x,
+      scaledStart.y,
       3,
       0,
       2 * Math.PI
@@ -579,9 +703,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
   }
 
   /**
-   * @param {CanvasRenderingContext2D} context 
-   * @param {XY} cursor 
-   * @param {XY} scaledStart 
+   * Render Preview Start Cursor,
+   * letting the user know where the mouse is located
    */
   RenderCursor(context: CanvasRenderingContext2D, cursor: XY, scaledStart: XY) {
 
@@ -869,4 +992,14 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
   }
 
 
+}
+
+export type ScaleToFit = {
+  ratio: XY
+  // Scale to fill taret size - more than 1 when the source is smaller than the target
+  scale: XY
+  // Size to fill target size
+  size: XY
+  // Size of margin
+  margin: XY
 }

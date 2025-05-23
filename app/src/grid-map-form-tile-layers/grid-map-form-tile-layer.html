@@ -2,20 +2,26 @@
 
   <!-- Tileset_input -->
   <div class="row input">
-    <label for="##Tileset_id##">Tileset</label>
-    <select id="##Tileset_id##" name="Tileset" data-layer-idx="##TileLayerIdx##"></select>
+    <label for="##Tileset_id##" title="Images to use for layer">Tileset</label>
+    <select
+      data-layer-idx="##TileLayerIdx##"
+      id="##Tileset_id##"
+      name="Tileset">
+    </select>
   </div>
   <!-- Tileset_input -->
 
   <!-- Color_input -->
   <div class="row input">
-    <label for="##Color_id##">Color</label>
+    <label for="##Color_id##" title="Color to target for layer">
+      Color
+    </label>
     <input
       class="console-font"
       data-layer-idx="##TileLayerIdx##"
       id="##Color_id##"
       name="Color"
-      title="Base Tile Color"
+      title="Tile Color"
       type="color"
     />
   </div>
@@ -23,7 +29,9 @@
 
   <!-- CanWalk_input -->
   <div class="row input">
-    <label for="##CanWalk_id##" title="Allow for Walking on the Tile">Can Walk</label>
+    <label for="##CanWalk_id##" title="Allow walking on layer">
+      Can Walk
+    </label>
     <select id="##CanWalk_id##" name="CanWalk" data-layer-idx="##TileLayerIdx##">
       <option value="true">Yes</option>
       <option value="false">No</option>
@@ -33,7 +41,9 @@
 
   <!-- Cutoff_input -->
   <div class="row input section">
-    <label for="##Cutoff_id##" title="Minimum value where the tile is rendered">Cutoff</label>
+    <label for="##Cutoff_id##" title="Minimum value where the tile is rendered">
+      Cutoff Start
+    </label>
     <input
       class="console-font"
       id="##Cutoff_id##"
@@ -50,7 +60,9 @@
 
   <!-- CutoffCap_input -->
   <div class="row input">
-    <label for="##CutoffCap_id##" title="Minimum value where the tile is rendered">Cutoff Cap</label>
+    <label for="##CutoffCap_id##" title="Minimum value where the tile is rendered">
+      Cutoff End
+    </label>
     <input
       class="console-font"
       id="##CutoffCap_id##"
