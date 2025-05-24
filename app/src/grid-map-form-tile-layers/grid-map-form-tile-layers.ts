@@ -81,8 +81,6 @@ export default class GridMapFormTileLayers extends HTMLElement {
 
   /** 
    * Set and Add an Array of TileLayers
-   * 
-   * @param {Array.<TileLayer>} tileLayers
    */
   SetTileLayers(tileLayers: Array<TileLayer>) {
     this.TileLayers = tileLayers
@@ -187,9 +185,6 @@ export default class GridMapFormTileLayers extends HTMLElement {
 
   /**
    * Create the form elements for a layer
-   * 
-   * @param {TileLayerDefault} tileLayer 
-   * @param {number} tileLayerIdx 
    */
   AddLayer(tileLayer: TileLayerDefault, tileLayerIdx: number) {
 
@@ -234,7 +229,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     panel.innerHTML = `${layerMarkup}`
     this.Tabs?.appendChild(panel)
 
-    // <select> tileset
+    // populate options in <select> tileset
     var tileSetSelect: HTMLSelectElement | null = panel.querySelector(`select[name="Tileset"]`)
     if (tileSetSelect != null) {
       this.AvailableTilesets.forEach(
@@ -250,13 +245,14 @@ export default class GridMapFormTileLayers extends HTMLElement {
     // set values
     this.AllInputs.forEach(
       (element) => {
+        // get the input element
         let inputElement: HTMLInputElement | null = panel.querySelector(`input[name="${element}"]`)
+        if(inputElement == null) inputElement = panel.querySelector(`select[name="${element}"]`)
 
-        // @ts-ignore
-        if (inputElement) inputElement.value = tileLayer[element].toString()
-        inputElement = panel.querySelector(`select[name="${element}"]`)
-        // @ts-ignore
-        if (inputElement) inputElement.value = tileLayer[element].toString()
+        const elementRef = tileLayer[element]
+        if(elementRef != undefined && inputElement){
+          inputElement.value = elementRef.toString()
+        }
       }
     )
 
@@ -300,6 +296,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     return html.slice(0, cutStart) + html.slice(cutEnd, html.length)
   }
 
+  // generate a unique id for the element
   CreateID() {
     return 'id_' + Date.now().toString(36) + Math.random().toString(36).substring(2)
   }

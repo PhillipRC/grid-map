@@ -11,15 +11,6 @@ slot {
   flex-shrink: 1;
 }
 
-.sidebar-container {
-  min-width: 350px;
-  width: 350px;
-}
-
-.sidebar grid-map-tiles {
-  display: inline-block;
-}
-
 .sidebar-toggle-bar {
   display: flex;
   flex-direction: column;

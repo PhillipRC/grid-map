@@ -26,7 +26,7 @@ export default class GridBase extends HTMLElement {
   constructor(css: string, html: string) {
     super()
 
-    // load style sheet and template as available
+    // load style sheet and markup into template as available
     const template = document.createElement('template')
     if (css) template.innerHTML = `<style>${css}</style>`
     if (html) template.innerHTML += html

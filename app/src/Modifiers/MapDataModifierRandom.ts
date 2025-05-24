@@ -4,7 +4,7 @@ export default class MapDataModifierRandom {
   /**
    * Force value to be 0 to 1
    */
-  static ConstrainRate(value: number): number {
+  static ConstrainValue(value: number): number {
     if (value < 0 || value > 1) {
       return value = Math.abs(
         Math.sin(value)
@@ -21,7 +21,7 @@ export default class MapDataModifierRandom {
 
     const returnData = new Array(data.length).fill(0)
 
-    rate = MapDataModifierRandom.ConstrainRate(rate)
+    rate = MapDataModifierRandom.ConstrainValue(rate)
 
     data.forEach(
       (value, valueIdx) => {
