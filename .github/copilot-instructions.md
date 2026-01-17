@@ -1,7 +1,7 @@
 # Grid-Map Copilot Instructions
 
 ## Architecture Overview
-This is a Progressive Web App (PWA) for generating and displaying grid-based terrain maps using Perlin noise. The app uses Web Components architecture with TypeScript and Vite.
+This is a Progressive Web App (PWA) for generating and displaying grid-based terrain maps using multiple octaves of Perlin noise. The app uses Web Components architecture with TypeScript and Vite.
 
 - **Main App** (`app/`): Web Components-based UI for map generation, editing, and display
 - **Tile Builder** (`tile-builder/`): Node.js utility for processing SVG tiles from PenPot exports
@@ -19,13 +19,15 @@ Components use Shadow DOM and communicate via custom events (e.g., `GridMapData.
 
 ## Key Patterns
 - **Base Class**: All components extend `GridBase` from `src/shared/grid-base.ts`, which sets up Shadow DOM
-- **Event Communication**: Use `this.dispatchEvent(new CustomEvent(...))` for cross-component messaging
+- **Event Communication**: Use `this.dispatchEvent(new CustomEvent(...))` for cross-component messaging; listen on `document` for global events
 - **Imports**: HTML/CSS imported with `?raw` suffix: `import html from './component.html?raw'`
 - **Naming**: Kebab-case for element names (e.g., `<app-main>`), matching folder names
+- **TypeScript**: Follow `.github/instructions/typescript-5-es2022.instructions.md` for TS5/ES2022 guidelines, pure ES modules, PascalCase for types, camelCase for variables
 
 ## Development Workflow
 - **Dev Server**: `npm run dev` (Vite dev server)
 - **Build**: `npm run build` (TypeScript compilation + Vite build + postbuild script)
+- **Lint**: `npm run lint` (ESLint)
 - **Preview**: `npm run preview` (serve built app)
 - **PWA**: Configured with `vite-plugin-pwa`, assets generated via `@vite-pwa/assets-generator`
 
@@ -33,6 +35,7 @@ Components use Shadow DOM and communicate via custom events (e.g., `GridMapData.
 - `@lion/ui`: UI components (tabs, buttons)
 - `vite-plugin-pwa`: PWA functionality
 - `workbox-window`: Service worker management
+- `xml-js`: SVG manipulation in tile-builder
 
 ## Tile Builder
 Separate Node.js project in `tile-builder/`:
@@ -42,6 +45,8 @@ Separate Node.js project in `tile-builder/`:
 
 ## Key Files
 - `src/app.ts`: Registers all custom elements
-- `src/grid-map-data/grid-map-data.ts`: Central data management
-- `src/types.ts`: TypeScript interfaces (MapData, TileLayer, etc.)
+- `src/grid-map-data/grid-map-data.ts`: Central data management (MapRenderData, events)
+- `src/types.ts`: TypeScript interfaces (MapData, TileLayer, NoiseLayer, etc.)
+- `src/shared/grid-base.ts`: Base class for components (Shadow DOM setup)
 - `app/vite.config.ts`: Vite config with PWA settings
+- `tile-builder/main.js`: Entry point for tile processing
