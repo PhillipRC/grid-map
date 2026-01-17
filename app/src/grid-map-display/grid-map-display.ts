@@ -553,7 +553,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.ClearLayers()
 
-    for (var layerIdx = 0; layerIdx < this.GridMapData.MapData.Layers.length; layerIdx++) {
+    for (let layerIdx = 0; layerIdx < this.GridMapData.MapData.Layers.length; layerIdx++) {
 
       const layer = this.GridMapData.MapData.Layers[layerIdx]
       const tileSet = this.GridMapTiles?.GetTileSetByName(layer.Tileset)!
@@ -631,7 +631,7 @@ export default class GridMapDisplay extends GridBase {
 
     this.ClearLayerStyles()
 
-    for (var layerIdx = 0; layerIdx < this.GridMapData.MapData.Layers.length; layerIdx++) {
+    for (let layerIdx = 0; layerIdx < this.GridMapData.MapData.Layers.length; layerIdx++) {
 
       const layer = this.GridMapData.MapData.Layers[layerIdx]
       const tileSet = this.GridMapTiles?.GetTileSetByName(layer.Tileset)!
@@ -706,7 +706,7 @@ export default class GridMapDisplay extends GridBase {
 
 
   HandleLayerSelected(layerIdx: number) {
-    let tileLayer = this.GridMapData?.MapData?.Layers[layerIdx]
+    const tileLayer = this.GridMapData?.MapData?.Layers[layerIdx]
     if (tileLayer?.Tileset != null && tileLayer?.CanWalk != null) {
       this.SelectedLocationData = {
         Layer: layerIdx,
@@ -1101,7 +1101,7 @@ export default class GridMapDisplay extends GridBase {
 
     if (!this.LayersStyle) return
 
-    for (var idx = this.LayersStyle.childNodes.length; idx > 0; idx--) {
+    for (let idx = this.LayersStyle.childNodes.length; idx > 0; idx--) {
       const node = this.LayersStyle.childNodes.item(idx - 1)
       this.LayersStyle.removeChild(node)
     }
@@ -1518,8 +1518,8 @@ export default class GridMapDisplay extends GridBase {
       this.Layers[layer].RenderedTiles.forEach(
         (tile) => {
           // @ts-ignore
-          let data = this.GridMapData.GetTileData(tile.x, tile.y, layer).SurroundingMapData
-          let mapValue = parseInt(data, 2)
+          const data = this.GridMapData.GetTileData(tile.x, tile.y, layer).SurroundingMapData
+          const mapValue = parseInt(data, 2)
           if (mapValue != tile.value) {
             tilesToRemove.push(tile)
           }
@@ -1579,8 +1579,8 @@ export default class GridMapDisplay extends GridBase {
    */
   RemoveTilesByLayer(tilesToRemove: Array<RenderedTile>, layer: number) {
     // loop through rendered tiles
-    for (var idx = this.Layers[layer].RenderedTiles.length - 1; idx > -1; idx--) {
-      var renderedTile = this.Layers[layer].RenderedTiles[idx]
+    for (let idx = this.Layers[layer].RenderedTiles.length - 1; idx > -1; idx--) {
+      const renderedTile = this.Layers[layer].RenderedTiles[idx]
       // if its on the list to remove - remove it
       if (tilesToRemove.map(t => t.id).indexOf(renderedTile.id) != -1) {
         renderedTile.ref.remove()

@@ -313,7 +313,7 @@ class GridMapTilesets extends HTMLElement {
 
       if (tileSet.Format == 'svg') {
         const svg = await response.text()
-        var svgContainer = document.createElementNS(
+        const svgContainer = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'svg'
         )
@@ -352,14 +352,14 @@ class GridMapTilesets extends HTMLElement {
     // temp canvas to hold the result
     const canvas = new OffscreenCanvas(64, 64)!
 
-    for (var y = 0; y < tileSet.TilesTall; y++) {
+    for (let y = 0; y < tileSet.TilesTall; y++) {
       const marginTop = (tileSet.Margin?.Top ? tileSet.Margin.Top : 0)
 
-      for (var x = 0; x < tileSet.TilesWide; x++) {
+      for (let x = 0; x < tileSet.TilesWide; x++) {
         const marginLeft = (tileSet.Margin?.Left ? tileSet.Margin.Left : 0)
 
         // cut up the sheet blob
-        var tileBmp = await createImageBitmap(
+        const tileBmp = await createImageBitmap(
           sheet,
           marginLeft + (x * scaleX),  // start x
           marginTop + (y * scaleY),  // start y
@@ -420,7 +420,7 @@ class GridMapTilesets extends HTMLElement {
 
     // loop over original tiles
     const tiles = this.Tiles[tileSet.Name] as HTMLImageElement[]
-    for (var tileIdx = 0; tileIdx < tiles.length; tileIdx++) {
+    for (let tileIdx = 0; tileIdx < tiles.length; tileIdx++) {
 
       // canvas to hold output
       const canvas = new OffscreenCanvas(64, 64)!

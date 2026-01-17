@@ -318,8 +318,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     if (!height) height = this.DefaultMap.Height
     if (!start) start = this.DefaultMap.Start
 
-    let widthInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="width"]')
-    let heightInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="height"]')
+    const widthInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="width"]')
+    const heightInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="height"]')
 
     if (widthInput) widthInput.value = width.toString()
     if (heightInput) heightInput.value = height.toString()
@@ -386,8 +386,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
    * @param {XY} start 
    */
   SetStart(start: XY) {
-    let xInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="startx')
-    let yInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="starty')
+    const xInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="startx')
+    const yInput: HTMLInputElement | null | undefined = this.shadowRoot?.querySelector('input[name="starty')
 
     if (xInput) xInput.value = start.x.toString()
     if (yInput) yInput.value = start.y.toString()
@@ -428,7 +428,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
     if (persistence == undefined) persistence = this.DefaultsNoise[noiseLayerDefaultIdx].Persistence
 
     // update the markup with the inputs
-    var noiseLayerMarkup = htmlNoiseLayer.replaceAll('##layer_idx##', (noiseLayerIdx + 1).toString())
+    let noiseLayerMarkup = htmlNoiseLayer.replaceAll('##layer_idx##', (noiseLayerIdx + 1).toString())
     noiseLayerMarkup = noiseLayerMarkup.replaceAll('##noise_seed##', seed.toString())
     noiseLayerMarkup = noiseLayerMarkup.replaceAll('##noise_zoom##', zoom.toString())
     noiseLayerMarkup = noiseLayerMarkup.replaceAll('##noise_octaves##', octaves.toString())
@@ -512,17 +512,17 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
 
             const tileLayerColor: RGBA = this.ConvertColorHexToRGBA(tileLayer.Color)
 
-            for (var x = 0; x < canvasWidth; x++) {
-              for (var y = 0; y < canvasHeight; y++) {
+            for (let x = 0; x < canvasWidth; x++) {
+              for (let y = 0; y < canvasHeight; y++) {
 
-                var value = this.Noise.Perlin2DWithOctaves(
+                const value = this.Noise.Perlin2DWithOctaves(
                   (x / canvasWidth) * zoomX,
                   (y / canvasHeight) * zoomY,
                   layer.Octaves,
                   layer.Persistence
                 )
 
-                var cell = (x + y * canvasWidth) * 4
+                const cell = (x + y * canvasWidth) * 4
 
                 if (!tileLayer.Cutoff || !tileLayer.CutoffCap) return
 
@@ -574,8 +574,8 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
       targetSize.y / inputSize.x,
     )
 
-    var size = { ...targetSize }
-    var scale = {
+    const size = { ...targetSize }
+    const scale = {
       x: 1,
       y: 1
     }
@@ -874,7 +874,7 @@ export default class GridMapDataGenerate extends AppSidebarWidget {
    * @returns {number}
    */
   GetInputValue(formData: FormData, inputName: string): number {
-    var returnValue = formData.get(inputName)?.toString()
+    const returnValue = formData.get(inputName)?.toString()
     if (returnValue == undefined) return 0
     return parseFloat(returnValue)
   }

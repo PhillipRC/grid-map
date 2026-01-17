@@ -109,7 +109,7 @@ export default class GridMapTilesetDisplay extends GridBase {
     // setup container for tiles
     const container = document.createElement('div')
     const columns = this.Tileset.AutoTerrain ? 4 : this.Tileset.TilesWide
-    let zoom = 256 / (columns * this.TileSize.x)
+    const zoom = 256 / (columns * this.TileSize.x)
     container.style.zoom = zoom.toString()
     container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`
 
@@ -129,7 +129,7 @@ export default class GridMapTilesetDisplay extends GridBase {
     this.TileData.forEach(
       (tile) => {
         // create each tile
-        let tileClone = tile.cloneNode(true)
+        const tileClone = tile.cloneNode(true)
         container.appendChild(tileClone)
       }
     )

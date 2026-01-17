@@ -68,7 +68,7 @@ export default class GridMapDataPersist extends AppSidebarWidget {
   /** Load a map from the local file system */
   HandleLoadFileSystemOption() {
 
-    let input = document.createElement('input')
+    const input = document.createElement('input')
     input.type = 'file';
     input.setAttribute('accept', '.json')
     input.addEventListener(
@@ -80,7 +80,7 @@ export default class GridMapDataPersist extends AppSidebarWidget {
 
           if (files.length < 1) return
 
-          var file = files[0]
+          const file = files[0]
           const reader: FileReader = new FileReader()
 
           reader.onload = () => {

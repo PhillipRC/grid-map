@@ -102,7 +102,7 @@ export default class Color {
 
 
   Contrast(): string {
-    var sum = Math.round(
+    const sum = Math.round(
       (
         (this.r * 299) + (this.g * 587) + (this.b * 114)
       ) / 1000
@@ -115,9 +115,9 @@ export default class Color {
 
   static RgbaToHsla(rgba: RGBA): HSLA {
 
-    let r = rgba.r / 255
-    let g = rgba.g / 255
-    let b = rgba.b / 255
+    const r = rgba.r / 255
+    const g = rgba.g / 255
+    const b = rgba.b / 255
     let h, s, l = 0
 
     const max = Math.max(r, g, b)
@@ -153,9 +153,9 @@ export default class Color {
 
   static HslatoRgba(hsla: HSLA): RGBA {
 
-    let h = hsla.h / 360
-    let s = hsla.s / 100
-    let l = hsla.l / 100
+    const h = hsla.h / 360
+    const s = hsla.s / 100
+    const l = hsla.l / 100
     let r, g, b
 
     if (s === 0) {

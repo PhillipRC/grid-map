@@ -57,7 +57,7 @@ export default class GridMapTilesetsDisplay extends AppSidebarWidget {
 
   Clear() {
     if (!this.TilesetDisplay) return
-    for (var idx = this.TilesetDisplay.childNodes.length; idx > 0; idx--) {
+    for (let idx = this.TilesetDisplay.childNodes.length; idx > 0; idx--) {
       const node = this.TilesetDisplay.childNodes.item(idx - 1)
       this.TilesetDisplay.removeChild(node)
     }

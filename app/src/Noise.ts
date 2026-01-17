@@ -130,7 +130,7 @@ export default class Noise {
       seed |= seed << 8
     }
 
-    for (var i = 0; i < 256; i++) {
+    for (let i = 0; i < 256; i++) {
       var v
       if (i & 1) {
         v = this.p[i] ^ (seed & 255)
@@ -179,8 +179,8 @@ export default class Noise {
   perlin2(x: number, y: number): number {
     
     // Find unit grid cell containing point
-    var X = Math.floor(x)
-    var Y = Math.floor(y)
+    let X = Math.floor(x)
+    let Y = Math.floor(y)
     
     // Get relative xy coordinates of point within that cell
     x = x - X
@@ -191,13 +191,13 @@ export default class Noise {
     Y = Y & 255
 
     // Calculate noise contributions from each of the four corners
-    var n00 = this.gradP[X + this.perm[Y]].dot2(x, y)
-    var n01 = this.gradP[X + this.perm[Y + 1]].dot2(x, y - 1)
-    var n10 = this.gradP[X + 1 + this.perm[Y]].dot2(x - 1, y)
-    var n11 = this.gradP[X + 1 + this.perm[Y + 1]].dot2(x - 1, y - 1)
+    const n00 = this.gradP[X + this.perm[Y]].dot2(x, y)
+    const n01 = this.gradP[X + this.perm[Y + 1]].dot2(x, y - 1)
+    const n10 = this.gradP[X + 1 + this.perm[Y]].dot2(x - 1, y)
+    const n11 = this.gradP[X + 1 + this.perm[Y + 1]].dot2(x - 1, y - 1)
 
     // Compute the fade curve value for x
-    var u = this.fade(x)
+    const u = this.fade(x)
 
     // Interpolate the four results
     return this.lerp(
@@ -221,7 +221,7 @@ export default class Noise {
     let frequency = 1
     let amplitude = 1
     let maxValue = 0
-    for (var i = 0; i < octaves; i++) {
+    for (let i = 0; i < octaves; i++) {
       total += this.perlin2(x * frequency, y * frequency) * amplitude
       maxValue += amplitude
       amplitude *= persistence

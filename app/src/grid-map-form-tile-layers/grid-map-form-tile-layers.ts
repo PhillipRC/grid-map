@@ -131,7 +131,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
    */
   AddTabs() {
     if (this.Tabs == null) {
-      var newTab = new LionTabs()
+      const newTab = new LionTabs()
       if (!newTab) return
       this.Tabs = newTab
       this.appendChild(this.Tabs)
@@ -230,7 +230,7 @@ export default class GridMapFormTileLayers extends HTMLElement {
     this.Tabs?.appendChild(panel)
 
     // populate options in <select> tileset
-    var tileSetSelect: HTMLSelectElement | null = panel.querySelector(`select[name="Tileset"]`)
+    const tileSetSelect: HTMLSelectElement | null = panel.querySelector(`select[name="Tileset"]`)
     if (tileSetSelect != null) {
       this.AvailableTilesets.forEach(
         (tileName) => {
