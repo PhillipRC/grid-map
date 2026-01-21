@@ -15,11 +15,11 @@ export class FunctionCallQueue {
     console.debug('FunctionCallQueue.Add()', func.name)
   }
 
-  Clear() {
+  Clear(): void {
     this.queue = []
   }
 
-  async Process() {
+  async Process(): Promise<void> {
     this.isRunning = true
     if (this.queue.length === 0) {
       this.isRunning = false
