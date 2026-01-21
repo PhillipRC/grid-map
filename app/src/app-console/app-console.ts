@@ -20,6 +20,7 @@ export default class GridConsole extends GridBase {
   /** listens: display message on console */
   static LogMessage = 'grid-console-log'
 
+  /** @type {HTMLTextAreaElement | null} */
   Textarea: HTMLTextAreaElement | null = null
 
   /**
@@ -27,6 +28,7 @@ export default class GridConsole extends GridBase {
    */
   Prompt: string = '>> '
 
+  /** @type {string} */
   PromptSpace = '   '
 
 
@@ -37,13 +39,14 @@ export default class GridConsole extends GridBase {
     )
   }
 
-  connectedCallback() {
+  /** Initializes the console component, sets up event listeners and initial state. */
+  connectedCallback(): void {
 
     // only handle once
     if (this.ConnectedCallback) return
     this.ConnectedCallback = true
 
-    this.Textarea = this.shadowRoot?.querySelector('textarea')!
+    this.Textarea = super.GetElementBySelector('textarea') as HTMLTextAreaElement
     this.Textarea.value = ''
     this.Help([])
     this.Textarea.value += `\r${this.Prompt}`
@@ -96,17 +99,20 @@ export default class GridConsole extends GridBase {
 
   }
 
-  ScrollToBottom() {
+  /** Scrolls the textarea to the bottom. */
+  ScrollToBottom(): void {
     if (this.Textarea) this.Textarea.scrollTop = this.Textarea.scrollHeight
   }
 
-  HandleKeydown(event: KeyboardEvent) {
+  /** Handles keydown events, toggles console on backtick. */
+  HandleKeydown(event: KeyboardEvent): void {
     if (event.key == '`') {
       this.HandleConsoleToggle()
     }
   }
 
-  HandleConsoleToggle() {
+  /** Toggles the console display expanded state. */
+  HandleConsoleToggle(): void {
     if (this.getAttribute('expanded')) {
       this.removeAttribute('expanded')
       this.shadowRoot?.querySelector('textarea')?.blur()
@@ -116,7 +122,8 @@ export default class GridConsole extends GridBase {
     }
   }
 
-  async ProcessCommand() {
+  /** Processes the entered command and executes it. */
+  async ProcessCommand(): Promise<void> {
 
     if (!this.Textarea) return
 
@@ -160,11 +167,13 @@ export default class GridConsole extends GridBase {
 
   }
 
-  Clear() {
+  /** Clears the console textarea. */
+  Clear(): void {
     if (this.Textarea) this.Textarea.value = ''
   }
 
-  Help(command: any[]) {
+  /** Displays help information for commands. */
+  Help(command: any[]): void {
 
     if (!this.Textarea) return
 
@@ -195,11 +204,13 @@ export default class GridConsole extends GridBase {
       + this.PromptSpace + ' Help        Command details\r'
   }
 
-  HandleLogMessage(text: string) {
+  /** Logs a message to the console. */
+  HandleLogMessage(text: string): void {
     if (this.Textarea) this.Textarea.value += `\r ${text}`
   }
 
-  Generate() {
+  /** Dispatches event to generate a random map. */
+  Generate(): void {
     document.dispatchEvent(
       new Event(
         GridMapData.EventGenerateRandom,
@@ -208,7 +219,8 @@ export default class GridConsole extends GridBase {
     )
   }
 
-  async Joke() {
+  /** Fetches and displays a dad joke. */
+  async Joke(): Promise<void> {
 
     if (!this.Textarea) return
 

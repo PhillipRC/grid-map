@@ -1,27 +1,31 @@
 import { FunctionCallQueue } from "./FunctionCallQueue"
 
 /**
- * Helper to remove redundant code creating shadowRoot
+ * Base class for all grid map web components that provides common functionality
+ * for Shadow DOM setup, element querying, and SVG manipulation.
  */
 export default class GridBase extends HTMLElement {
-
 
   /**
    * Track if connectedCallback() has been called
    */
   ConnectedCallback: boolean = false
 
-
+  /**
+   * Track if the component has been fully initialized
+   */
   IsInitialized: boolean = false
 
+  /**
+   * Queue for managing function calls
+   */
   Queue = new FunctionCallQueue()
 
-
   /**
-   * Set up a shadowdom with the input CSS and HTML
-   * 
-   * @param {string} css Style Sheet
-   * @param {string} html Markup
+   * Set up a shadow DOM with the input CSS and HTML
+   *
+   * @param css - Style sheet content to include in the shadow DOM
+   * @param html - HTML markup to include in the shadow DOM
    */
   constructor(css: string, html: string) {
     super()
@@ -36,13 +40,27 @@ export default class GridBase extends HTMLElement {
     this.shadowRoot?.appendChild(template.content.cloneNode(true))
   }
 
+  /**
+   * Get an HTMLElement from the shadow DOM by CSS selector
+   *
+   * @param selector - CSS selector string
+   * @returns The found HTMLElement
+   * @throws Error if element not found or not an HTMLElement
+   */
+  GetElementBySelector(selector: string): HTMLElement {
+    const element = this.shadowRoot?.querySelector(selector) ?? null
+    if (element && element instanceof HTMLElement) {
+      return element
+    }
+    throw new Error(`"${selector}" element not found or not an HTMLElement`)
+  }
 
   /**
-   * Create an SVGElement
-   * 
-   * @param {string} tag
-   * @param {Array} attributes
-   * @returns {SVGElement}
+   * Create an SVGElement with the specified tag name and attributes
+   *
+   * @param tag - SVG element tag name (e.g., 'rect', 'circle')
+   * @param attributes - Array of [attributeName, attributeValue] pairs
+   * @returns The created SVGElement with attributes applied
    */
   CreateSvgTag(tag: string, attributes: Array<any>): SVGElement {
     const svg = document.createElementNS(
@@ -50,12 +68,15 @@ export default class GridBase extends HTMLElement {
       tag
     )
     return this.AddAttributesToElement(svg, attributes) as SVGElement
-    
+
   }
 
-
   /**
-   * Add an array of Attributes and Values to a Tag
+   * Add an array of attributes and values to an HTMLElement or SVGElement
+   *
+   * @param tag - The element to add attributes to
+   * @param attributes - Array of [attributeName, attributeValue] pairs
+   * @returns The element with attributes applied
    */
   AddAttributesToElement(tag: HTMLElement | SVGElement, attributes: Array<any>): HTMLElement | SVGElement {
     attributes.forEach(
@@ -69,10 +90,12 @@ export default class GridBase extends HTMLElement {
     return tag
   }
 
-
   /**
-   * @param {string} html 
-   * @returns {Node|null}
+   * Convert HTML string to a DOM Node
+   *
+   * @param html - HTML string containing a single root element
+   * @returns The parsed DOM Node
+   * @throws Error if HTML contains more or less than one node
    */
   HtmlToNode(html: string): Node | null {
     const template = document.createElement('template')
@@ -83,7 +106,5 @@ export default class GridBase extends HTMLElement {
     }
     return template.content.firstChild
   }
-
-
 
 }
