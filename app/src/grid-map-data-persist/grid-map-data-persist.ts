@@ -7,32 +7,42 @@ import css from './grid-map-data-persist.css?raw'
 
 
 /**
+ * Widget responsible for persisting grid map data (save / load).
+ *
+ * @remarks
+ * Extends AppSidebarWidget to provide UI for saving and loading map data to/from the filesystem.
+ * Listens for GridMapData.EventLoaded to capture the current GridMapData instance.
  * @listens GridMapData.EventLoaded
  */
 export default class GridMapDataPersist extends AppSidebarWidget {
 
 
+  /** Reference to the central GridMapData instance (set when loaded). */
   GridMapData: GridMapData | null = null
 
 
-  /**
-   * Option to save to file
-   */
+  /** Button element that triggers saving the map to the filesystem. */
   SaveFileSystemOption: HTMLButtonElement | null = null
 
 
-  /**
-   * Option to load from file
-   */
+  /** Button element that triggers loading a map from the filesystem. */
   LoadFileSystemOption: HTMLButtonElement | null = null
 
 
+  /**
+   * Construct the widget and provide component styles to the base class.
+   */
   constructor() {
     super(css)
   }
 
 
-  connectedCallback() {
+  /**
+   * Connected lifecycle hook.
+   *
+   * Mounts template content and wires UI and global event listeners.
+   */
+  connectedCallback(): void {
 
     super.connectedCallback()
 
@@ -42,8 +52,8 @@ export default class GridMapDataPersist extends AppSidebarWidget {
     const node = this.HtmlToNode(html)
     if (node) this.WidgetContent?.append(node)
 
-    this.LoadFileSystemOption = this.shadowRoot?.querySelector('.load-file')!
-    this.SaveFileSystemOption = this.shadowRoot?.querySelector('.save-file')!
+    this.LoadFileSystemOption = super.GetElementBySelector('.load-file') as HTMLButtonElement
+    this.SaveFileSystemOption = super.GetElementBySelector('.save-file') as HTMLButtonElement
 
     this.LoadFileSystemOption?.addEventListener(
       'click',
@@ -55,65 +65,77 @@ export default class GridMapDataPersist extends AppSidebarWidget {
       () => { this.HandleSaveFileSystemOption() }
     )
 
+    // Listen for the central GridMapData instance being loaded elsewhere in the app.
     document.addEventListener(
       GridMapData.EventLoaded,
-      (customEvent: CustomEventInit<GridMapData>) => {
-        if (customEvent.detail) this.GridMapData = customEvent.detail
+      (evt: Event) => {
+        const customEvent = evt as CustomEvent<GridMapData>
+        if (customEvent?.detail) this.GridMapData = customEvent.detail
       }
     )
 
   }
 
 
-  /** Load a map from the local file system */
-  HandleLoadFileSystemOption() {
+  /**
+   * Prompt the user to select a JSON file and load it into GridMapData.
+   *
+   * @remarks
+   * Creates a temporary file input element to handle file selection.
+   * Parses the selected JSON file and delegates loading to GridMapData.LoadMapData.
+   * Logs errors if JSON parsing fails.
+   * @example
+   * // User clicks load button, selects a valid map.json file
+   * // GridMapData.MapData is updated with the loaded data
+   */
+  HandleLoadFileSystemOption(): void {
 
     const input = document.createElement('input')
     input.type = 'file';
     input.setAttribute('accept', '.json')
     input.addEventListener(
       'change',
-      (event) => {
-        // @ts-ignore
-        const files = event.target.files
-        if (files) {
+      (event: Event) => {
+        // Cast to HTMLInputElement to access `.files` safely
+        const inputEl = event.target as HTMLInputElement | null
+        const files = inputEl?.files
+        if (!files || files.length < 1) return
 
-          if (files.length < 1) return
+        const file = files[0]
+        const reader: FileReader = new FileReader()
 
-          const file = files[0]
-          const reader: FileReader = new FileReader()
-
-          reader.onload = () => {
-            try {
-              if (reader.result) {
-                this.GridMapData?.LoadMapData(
-                  JSON.parse(
-                    reader.result.toString()
-                  )
-                )
-              }
-            } catch (error) {
-              if (error instanceof SyntaxError) {
-                console.error(error.message)
-              } else if (error instanceof Error) {
-                console.error(error.message)
-              } else {
-                console.error(error)
-              }
+        // When the file is loaded, parse and delegate to GridMapData
+        reader.onload = (): void => {
+          try {
+            if (typeof reader.result === 'string') {
+              this.GridMapData?.LoadMapData(JSON.parse(reader.result))
             }
+          } catch (error) {
+            // Log parsing errors concisely
+            console.error(error instanceof Error ? error.message : error)
           }
-          reader.readAsText(file)
         }
+        reader.readAsText(file)
       }
     )
     input.click()
   }
 
 
-  /** Download a map to the local file system */
-  HandleSaveFileSystemOption() {
-    
-    const json = JSON.stringify(this.GridMapData?.MapData, null)
+  /**
+   * Serialize current GridMapData.MapData and trigger a download.
+   *
+   * @remarks
+   * Exports the map data as a JSON file named 'map.json'.
+   * No-op if MapData is unavailable.
+   * @example
+   * // User clicks save button with valid MapData
+   * // A 'map.json' file is downloaded containing the serialized data
+   */
+  HandleSaveFileSystemOption(): void {
+    if (!this.GridMapData?.MapData) return
+
+    const json = JSON.stringify(this.GridMapData.MapData, null)
     const blob = new Blob([json], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -123,7 +145,7 @@ export default class GridMapDataPersist extends AppSidebarWidget {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  
+
   }
 
 
