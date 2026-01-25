@@ -11,6 +11,7 @@ import consoleCss from '../shared/console.css?raw'
  * @fires GridMapData.EventGenerateRandom
  * 
  * @listens GridConsole.ToggleDisplay
+ * @listens GridConsole.LogMessage
  */
 export default class GridConsole extends GridBase {
 

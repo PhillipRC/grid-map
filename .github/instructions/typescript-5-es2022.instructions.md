@@ -112,4 +112,4 @@ applyTo: '**/*.ts'
 - Add JSDoc to public APIs; include `@remarks` or `@example` when helpful.
 - Write comments that capture intent, and remove stale notes during refactors.
 - Update architecture or design docs when introducing significant patterns.
-- Be sure to document all events, both @fires and @listens.
+- Be sure to document all events, both `@fires` and `@listens`.

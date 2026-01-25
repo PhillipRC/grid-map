@@ -6,6 +6,11 @@ const DEFAULT_EASING_COLLAPSE = 'cubic-bezier(0.4, 0, 0.2, 1)'
 /**
  * A custom element that provides animated collapse/expand functionality for its content.
  * Supports vertical and horizontal directions with customizable durations and easings via CSS variables.
+ *
+ * @fires expandstart - Fired when the expand animation starts.
+ * @fires collapsestart - Fired when the collapse animation starts.
+ * @fires expandend - Fired when the expand animation ends.
+ * @fires collapseend - Fired when the collapse animation ends.
  */
 export default class AnimatedCollapse extends HTMLElement {
 

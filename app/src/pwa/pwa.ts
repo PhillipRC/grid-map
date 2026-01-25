@@ -1,6 +1,10 @@
 import { registerSW } from 'virtual:pwa-register'
 
-export function initPWA(app: Element) {
+/**
+ * Initializes the Progressive Web App (PWA) functionality.
+ * @param app - The root element of the application.
+ */
+export function initPWA(app: Element): void {
   const pwaToast = app.querySelector<HTMLDivElement>('#pwa-toast')!
   const pwaToastMessage = pwaToast.querySelector<HTMLDivElement>('.message #toast-message')!
   const pwaCloseBtn = pwaToast.querySelector<HTMLButtonElement>('#pwa-close')!
@@ -8,9 +12,13 @@ export function initPWA(app: Element) {
 
   let refreshSW: (reloadPage?: boolean) => Promise<void> | undefined
 
-  const refreshCallback = () => refreshSW?.(true)
+  const refreshCallback = (): Promise<void> | undefined => refreshSW?.(true)
 
-  function hidePwaToast(raf: boolean) {
+  /**
+   * Hides the PWA toast notification.
+   * @param raf - Indicates if the requestAnimationFrame should be used.
+   */
+  function hidePwaToast(raf: boolean): void {
     if (raf) {
       requestAnimationFrame(() => hidePwaToast(false))
       return
@@ -20,7 +28,12 @@ export function initPWA(app: Element) {
 
     pwaToast.classList.remove('show', 'refresh')
   }
-  function showPwaToast(offline: boolean) {
+
+  /**
+   * Shows the PWA toast notification.
+   * @param offline - Indicates if the app is offline.
+   */
+  function showPwaToast(offline: boolean): void {
     if (!offline)
       pwaRefreshBtn.addEventListener('click', refreshCallback)
     requestAnimationFrame(() => {
@@ -68,9 +81,12 @@ export function initPWA(app: Element) {
 }
 
 /**
- * This function will register a periodic sync check every hour, you can modify the interval as needed.
+ * Registers a periodic sync check for the service worker.
+ * @param period - The interval period in milliseconds for the sync check.
+ * @param swUrl - The URL of the service worker.
+ * @param r - The service worker registration object.
  */
-function registerPeriodicSync(period: number, swUrl: string, r: ServiceWorkerRegistration) {
+function registerPeriodicSync(period: number, swUrl: string, r: ServiceWorkerRegistration): void {
   if (period <= 0) return
 
   setInterval(async () => {

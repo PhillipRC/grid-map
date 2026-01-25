@@ -10,7 +10,7 @@ export class FunctionCallQueue {
 
   constructor() { }
 
-  Add(func: Function, ...args: any) {
+  Add(func: Function, ...args: any): void {
     this.queue.push({ func, args })
     console.debug('FunctionCallQueue.Add()', func.name)
   }
